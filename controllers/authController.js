@@ -1,6 +1,8 @@
 const asyncHandler = require('express-async-handler');
 const bcrypt = require('bcrypt');
 const { validateUserRegister, validateUserLogin, User } = require('../models/User');
+const { DentistProfile } = require('../models/DentistProfile');
+const SickProfile = require('../models/SickProfile');
 
 /**-----------------------------------------------------
  * @desc Register new user (JSON)
@@ -13,32 +15,62 @@ module.exports.createRegisterUser = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: error.details.map(e => e.message).join(', ') });
   }
 
-  const { email, password, username, role, bio, isAdmin, profile_photo } = req.body;
+  const { email, password, firstname, lastname, role, universitynumber } = req.body;
 
+  // Prevent duplicate emails
   const existingUser = await User.findOne({ email });
   if (existingUser) {
     return res.status(400).json({ message: 'This email is already registered' });
   }
 
+  // Hash password
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(password, salt);
 
+  // Create user
   const newUser = new User({
     email,
     password: hashedPassword,
-    username,
-    role,
-    bio,
-    isAdmin: isAdmin || false,
-    profile_photo: {
-      url: profile_photo?.url || 'https://www.bing.com/th/id/OIP.PKlD9uuBX0m4S8cViqXZHAHaHa?w=195&h=211&c=8&rs=1&qlt=90&o=6&cb=12&pid=3.1&rm=2',
-      publicId: profile_photo?.publicId || null
-    }
+    role
   });
 
-  const result = await newUser.save();
-  const { password: _, ...userData } = result._doc;
-  res.status(201).json({ message: 'User registered successfully', data: userData });
+  await newUser.save();
+
+  // Create corresponding profile and link user
+  let profile;
+  if (role === 'dentist') {
+    profile = new DentistProfile({
+      firstname,
+      lastname,
+      universitynumber,
+      user: newUser._id
+    });
+    await profile.save();
+  } else {
+    profile = new SickProfile({
+      firstname,
+      lastname,
+      universitynumber,
+      user: newUser._id
+    });
+    await profile.save();
+  }
+
+
+  // Clean response
+  const { _id, user, createdAt, updatedAt, __v, ...profileData } = profile._doc;
+
+  const userData = {
+    _id: newUser._id,
+    email: newUser.email,
+    role: newUser.role
+    , profileData
+  };
+
+  res.status(201).json({
+    message: 'User registered successfully',
+    data:userData ,
+  });
 });
 
 /**-----------------------------------------------------
@@ -64,7 +96,32 @@ module.exports.loginUser = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: 'Invalid email or password' });
   }
 
-  const { password: _, ...userData } = user._doc;
+  // Fetch profile based on user role
+  let profile;
+  if (user.role === 'dentist') {
+    profile = await DentistProfile.findOne({ user: user._id });
+  } else {
+    profile = await SickProfile.findOne({ user: user._id });
+  }
+
   const token = user.generateToken();
-  res.status(200).json({ message: 'Login successful', data: userData,token });
+
+  if (profile) {
+    const { _id, user: userRef, createdAt, updatedAt, __v, ...rest } = profile._doc;
+    profileData = rest;
+  }
+  
+  
+  const userData = {
+    _id: user._id,
+    email: user.email,
+    role: user.role
+    , profileData
+  };
+
+  res.status(200).json({
+    message: 'Login successful',
+    data:userData,
+    token
+  });
 });
