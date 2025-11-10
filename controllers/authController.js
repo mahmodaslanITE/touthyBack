@@ -12,7 +12,7 @@ const SickProfile = require('../models/SickProfile');
 module.exports.createRegisterUser = asyncHandler(async (req, res) => {
   const { error } = validateUserRegister(req.body);
   if (error) {
-    return res.status(400).json({ message: error.details.map(e => e.message).join(', ') });
+    return res.status(400).json({ status:"error",message: error.details.map(e => e.message).join(', ') });
   }
 
   const { email, password, firstname, lastname, role, universitynumber } = req.body;
@@ -20,7 +20,7 @@ module.exports.createRegisterUser = asyncHandler(async (req, res) => {
   // Prevent duplicate emails
   const existingUser = await User.findOne({ email });
   if (existingUser) {
-    return res.status(400).json({ message: 'This email is already registered' });
+    return res.status(400).json({status:"error",message: 'This email is already registered' });
   }
 
   // Hash password
@@ -68,6 +68,7 @@ module.exports.createRegisterUser = asyncHandler(async (req, res) => {
   };
 
   res.status(201).json({
+    status:"success",
     message: 'User registered successfully',
     data:userData ,
   });
@@ -88,12 +89,12 @@ module.exports.loginUser = asyncHandler(async (req, res) => {
 
   const user = await User.findOne({ email });
   if (!user) {
-    return res.status(400).json({ message: 'Invalid email or password' });
+    return res.status(400).json({ status:"error",message: 'Invalid email or password' });
   }
 
   const isPasswordValid = await bcrypt.compare(password, user.password);
   if (!isPasswordValid) {
-    return res.status(400).json({ message: 'Invalid email or password' });
+    return res.status(400).json({status:"error", message: 'Invalid email or password' });
   }
 
   // Fetch profile based on user role
@@ -120,6 +121,7 @@ module.exports.loginUser = asyncHandler(async (req, res) => {
   };
 
   res.status(200).json({
+    status:"success",
     message: 'Login successful',
     data:userData,
     token

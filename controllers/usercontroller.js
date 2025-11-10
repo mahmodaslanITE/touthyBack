@@ -1,7 +1,96 @@
-const { User } = require("../models/User");
+const asyncHandler = require('express-async-handler');
+const { DentistProfile } = require('../models/DentistProfile');
+const SickProfile = require('../models/SickProfile');
+const path=require('path');
+const { cloudenaryUplodeImage, cloudenaryRemoveImage } = require('../utils/cloudinary');
+const { User } = require('../models/User');
 
-module.exports.getUserProfile= async function (req, res)  {
-    // الوصول إلى بيانات المستخدم من التوكن
-    const user=await User.findById(req.user.id).select('-password')
-    res.json({ message: 'تم التحقق من التوكن', user });
+  /**-----------------------------------------------------
+ * @desc Update user profile (dentist or sick)
+ * @route PUT /api/profile
+ * @access Private
+ ------------------------------------------------------*/
+module.exports.updateUserProfile = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+  const userRole = req.user.role;
+
+  const { firstname, lastname, universitynumber, bio } = req.body;
+
+  let profile;
+
+  if (userRole === 'dentist') {
+    profile = await DentistProfile.findOne({ user: userId });
+  } else if (userRole === 'sick') {
+    profile = await SickProfile.findOne({ user: userId });
+  } else {
+    return res.status(400).json({ message: 'نوع المستخدم غير صالح' });
   }
+
+  if (!profile) {
+    return res.status(404).json({ message: 'الملف الشخصي غير موجود' });
+  }
+
+  // تحديث البيانات
+  if (firstname) profile.firstname = firstname;
+  if (lastname) profile.lastname = lastname;
+  if (universitynumber) profile.universitynumber = universitynumber;
+  if (bio) profile.bio = bio;
+
+  await profile.save();
+
+  const { _id, user, createdAt, updatedAt, __v, ...profileData } = profile._doc;
+
+  res.status(200).json({
+    message: 'تم تحديث الملف الشخصي بنجاح',
+    data: profileData,
+  });
+});
+
+/**-----------------------------------------------------
+ * @desc Update profile photo (dentist or sick)
+ * @route PUT /api/profile/photo
+ * @access Private
+ ------------------------------------------------------*/
+ module.exports.updateProfilePhoto = asyncHandler(async (req, res) => {
+  console.log("📂 Received file:", req.file);
+  if (!req.file) {
+    return res.status(400).json({ message: "No file uploaded" });
+  }
+  //get the path of image
+  const imagepath=path.join(__dirname,`../images/${req.file.filename}`)
+
+  //uplode to cloudinary
+  const result=await cloudenaryUplodeImage(imagepath);
+  console.log(result);
+  //get user 
+  let profile;
+if (req.user.role === 'sick') {
+  profile = await SickProfile.findOne({ user: req.user.id });
+} else {
+  profile = await DentistProfile.findOne({ user: req.user.id });
+}
+
+  //delete the old profile photo
+  if(profile.profile_photo?.default?.publicId){
+    await cloudenaryRemoveImage(profile.profile_photo.default.publicId)
+  }
+  //change the profile photo in the DB
+  profile.profile_photo= {
+    type: Object,
+    default: {
+      publicId: result.public_id,
+      url: result.secure_url
+    }
+  } 
+  await profile.save();
+  // send response to cleint 
+  res.status(200).json({
+    message: "✅ File uploaded successfully",
+    profile_photo:{
+      publicId: result.public_id,
+      url: result.secure_url
+    }
+  });
+});
+
+

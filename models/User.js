@@ -45,15 +45,20 @@ const validateUserRegister = (data) => {
     email: Joi.string().email().required(),
     firstname: Joi.string().min(6).required(),
     lastname: Joi.string().min(6).required(),
-    universitynumber: Joi.string().required(),
+    universitynumber: Joi.string().when('role', {
+      is: 'dentist',
+      then: Joi.required(),
+      otherwise: Joi.optional()
+    }),
     password: Joi.string().min(6).required(),
-    role: Joi.string().valid('dentist', 'sick'),
+    role: Joi.string().valid('dentist', 'sick').required(),
     bio: Joi.string().max(500),
     isAdmin: Joi.boolean()
   }).options({ abortEarly: false });
 
   return schema.validate(data);
 };
+
 
 // Validation for login
 const validateUserLogin = (data) => {
