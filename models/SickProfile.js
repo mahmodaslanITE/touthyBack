@@ -1,12 +1,12 @@
 const mongoose=require('mongoose');
 const profileSchema=mongoose.Schema({
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User',},
-    firstname: {
+    first_name: {
         type: String,
         required: true,
         trim: true
       },
-    lastname: {
+    last_name: {
         type: String,
         required: true,
         trim: true

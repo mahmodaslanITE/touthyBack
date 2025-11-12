@@ -14,7 +14,7 @@ module.exports.updateUserProfile = asyncHandler(async (req, res) => {
   const userId = req.user._id;
   const userRole = req.user.role;
 
-  const { firstname, lastname, universitynumber, bio } = req.body;
+  const { first_name, last_name, university_number, bio } = req.body;
 
   let profile;
 
@@ -31,9 +31,9 @@ module.exports.updateUserProfile = asyncHandler(async (req, res) => {
   }
 
   // تحديث البيانات
-  if (firstname) profile.firstname = firstname;
-  if (lastname) profile.lastname = lastname;
-  if (universitynumber) profile.universitynumber = universitynumber;
+  if (first_name) profile.first_name = first_name;
+  if (last_name) profile.last_name = last_name;
+  if (university_number) profile.university_number = university_number;
   if (bio) profile.bio = bio;
 
   await profile.save();

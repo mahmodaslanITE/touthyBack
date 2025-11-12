@@ -15,7 +15,7 @@ module.exports.createRegisterUser = asyncHandler(async (req, res) => {
     return res.status(400).json({ status:"error",message: error.details.map(e => e.message).join(', ') });
   }
 
-  const { email, password, firstname, lastname, role, universitynumber } = req.body;
+  const { email, password, first_name, last_name, role, university_number } = req.body;
 
   // Prevent duplicate emails
   const existingUser = await User.findOne({ email });
@@ -40,17 +40,17 @@ module.exports.createRegisterUser = asyncHandler(async (req, res) => {
   let profile;
   if (role === 'dentist') {
     profile = new DentistProfile({
-      firstname,
-      lastname,
-      universitynumber,
+      first_name,
+      last_name,
+      university_number,
       user: newUser._id
     });
     await profile.save();
   } else {
     profile = new SickProfile({
-      firstname,
-      lastname,
-      universitynumber,
+      first_name,
+      last_name,
+      university_number,
       user: newUser._id
     });
     await profile.save();
