@@ -43,15 +43,15 @@ UserSchema.methods.generateToken = function () {
 const validateUserRegister = (data) => {
   const schema = Joi.object({
     email: Joi.string().email().required(),
-    firstname: Joi.string().min(6).required(),
-    lastname: Joi.string().min(6).required(),
-    universitynumber: Joi.string().when('role', {
+    first_name: Joi.string().min(6).required(),
+    last_name: Joi.string().min(6).required(),
+    university_number: Joi.string().when('role', {
       is: 'dentist',
       then: Joi.required(),
       otherwise: Joi.optional()
     }),
     password: Joi.string().min(6).required(),
-    role: Joi.string().valid('dentist', 'sick').required(),
+    role: Joi.string().valid('dentist', 'sick'),
     bio: Joi.string().max(500),
     isAdmin: Joi.boolean()
   }).options({ abortEarly: false });
