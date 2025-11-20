@@ -17,8 +17,8 @@ const UserSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['dentist', 'sick'],
-    default: 'sick'
+    enum: ['student', 'patient','overseer'],
+    default: 'patient'
   },
   isAdmin: {
     type: Boolean,
@@ -43,15 +43,15 @@ UserSchema.methods.generateToken = function () {
 const validateUserRegister = (data) => {
   const schema = Joi.object({
     email: Joi.string().email().required(),
-    first_name: Joi.string().min(6).required(),
-    last_name: Joi.string().min(6).required(),
+    first_name: Joi.string().required(),
+    last_name: Joi.string().required(),
     university_number: Joi.string().when('role', {
-      is: 'dentist',
+      is: 'student',
       then: Joi.required(),
       otherwise: Joi.optional()
     }),
     password: Joi.string().min(6).required(),
-    role: Joi.string().valid('dentist', 'sick'),
+    role: Joi.string().valid('student', 'patient'),
     bio: Joi.string().max(500),
     isAdmin: Joi.boolean()
   }).options({ abortEarly: false });

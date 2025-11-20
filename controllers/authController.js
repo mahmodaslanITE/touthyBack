@@ -38,7 +38,7 @@ module.exports.createRegisterUser = asyncHandler(async (req, res) => {
 
   // Create corresponding profile and link user
   let profile;
-  if (role === 'dentist') {
+  if (role === 'student') {
     profile = new DentistProfile({
       first_name,
       last_name,
@@ -99,21 +99,27 @@ module.exports.loginUser = asyncHandler(async (req, res) => {
 
   // Fetch profile based on user role
   let profile;
-  if (user.role === 'dentist') {
+  if (user.role === 'student') {
     profile = await DentistProfile.findOne({ user: user._id });
   } else {
     profile = await SickProfile.findOne({ user: user._id });
   }
 
   const token = user.generateToken();
-
+  let profileData = null;
   if (profile) {
     const { _id, user: userRef, createdAt, updatedAt, __v, ...rest } = profile._doc;
     profileData = rest;
   }
   
   
-  const userData = {
+  const userData =(user.isAdmin)? {
+    _id: user._id,
+    email: user.email,
+    role: user.role,
+    is_admin:true
+    , profileData
+  }:{
     _id: user._id,
     email: user.email,
     role: user.role

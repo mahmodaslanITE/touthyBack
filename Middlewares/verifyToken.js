@@ -2,18 +2,15 @@ const jwt = require('jsonwebtoken');
 
 const verifyToken = (req, res, next) => {
   const authHeader = req.headers.authorization;
-console.log(authHeader)
-console.log(authHeader.startsWith('Bearer '))
+  console.log("token is :",authHeader)
   // التحقق من وجود التوكن
   if (!authHeader /*|| !authHeader.startsWith('Bearer ')*/) {
     return res.status(401).json({ message: 'توكن غير موجود أو غير صالح' });
   }
-
-  const token = authHeader.split(' ')[1];
-
   try {
+    const token = authHeader.split(' ')[1];
     // فك التوكن والتحقق منه
-    const decoded = jwt.verify(authHeader, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     // حفظ بيانات المستخدم في الطلب لاستخدامها لاحقًا
     req.user = decoded;
