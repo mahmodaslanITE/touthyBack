@@ -25,6 +25,13 @@ const { cloudenaryUplodeImage, cloudenaryRemoveImage } = require('../utils/cloud
 
  })
   /**-----------------------------------------------------
+ * @desc Get all profile (dentist or sick)
+ * @route  /api/profile/all
+ * @access Private
+ ------------------------------------------------------*/
+ module.exports.getAllProfile=asyncHandler(async(req,res)=>{
+ })
+  /**-----------------------------------------------------
  * @desc Update user profile (dentist or sick)
  * @route PUT /api/profile
  * @access Private
