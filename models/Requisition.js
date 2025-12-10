@@ -39,7 +39,6 @@ const TreatmentRequestSchema = new mongoose.Schema(
     status: {
       type: String,
       enum: ['pending', 'processing'],
-      required: true
     },
     case_type: {
       type: String,
@@ -67,7 +66,7 @@ const validateTreatmentRequest = (data) => {
         otherwise: Joi.optional()
       }),
       caseImageUrl: Joi.string().uri().optional(),
-      status: Joi.string().valid('pending', 'processing').required(),
+      status: Joi.string().valid('pending', 'processing'),
       case_type: Joi.string().max(100).required(),
       notes: Joi.string().max(1000).optional()
     }).options({ abortEarly: false });

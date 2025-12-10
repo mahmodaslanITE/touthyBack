@@ -24,7 +24,7 @@ exports.createTreatmentRequest = async (req, res) => {
       user: user.id // ربط الطلب بالمستخدم من التوكن
     });
     await request.save();
-    res.status(201).json({status:'succes',message:'creating request succecfuly',request});
+    res.status(201).json({status:'success',message:'creating request succecfuly',request});
   } catch (err) {
     res.status(500).json({ status:'error',message: err.message });
   }
