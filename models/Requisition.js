@@ -29,16 +29,10 @@ const TreatmentRequestSchema = new mongoose.Schema(
     is_regnant: {
       type: Boolean,
     },
-    photo: {
-        type: Object,
-        default: {
-          publicId: null,
-          url: 'https://www.bing.com/th/id/OIP.PKlD9uuBX0m4S8cViqXZHAHaHa?w=195&h=211&c=8&rs=1&qlt=90&o=6&cb=12&pid=3.1&rm=2'
-        }
-      } ,
     status: {
       type: String,
       enum: ['pending', 'processing'],
+      default:'pending'
     },
     case_type: {
       type: String,
@@ -48,7 +42,20 @@ const TreatmentRequestSchema = new mongoose.Schema(
     notes: {
       type: String,
       maxlength: 1000
-    }
+    },
+    age:{
+type:String,
+required:true,
+
+    },
+    photo: {
+        type: Object,
+        default: {
+          publicId: null,
+          url: 'https://www.bing.com/th/id/OIP.PKlD9uuBX0m4S8cViqXZHAHaHa?w=195&h=211&c=8&rs=1&qlt=90&o=6&cb=12&pid=3.1&rm=2'
+        }
+      },
+    
   },
   { timestamps: true }
 );
@@ -57,6 +64,7 @@ const validateTreatmentRequest = (data) => {
       pain_severity: Joi.number().integer().min(0).max(10).required(),
       pain_time: Joi.string().required(),
       tooth_location: Joi.string().max(50).required(),
+      age:Joi.string().required(),
       gender: Joi.string().valid('male', 'female', 'unknown').required(),
       is_regnant: Joi.boolean().when('gender', {
         is: 'female',
