@@ -68,7 +68,7 @@ module.exports.updateUserProfile = asyncHandler(async (req, res) => {
   const { _id, user, createdAt, updatedAt, __v, ...profileData } = profile._doc;
 
   res.status(200).json({
-    status:"succes",
+    status:"success",
     message: 'تم تحديث الملف الشخصي بنجاح',
     data: profileData,
   });
@@ -79,46 +79,45 @@ module.exports.updateUserProfile = asyncHandler(async (req, res) => {
  * @route PUT /api/profile/photo
  * @access Private
  ------------------------------------------------------*/
- module.exports.updateProfilePhoto = asyncHandler(async (req, res) => {
+const fs = require("fs");
+
+module.exports.updateProfilePhoto = asyncHandler(async (req, res) => {
   console.log("📂 Received file:", req.file);
   if (!req.file) {
     return res.status(400).json({ message: "No file uploaded" });
   }
-  //get the path of image
-  const imagepath=path.join(__dirname,`../images/${req.file.filename}`)
 
-  //uplode to cloudinary
-  const result=await cloudenaryUplodeImage(imagepath);
-  console.log(" upload photo to cludinary",result);
-  //get user 
+  // المسار المحلي للصورة
+  const imagePath = path.join(__dirname, `../images/${req.file.filename}`);
+
+  // الحصول على البروفايل حسب نوع المستخدم
   let profile;
-if (req.user.role === 'patient') {
-  profile = await SickProfile.findOne({ user: req.user.id });
-} else {
-  profile = await DentistProfile.findOne({ user: req.user.id });
-}
-
-  //delete the old profile photo
-  if(profile.profile_photo?.default?.publicId){
-    await cloudenaryRemoveImage(profile.profile_photo.default.publicId)
+  if (req.user.role === "patient") {
+    profile = await SickProfile.findOne({ user: req.user.id });
+  } else {
+    profile = await DentistProfile.findOne({ user: req.user.id });
   }
-  //change the profile photo in the DB
-  profile.profile_photo= {
-    type: Object,
-    default: {
-      publicId: result.public_id,
-      url: result.secure_url
+
+  // حذف الصورة القديمة من السيرفر إذا كانت موجودة
+  if (profile.profile_photo?.url) {
+    const oldImagePath = path.join(__dirname, `../images/${path.basename(profile.profile_photo.url)}`);
+    if (fs.existsSync(oldImagePath)) {
+      fs.unlinkSync(oldImagePath);
     }
-  } 
+  }
+
+  // تحديث الصورة الجديدة في قاعدة البيانات
+  profile.profile_photo = {
+    url: `/images/${req.file.filename}` // رابط نسبي يمكن استخدامه في الواجهة الأمامية
+  };
+
   await profile.save();
-  // send response to cleint 
+
+  // إرسال الرد للعميل
   res.status(200).json({
     message: "✅ File uploaded successfully",
-    profile_photo:{
-      publicId: result.public_id,
-      url: result.secure_url
+    profile_photo: {
+      url: `/images/${req.file.filename}`
     }
   });
 });
-
-

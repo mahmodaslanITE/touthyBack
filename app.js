@@ -7,7 +7,6 @@ const socket = require('./socket/init');
 
 dotenv.config();
 
-const { Server } = require('socket.io');
 const app = express();
 const server = http.createServer(app);
 
@@ -16,7 +15,6 @@ app.use(express.json());
 
 // جعل مجلد الصور متاح
 app.use('/images', express.static(path.join(__dirname, 'images')));
-
 // راوتر المستخدمين
 app.use('/api/users', userRoutes);
 app.use('/api/auth/', require('./routes/auth'));

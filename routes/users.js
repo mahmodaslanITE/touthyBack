@@ -3,11 +3,12 @@ const router = express.Router();
 const upload = require('../Middlewares/upload');
 const verifyToken = require('../Middlewares/verifyToken');
 const { updateProfilePhoto, updateUserProfile, showUserProfile } = require('../controllers/usercontroller');
-//update user profile
-// router.put('/',verifyToken,updat)
-// Controller مؤقت لرفع الصورة
+
+// update profile photo
 router.put('/photo', verifyToken, upload.single('file'),updateProfilePhoto);
-router.put('/', verifyToken, upload.single('file'),updateUserProfile);
+
+// update user profile
+router.put('/', verifyToken,updateUserProfile);
 
 //show User Profile
 router.get('/',verifyToken,showUserProfile)

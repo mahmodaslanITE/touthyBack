@@ -1,0 +1,8 @@
+http://localhost:5000/api/request Post ***********add request 
+http://localhost:5000/api/request get ***********show all request 
+http://localhost:5000/api/request/accept/id ***********Post accept request 
+http://localhost:5000/api/auth/login Post *********login
+ http://localhost:5000/api/auth/register Post *********register 
+http://localhost:5000/api/profile Put *********apdate profile 
+http://localhost:5000/api/user/photo Put *********update profile photo 
+http://localhost:5000/api/request/my ********* show my requset
