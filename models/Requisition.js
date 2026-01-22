@@ -26,7 +26,7 @@ const TreatmentRequestSchema = new mongoose.Schema(
       enum: ['male', 'female', 'unknown'],
       required: true
     },
-    is_regnant: {
+    is_pregnant: {
       type: Boolean,
     },
     status: {
@@ -66,7 +66,7 @@ const validateTreatmentRequest = (data) => {
       tooth_location: Joi.string().max(50).required(),
       age:Joi.string().required(),
       gender: Joi.string().valid('male', 'female', 'unknown').required(),
-      is_regnant: Joi.boolean().when('gender', {
+      is_pregnant: Joi.boolean().when('gender', {
         is: 'female',
         then: Joi.required().messages({
           'any.required': 'حقل الحمل مطلوب إذا كان الجنس أنثى'
@@ -74,7 +74,6 @@ const validateTreatmentRequest = (data) => {
         otherwise: Joi.optional()
       }),
       caseImageUrl: Joi.string().uri().optional(),
-      status: Joi.string().valid('pending', 'processing'),
       case_type: Joi.string().max(100).required(),
       notes: Joi.string().max(1000).optional()
     }).options({ abortEarly: false });

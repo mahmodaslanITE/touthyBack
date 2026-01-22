@@ -5,7 +5,7 @@ const verifyToken = require('../Middlewares/verifyToken');
 const { updateProfilePhoto, updateUserProfile, showUserProfile } = require('../controllers/usercontroller');
 
 // update profile photo
-router.put('/photo', verifyToken,uploadProfilePhoto.single('photo'),updateProfilePhoto);
+router.put('/photo', verifyToken,uploadProfilePhoto.single('profile_photo'),updateProfilePhoto);
 
 // update user profile
 router.put('/', verifyToken,updateUserProfile);

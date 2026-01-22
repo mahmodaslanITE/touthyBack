@@ -23,5 +23,5 @@ const profileSchema=mongoose.Schema({
         }
       } 
 })
-const SickProfile=mongoose.model('SickProfile',profileSchema)
-module.exports=SickProfile
+const Patient_profil=mongoose.model('Patient_profil',profileSchema)
+module.exports=Patient_profil

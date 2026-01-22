@@ -1,0 +1,306 @@
+{
+	"info": {
+		"_postman_id": "0b2dd5c1-996a-4050-ade5-32084c7fcf02",
+		"name": "firtst-project",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "49497533",
+		"_collection_link": "https://mahmodaslan2002-9607887.postman.co/workspace/mahmoudAslan's-Workspace~3cfc4b32-b2b1-4f9e-84d9-e4b2c30fa6dd/collection/49497533-0b2dd5c1-996a-4050-ade5-32084c7fcf02?action=share&source=collection_link&creator=49497533"
+	},
+	"item": [
+		{
+			"name": "user",
+			"item": [
+				{
+					"name": "profile-photo",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5MDM3MzhkOGNkZmExNGIyZGQ4NmZiMyIsInJvbGUiOiJzaWNrIiwiaXNBZG1pbiI6ZmFsc2UsImlhdCI6MTc2MTgzNDkyMSwiZXhwIjoxNzYyNDM5NzIxfQ.36Se1TkLwBnaVL5O9wkgZjSkWgL7wOHHRediDvNCpxk",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "postman-cloud:///1f0b74cf-9b8a-42f0-b5f1-d792c863d08f"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:5000/api/users/photo",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"users",
+								"photo"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update user profile",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5000/api/users",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "show my profile",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5000/api/users",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "request",
+			"item": [
+				{
+					"name": "creat-request",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5Mjk1Y2UzODM5OGQzNWE2YWNiYjY1NCIsInJvbGUiOiJzdHVkZW50IiwiaXNBZG1pbiI6ZmFsc2UsImlhdCI6MTc2Nzc5ODE4NiwiZXhwIjoxNzY4NDAyOTg2fQ.-54C4D1zj31GWYKQQOiQV-2w18yAhMbbJh0_cl3F9bI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "age",
+									"value": "20",
+									"type": "text"
+								},
+								{
+									"key": "pain_severity",
+									"value": "9",
+									"type": "text"
+								},
+								{
+									"key": "pain_time",
+									"value": "all",
+									"type": "text"
+								},
+								{
+									"key": "tooth_location",
+									"value": "20",
+									"type": "text"
+								},
+								{
+									"key": "gender",
+									"value": "female",
+									"type": "text"
+								},
+								{
+									"key": "case_type",
+									"value": "sex",
+									"type": "text"
+								},
+								{
+									"key": "is_regnant",
+									"value": "true",
+									"type": "text"
+								},
+								{
+									"key": "photo",
+									"type": "file",
+									"src": "postman-cloud:///1f0ed7ab-e3e9-41d0-bdd2-9e589dff471f"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:5000/api/request",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"request"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "accept request",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "?date&hour&location",
+							"query": [
+								{
+									"key": "date",
+									"value": null
+								},
+								{
+									"key": "hour",
+									"value": null
+								},
+								{
+									"key": "location",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "show all request",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5000/api/request",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"request"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "show my requests",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "auth",
+			"item": [
+				{
+					"name": "register",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n   \"email\":\"mahmoudaslanstudent@gmail.com\",\r\n   \"password\":\"12345678\",\r\n   \"first_name\":\"mahmoud\",\r\n   \"last_name\":\"aslan\",\r\n   \"role\":\"student\",\r\n   \"university_number\":\"1234\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5000/api/auth/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"mahmoudaslan@gmail.com\",\r\n    \"password\":\"12345678\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5000/api/auth/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

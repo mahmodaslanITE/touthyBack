@@ -28,5 +28,5 @@ const profileSchema=mongoose.Schema({
         }
       } 
 })
-const DentistProfile=mongoose.model('DentistProfile',profileSchema)
-module.exports={DentistProfile}
+const Student_profile=mongoose.model('Student_profile',profileSchema)
+module.exports=Student_profile
