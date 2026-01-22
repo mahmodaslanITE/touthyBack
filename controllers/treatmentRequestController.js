@@ -1,34 +1,51 @@
 const { TreatmentRequest, validateTreatmentRequest } = require('../models/Requisition');
 const asyncHandler=require('express-async-handler')
-/**
- -----------------------------------------------------------------------------
- * @desc add new requistion
- * @route api/requestion
- * @method POST
- * @access private
- -----------------------------------------------------------------------------*/
+// controllers/treatmentRequestController.js
+
 exports.createTreatmentRequest = async (req, res) => {
-  const user = req.user
+  const user = req.user;
   if (!user) {
     return res.status(401).json({ error: 'توكن غير صالح أو غير موجود' });
   }
 
+  // التحقق من البيانات النصية القادمة من FormData
   const { error } = validateTreatmentRequest(req.body);
   if (error) {
     return res.status(400).json({ errors: error.details.map(d => d.message) });
   }
 
   try {
+    // تجهيز بيانات الصورة إذا تم رفعها
+    let photoData = {
+      publicId: null,
+      url: 'https://www.bing.com/th/id/OIP.PKlD9uuBX0m4S8cViqXZHAHaHa?w=195&h=211&c=8&rs=1&qlt=90&o=6&cb=12&pid=3.1&rm=2'
+    };
+
+    if (req.file) {
+      photoData = {
+        publicId: null,
+        url: `/images/requests/${req.file.filename}` // المسار المحلي للصورة
+      };
+      console.log(req.file.filename)
+    }
+
     const request = new TreatmentRequest({
       ...req.body,
-      user: user.id // ربط الطلب بالمستخدم من التوكن
+      user: user.id, // ربط الطلب بالمستخدم من التوكن
+      photo: photoData
     });
+
     await request.save();
-    res.status(201).json({status:'success',message:'creating request succecfuly',request});
+    res.status(201).json({
+      status: 'success',
+      message: 'تم إنشاء الطلب بنجاح',
+      request
+    });
   } catch (err) {
-    res.status(500).json({ status:'error',message: err.message });
+    res.status(500).json({ status: 'error', message: err.message });
   }
 };
+
 
 /**-----------------------------------------------------------------------------
  * @desc show My requestions

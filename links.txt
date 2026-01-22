@@ -1,8 +1,76 @@
-http://localhost:5000/api/request Post ***********add request 
-http://localhost:5000/api/request get ***********show all request 
-http://localhost:5000/api/request/accept/id ***********Post accept request 
-http://localhost:5000/api/auth/login Post *********login
- http://localhost:5000/api/auth/register Post *********register 
-http://localhost:5000/api/profile Put *********apdate profile 
-http://localhost:5000/api/user/photo Put *********update profile photo 
-http://localhost:5000/api/request/my ********* show my requset
+1: register 
+{
+    link:http://localhost:5000/api/auth/register
+    method: post 
+    parameters:{email, password,first_name,last_name,role,university_number}
+}
+********************************************************************************
+ 2: login
+{
+    link:http://localhost:5000/api/auth/login
+    method: post 
+    parameters:{email, password}
+}
+********************************************************************************
+3:update user profile
+{
+    link:http://localhost:5000/api/users
+    method: Put
+    parameters:{email, password,first_name,last_name,role,university_number} (NR)
+}
+ ********************************************************************************
+4:update profile photo
+{
+    link:http://localhost:5000/api/users/photo
+    method: put
+    parameters:{photo}
+}
+ ********************************************************************************
+ 5:show User Profile
+{
+    link:http://localhost:5000/api/users
+    method: get
+    parameters:null
+}
+  ********************************************************************************
+6:add request
+{
+    link:http://localhost:5000/api/request
+    method: post
+    parameters:{age,pain_severity,pain_time,tooth_location,gender,case_type,is_regnant(if gender=female),photo}
+}
+  ********************************************************************************
+ 7: accept request
+{
+    link:http://localhost:5000/api/request/accept/{id}
+    method: post
+    parameters:{date,hour,location}
+}
+  ********************************************************************************
+ 7: accept request
+{
+    link:http://localhost:5000/api/request/accept/{id}
+    method: post
+    parameters:{date,hour,location}
+}
+  ********************************************************************************
+ 7: accept request
+{
+    link:http://localhost:5000/api/request/accept/{id}
+    method: post
+    parameters:{date,hour,location}
+}
+  ********************************************************************************
+ 7: accept request
+{
+    link:http://localhost:5000/api/request/accept/{id}
+    method: post
+    parameters:{date,hour,location}
+}
+  ********************************************************************************
+ 7: accept request
+{
+    link:http://localhost:5000/api/request/accept/{id}
+    method: post
+    parameters:{date,hour,location}
+}

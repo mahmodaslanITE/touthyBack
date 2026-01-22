@@ -82,13 +82,10 @@ module.exports.updateUserProfile = asyncHandler(async (req, res) => {
 const fs = require("fs");
 
 module.exports.updateProfilePhoto = asyncHandler(async (req, res) => {
-  console.log("📂 Received file:", req.file);
   if (!req.file) {
     return res.status(400).json({ message: "No file uploaded" });
   }
 
-  // المسار المحلي للصورة
-  const imagePath = path.join(__dirname, `../images/${req.file.filename}`);
 
   // الحصول على البروفايل حسب نوع المستخدم
   let profile;
@@ -100,7 +97,7 @@ module.exports.updateProfilePhoto = asyncHandler(async (req, res) => {
 
   // حذف الصورة القديمة من السيرفر إذا كانت موجودة
   if (profile.profile_photo?.url) {
-    const oldImagePath = path.join(__dirname, `../images/${path.basename(profile.profile_photo.url)}`);
+    const oldImagePath = path.join(__dirname, `../profile/images/${path.basename(profile.profile_photo.url)}`);
     if (fs.existsSync(oldImagePath)) {
       fs.unlinkSync(oldImagePath);
     }
@@ -108,16 +105,17 @@ module.exports.updateProfilePhoto = asyncHandler(async (req, res) => {
 
   // تحديث الصورة الجديدة في قاعدة البيانات
   profile.profile_photo = {
-    url: `/images/${req.file.filename}` // رابط نسبي يمكن استخدامه في الواجهة الأمامية
+    url: `profile/images/${req.file.filename}` // رابط نسبي يمكن استخدامه في الواجهة الأمامية
   };
 
   await profile.save();
 
   // إرسال الرد للعميل
   res.status(200).json({
-    message: "✅ File uploaded successfully",
+    status:"success",
+    message: " File uploaded successfully",
     profile_photo: {
-      url: `/images/${req.file.filename}`
+      url: `/images/profile/${req.file.filename}`
     }
   });
 });
