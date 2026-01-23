@@ -32,15 +32,12 @@ if(user.role!='patient'){
     message:'you are not allowed only patients'
   })
 }
-  let photoData = {
-    publicId: null,
-    url: 'https://www.bing.com/th/id/OIP.PKlD9uuBX0m4S8cViqXZHAHaHa?w=195&h=211&c=8&rs=1&qlt=90&o=6&cb=12&pid=3.1&rm=2'
-  };
+  let photoData=null
 
   if (req.file) {
     photoData = {
       publicId: null,
-      url: `/images/requests/${req.file.filename}`
+      url: `images/requests/${req.file.filename}`
     };
   }
 

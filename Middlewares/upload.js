@@ -23,7 +23,9 @@ const storageRequest = multer.diskStorage({
 
 // فلتر للتحقق من نوع الملف
 const fileFilter = (req, file, cb) => {
-    if (file.mimetype.startsWith('image')) {
+    const allowedExtensions=['.jpg','.jpeg','.png','.gif','webp','bmp'];
+    const extentions=file.originalname.toLowerCase().match(/\.[0-9a-z]+$/)?.[0] || '';
+    if (allowedExtensions.includes(extentions)) {
         cb(null, true);
     } else {
         cb(new Error('File type not supported'), false);

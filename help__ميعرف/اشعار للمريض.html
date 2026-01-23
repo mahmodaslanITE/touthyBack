@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>تجربة إشعارات Socket.IO</title>
+  <!-- مكتبة socket.io من الـ CDN -->
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+</head>
+<body>
+  <h1>واجهة المريض</h1>
+  <p>انتظر إشعار عند قبول الحالة...</p>
+
+  <script>
+    // الاتصال بالسيرفر
+    const socket = io("http://localhost:5000", {
+      transports: ["websocket"], // يجبر الاتصال عبر websocket
+    });
+
+    // عند الاتصال
+    socket.on("connect", () => {
+      console.log("متصل بالسيرفر عبر socket.io, id:", socket.id);
+
+      // سجل المريض بغرفته (ضع معرف المريض الحقيقي هنا)
+      const patientId = '691b3b60e65f802df9629312'; 
+      socket.emit("registerPatient", patientId);
+    });
+
+    // استقبال الإشعار من السيرفر
+    socket.on("requestAccepted", (data) => {
+      console.log("وصل إشعار:", data);
+      alert(data.message);
+    });
+
+    // عند انقطاع الاتصال
+    socket.on("disconnect", () => {
+      console.log("تم قطع الاتصال مع السيرفر");
+    });
+  </script>
+</body>
+</html>
