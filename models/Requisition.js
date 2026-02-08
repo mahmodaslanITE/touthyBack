@@ -77,9 +77,29 @@ const validateTreatmentRequest = (data) => {
       case_type: Joi.string().max(100).required(),
       notes: Joi.string().max(1000).optional()
     }).options({ abortEarly: false });
+    return schema.validate(data)
+  }
+const validateUpdateRequest = (data) => {
+    const schema = Joi.object({
+      pain_severity: Joi.number().integer().min(0).max(10),
+      pain_time: Joi.string(),
+      tooth_location: Joi.string().max(50),
+      age:Joi.string(),
+      gender: Joi.string().valid('male', 'female', 'unknown'),
+      is_pregnant: Joi.boolean().when('gender', {
+        is: 'female',
+        then: Joi.required().messages({
+          'any.required': 'حقل الحمل مطلوب إذا كان الجنس أنثى'
+        }),
+        otherwise: Joi.optional()
+      }),
+      caseImageUrl: Joi.string().uri().optional(),
+      case_type: Joi.string().max(100),
+      notes: Joi.string().max(1000).optional()
+    }).options({ abortEarly: false });
   
     return schema.validate(data);
   };
 
  const TreatmentRequest= mongoose.model('TreatmentRequest', TreatmentRequestSchema);
-module.exports ={TreatmentRequest,validateTreatmentRequest}
+module.exports ={TreatmentRequest,validateTreatmentRequest,validateUpdateRequest};

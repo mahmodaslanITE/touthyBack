@@ -1,4 +1,4 @@
-const { TreatmentRequest, validateTreatmentRequest } = require('../models/Requisition');
+const { TreatmentRequest, validateTreatmentRequest, validateUpdateRequest } = require('../models/Requisition');
 const asyncHandler = require('express-async-handler');
 const socket = require('../socket/init');
 
@@ -73,14 +73,158 @@ exports.getUserTreatmentRequests = asyncHandler(async (req, res) => {
   });
 });
 
+/**________________________________________________________________________________
+ * @desc update the requestion until it is pending
+ * @route Put /api/requestion/:id
+ * @access private
+ *_____________________________________________________________________
+ */
+ module.exports.updateRequest = asyncHandler(async (req, res) => {
+  const userId = req.user.id;
+  const role = req.user.role;
+
+  // check role
+  if (role !== 'patient') {
+    return res.status(403).json({
+      status: 'error',
+      message: 'انت مش مريض علشان تعدل الحالة'
+    });
+  }
+
+  // find request
+  const request = await TreatmentRequest.findById(req.params.id);
+
+  // check if request exists
+  if (!request) {
+    return res.status(404).json({
+      status: 'error',
+      message: 'الحالة غير موجودة'
+    });
+  }
+
+  // check ownership
+  if (request.user!= userId) {
+    return res.status(403).json({
+      status: 'error',
+      message: 'هذه الحالة ليست لك'
+    });
+  }
+
+  // check status
+  if (request.status !== 'pending') {
+    return res.status(403).json({
+      status: 'error',
+      message: 'لا يمكن تعديل الحالة بعد قبولها أو رفضها'
+    });
+  }
+
+  // validate body
+  const { error } = validateUpdateRequest(req.body);
+  if (error) {
+    return res.status(400).json({
+      status: 'error',
+      message: error.details[0].message
+    });
+  }
+
+  // update fields
+  const {
+    pain_severity,
+    pain_time,
+    tooth_location,
+    gender,
+    is_pregnant,
+    case_type,
+    notes,
+    age
+  } = req.body;
+
+  if (pain_severity !== undefined) request.pain_severity = pain_severity;
+  if (pain_time !== undefined) request.pain_time = pain_time;
+  if (tooth_location !== undefined) request.tooth_location = tooth_location;
+  if (gender !== undefined) request.gender = gender;
+  if (is_pregnant !== undefined) request.is_pregnant = is_pregnant;
+  if (case_type !== undefined) request.case_type = case_type;
+  if (notes !== undefined) request.notes = notes;
+  if (age !== undefined) request.age = age;
+
+  // update photo if exists
+  if (req.file) {
+    request.photo = {
+      url: `images/requests/${req.file.filename}`
+    };
+  }
+
+  await request.save();
+
+  res.status(200).json({
+    status: 'success',
+    message: 'تم التعديل بنجاح',
+    data: request
+  });
+});
+
 /**-----------------------------------------------------
+ * @desc delete requests
+ * @route DELETE /api/requestion
+ * @access Private
+/**-----------------------------------------------------*/
+ module.exports.deleteRequest = asyncHandler(async (req, res) => {
+  const userId = req.user.id;
+  const role = req.user.role;
+
+  // check role
+  if (role !== 'patient') {
+    return res.status(403).json({
+      status: 'error',
+      message: 'انت مش مريض علشان تحذف الحالة'
+    });
+  }
+
+  // find request
+  const request = await TreatmentRequest.findById(req.params.id);
+
+  // check if request exists
+  if (!request) {
+    return res.status(404).json({
+      status: 'error',
+      message: 'الحالة غير موجودة'
+    });
+  }
+
+// check ownership
+if (request.user!= userId) {
+  return res.status(403).json({
+    status: 'error',
+    message: 'هذه الحالة ليست لك'
+  });
+}
+
+  // check status (optional but recommended)
+  if (request.status !== 'pending') {
+    return res.status(403).json({
+      status: 'error',
+      message: 'لا يمكن حذف الحالة بعد قبولها أو رفضها'
+    });
+  }
+
+  // delete request
+  await request.deleteOne();
+
+  res.status(200).json({
+    status: 'success',
+    message: 'تم حذف الحالة بنجاح'
+  });
+});
+
+/*
  * @desc Show all requests
  * @route GET /api/requestion
  * @access Private
  ------------------------------------------------------*/
 module.exports.showAllRequesyions = asyncHandler(async (req, res) => {
   const userId = req.user.id;
-  const role = req.user.role;
+  const role = req.user.role;n
 
   if (!userId) {
     return res.status(403).json({

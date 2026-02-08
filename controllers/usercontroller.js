@@ -12,7 +12,7 @@ const Patient_profile = require('../models/Patient_profile');
  ------------------------------------------------------*/
 module.exports.showUserProfile = asyncHandler(async (req, res) => {
   const userId = req.user.id;
-  const userRole = req.user.role;
+  const userRole = req.user.role; 
 
   let profile;
 

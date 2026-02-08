@@ -1,6 +1,6 @@
 const express=require('express');
 const verifyToken = require('../Middlewares/verifyToken');
-const { createTreatmentRequest, showAllRequesyions, getUserTreatmentRequests, acceptRequest } = require('../controllers/treatmentRequestController');
+const { createTreatmentRequest, showAllRequesyions, getUserTreatmentRequests, acceptRequest, updateRequest, deleteRequest } = require('../controllers/treatmentRequestController');
 const { uploadRequestPhoto } = require('../Middlewares/upload');
 const router=express.Router();
 //add request
@@ -14,4 +14,10 @@ router.get('/my',verifyToken,getUserTreatmentRequests);
 
 // the student  can accept requests
 router.post('/accept/:id',verifyToken,acceptRequest)
+
+//update the requests
+router.put('/:id',verifyToken,uploadRequestPhoto.single('photo'),updateRequest)
+
+//delete request
+router.delete('/:id',verifyToken,deleteRequest)
 module.exports=router
