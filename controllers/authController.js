@@ -20,7 +20,7 @@ module.exports.createRegisterUser = asyncHandler(async (req, res) => {
     });
   }
 
-  const { email, password, first_name, last_name, role, university_number } = req.body;
+  const { email, password, first_name, last_name,father_name, role, university_number,gender } = req.body;
 
   // منع تكرار الإيميل
   const existingUser = await User.findOne({ email });
@@ -49,16 +49,20 @@ module.exports.createRegisterUser = asyncHandler(async (req, res) => {
   if (role === 'student') {
     profile = new Student_profile({
       first_name,
+      father_name,
       last_name,
       university_number,
-      user: newUser._id
+      user: newUser._id,
+      gender
     });
   } else if (role === 'patient') {
     profile = new Patient_profile({
       first_name,
+      father_name,
       last_name,
       university_number,
-      user: newUser._id
+      user: newUser._id,
+      gender
     });
   } else {
     return res.status(400).json({
@@ -139,7 +143,8 @@ module.exports.loginUser = asyncHandler(async (req, res) => {
         email: user.email,
         role: user.role,
         is_admin: true,
-        profileData
+        profileData,
+        
       }
     : {
         _id: user._id,

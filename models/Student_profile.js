@@ -1,3 +1,4 @@
+const { required } = require('joi');
 const mongoose=require('mongoose');
 const profileSchema=mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
@@ -7,6 +8,11 @@ const profileSchema=mongoose.Schema({
         trim: true
       },
   first_name: {
+        type: String,
+        required: true,
+        trim: true
+      },
+      father_name:{
         type: String,
         required: true,
         trim: true
@@ -26,7 +32,10 @@ const profileSchema=mongoose.Schema({
           publicId: null,
           url: null
         }
-      } 
+      } ,
+      gender:{
+        type:String,
+      }
 })
 const Student_profile=mongoose.model('Student_profile',profileSchema)
 module.exports=Student_profile

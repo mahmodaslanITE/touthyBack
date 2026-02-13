@@ -44,6 +44,7 @@ const validateUserRegister = (data) => {
   const schema = Joi.object({
     email: Joi.string().email().required(),
     first_name: Joi.string().required(),
+    father_name:Joi.string().required(),
     last_name: Joi.string().required(),
     university_number: Joi.string().when('role', {
       is: 'student',
@@ -52,6 +53,7 @@ const validateUserRegister = (data) => {
     }),
     password: Joi.string().min(6).required(),
     role: Joi.string().valid('student', 'patient'),
+    gender:Joi.required().valid("male","female"),
     bio: Joi.string().max(500),
     isAdmin: Joi.boolean()
   }).options({ abortEarly: false });

@@ -6,6 +6,11 @@ const profileSchema=mongoose.Schema({
         required: true,
         trim: true
       },
+      father_name:{
+        type: String,
+        required: true,
+        trim: true
+      },
     last_name: {
         type: String,
         required: true,
@@ -21,7 +26,10 @@ const profileSchema=mongoose.Schema({
           publicId: null,
           url: null
         }
-      } 
+      },
+      gender:{
+        type:String
+      }
 })
 const Patient_profil=mongoose.model('Patient_profil',profileSchema)
 module.exports=Patient_profil
