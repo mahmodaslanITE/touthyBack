@@ -289,7 +289,8 @@ module.exports.acceptRequest = asyncHandler(async (req, res) => {
       message: 'there is another student accepted this case'
     });
   }
-
+request.status='processing';
+await request.save();
   const patientId = request.user.toString();
   const io = socket.getIO();
 
