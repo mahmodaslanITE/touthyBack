@@ -224,7 +224,7 @@ if (request.user!= userId) {
  ------------------------------------------------------*/
 module.exports.showAllRequesyions = asyncHandler(async (req, res) => {
   const userId = req.user.id;
-  const role = req.user.role;n
+  const role = req.user.role;
 
   if (!userId) {
     return res.status(403).json({

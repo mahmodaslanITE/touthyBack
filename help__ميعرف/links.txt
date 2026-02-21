@@ -74,3 +74,14 @@
     method: post
     parameters:{date,hour,location}
 }
+*******************************************************************
+8:update request 
+http://localhost:5000/api/request/id
+method PUT
+paraneters:{data}
+****************************************************************************
+9:delete request
+update request 
+http://localhost:5000/api/request/id
+method delete
+paraneters:null
