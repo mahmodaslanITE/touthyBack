@@ -143,15 +143,26 @@ module.exports.loginUser = asyncHandler(async (req, res) => {
         email: user.email,
         role: user.role,
         is_admin: true,
-        profileData,
+        first_name:profile.first_name,
+        father_name:profile.father_name,
+        last_name:profile.last_name,
+        bio:profile.bio,
+        gender:profile.gender,
+        profile_photo:profile.profile_photo,
+       university_number: profile.university_number,
         
       }
     : {
         _id: user._id,
         email: user.email,
         role: user.role,
-        profileData
-      };
+        first_name:profile.first_name,
+        father_name:profile.father_name,
+        last_name:profile.last_name,
+        bio:profile.bio,
+        gender:profile.gender,
+        profile_photo:profile.profile_photo,
+       university_number: profile.university_number,      };
 
   res.status(200).json({
     status: "success",

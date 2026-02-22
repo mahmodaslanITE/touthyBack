@@ -4,6 +4,7 @@ const socket = require('../socket/init');
 
 // الموديل بالاسم الجديد
 const Student_profile = require('../models/Student_profile');
+const InProcess = require('../models/InProcess');
 
 /**-----------------------------------------------------
  * @desc Create treatment request
@@ -254,52 +255,71 @@ module.exports.showAllRequesyions = asyncHandler(async (req, res) => {
  * @route post /api/requestion/:id/accept
  * @access Private (student)
  ------------------------------------------------------*/
-module.exports.acceptRequest = asyncHandler(async (req, res) => {
+ module.exports.acceptRequest = asyncHandler(async (req, res) => {
   const user = req.user;
   const role = req.user.role;
   const { date, hour, location } = req.body;
 
   if (!user) {
-    return res.status(401).json({
-      status: 'error',
-      message: 'you have to login'
-    });
+    return res.status(401).json({ status: 'error', message: 'you have to login' });
   }
 
   if (role !== 'student') {
+    return res.status(403).json({ status: 'error', message: 'you are not allowed... only students' });
+  }
+
+  // 1. جلب الطلب أولاً للحصول على نوع الحالة (case_type)
+  const request = await TreatmentRequest.findById(req.params.id);
+
+  if (!request) {
+    return res.status(404).json({ status: 'error', message: 'request not found' });
+  }
+
+  if (request.status !== 'pending') {
+    return res.status(409).json({ status: 'error', message: 'there is another student accepted this case' });
+  }
+
+  // 2. التحقق من "الحالات المفتوحة" للطالب (التصحيح هنا)
+  // نبحث عن أي سجل في InProcess يخص هذا الطالب ويحمل نفس نوع الحالة
+  // ملاحظة: تأكد أن موديل InProcess يحتوي على حقل case_type
+  const request_in_process = await InProcess.findOne({ 
+    student: user.id, 
+    case_type: request.case_type 
+  });
+
+  if (request_in_process) {
     return res.status(403).json({
       status: 'error',
-      message: 'you are not allowed... only students'
+      message: "لا تستطيع حجز هذه الحالة، لديك حالة " + request.case_type + " قيد التنفيذ حالياً"
     });
   }
 
   const student = await Student_profile.findOne({ user: user.id });
-  const request = await TreatmentRequest.findById(req.params.id);
 
-  if (!request) {
-    return res.status(404).json({
-      status: 'error',
-      message: 'request not found'
-    });
-  }
+  // 3. تحديث حالة الطلب
+  request.status = 'processing';
+  await request.save();
 
-  if (request.status !== 'pending') {
-    return res.status(409).json({
-      status: 'error',
-      message: 'there is another student accepted this case'
-    });
-  }
-request.status='processing';
-await request.save();
+  // 4. إرسال التنبيه عبر Socket
   const patientId = request.user.toString();
   const io = socket.getIO();
+  if (io) {
+    io.to(patientId).emit('requestAccepted', {
+      message: `تم قبول حالتك من قبل الطالب ${student?.first_name || ''} ${student?.last_name || ''} يرجى الحضور الى العيادة ${location} في ${date}..${hour}`,
+      date, hour, location
+    });
+  }
 
-  io.to(patientId).emit('requestAccepted', {
-    message: `تم قبول حالتك من قبل الطالب ${student.first_name} ${student.last_name} يرجى الحضور الى العيادة ${location} في ${date}..${hour}`,
-    date,
-    hour,
-    location
+  // 5. إضافة السجل لجدول العمليات (يجب تخزين case_type لكي يعمل الفحص مستقبلاً)
+  const in_process = new InProcess({
+    patient: request.user,
+    student: user.id,
+    request: request.id,
+    case_type: request.case_type, // ضروري جداً لنجاح الفحص في المرة القادمة
+    date_of_accepting: new Date()
   });
+  
+  await in_process.save();
 
   res.status(200).json({
     status: 'success',
