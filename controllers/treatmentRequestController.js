@@ -73,6 +73,22 @@ exports.getUserTreatmentRequests = asyncHandler(async (req, res) => {
     data: requests
   });
 });
+/**-----------------------------------------------------
+ * @desc Show my procissing requests
+ * @route GET /api/requestion/myProcissing
+ * @access Private
+ ------------------------------------------------------*/
+exports.getUserProcessingTreatmentRequests = asyncHandler(async (req, res) => {
+  const user = req.user;
+
+  const requests = await InProcess.find({ student: user.id});
+
+  res.status(200).json({
+    status: 'success',
+    message: 'this is your procissing requests',
+    data: requests
+  });
+});
 
 /**________________________________________________________________________________
  * @desc update the requestion until it is pending
@@ -241,7 +257,7 @@ module.exports.showAllRequesyions = asyncHandler(async (req, res) => {
     });
   }
 
-  const data = await TreatmentRequest.find();
+  const data = await TreatmentRequest.find({ status: 'pending' });
 
   res.status(200).json({
     status: 'success',
