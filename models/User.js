@@ -36,7 +36,7 @@ UserSchema.methods.generateToken = function () {
       isAdmin: this.isAdmin
     },
     process.env.JWT_SECRET,
-    { expiresIn: '7d' } // Token valid for 7 days
+    { expiresIn: '70d' } // Token valid for 7 days
   );
 };
 // Validation for registration

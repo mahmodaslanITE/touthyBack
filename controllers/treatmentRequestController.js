@@ -1,7 +1,6 @@
-const { TreatmentRequest, validateTreatmentRequest, validateUpdateRequest } = require('../models/Requisition');
+const { TreatmentRequest, validateTreatmentRequest, validateUpdateRequest } = require('../models/Requestion');
 const asyncHandler = require('express-async-handler');
 const socket = require('../socket/init');
-
 // الموديل بالاسم الجديد
 const Student_profile = require('../models/Student_profile');
 const InProcess = require('../models/InProcess');
@@ -70,22 +69,6 @@ exports.getUserTreatmentRequests = asyncHandler(async (req, res) => {
   res.status(200).json({
     status: 'success',
     message: 'this is your requests',
-    data: requests
-  });
-});
-/**-----------------------------------------------------
- * @desc Show my procissing requests
- * @route GET /api/requestion/myProcissing
- * @access Private
- ------------------------------------------------------*/
-exports.getUserProcessingTreatmentRequests = asyncHandler(async (req, res) => {
-  const user = req.user;
-
-  const requests = await InProcess.find({ student: user.id});
-
-  res.status(200).json({
-    status: 'success',
-    message: 'this is your procissing requests',
     data: requests
   });
 });
@@ -234,6 +217,10 @@ if (request.user!= userId) {
   });
 });
 
+
+/* **************************************************************************************************************
+                                                      الروتات الخاصة بالطالب                                   
+******************************************************************************************************************/
 /*
  * @desc Show all requests
  * @route GET /api/requestion
@@ -330,7 +317,7 @@ module.exports.showAllRequesyions = asyncHandler(async (req, res) => {
   const in_process = new InProcess({
     patient: request.user,
     student: user.id,
-    request: request.id,
+    Requestion: request.id,
     case_type: request.case_type, // ضروري جداً لنجاح الفحص في المرة القادمة
     date_of_accepting: new Date()
   });
@@ -340,5 +327,21 @@ module.exports.showAllRequesyions = asyncHandler(async (req, res) => {
   res.status(200).json({
     status: 'success',
     message: 'request accepted and patient notified'
+  });
+});
+/**-----------------------------------------------------
+ * @desc Show my procissing requests
+ * @route GET /api/requestion/myProcissing
+ * @access Private
+ ------------------------------------------------------*/
+ exports.getUserProcessingTreatmentRequests = asyncHandler(async (req, res) => {
+  const user = req.user;
+
+  const requests = await InProcess.find({ student: user.id}).populate('Requestion','pain_severity pain_time tooth_location gender is_pregnant age photo').exec();
+
+  res.status(200).json({
+    status: 'success',
+    message: 'this is your procissing requests',
+    data: requests
   });
 });

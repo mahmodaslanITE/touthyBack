@@ -9,8 +9,8 @@ const inProcessSchema=mongoose.Schema({
         ref:'User',
         required:true
     },
-    request:{type:mongoose.Schema.Types.ObjectId,
-        ref:'Requisition',
+    Requestion:{type:mongoose.Schema.Types.ObjectId,
+        ref:'TreatmentRequest',
         required:true
     },
     date_of_accepting:{
