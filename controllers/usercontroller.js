@@ -4,6 +4,7 @@ const fs = require("fs");
 
 const Student_profile = require('../models/Student_profile');
 const Patient_profile = require('../models/Patient_profile');
+const { profile } = require('console');
 
 /**-----------------------------------------------------
  * @desc Get user profile (student or patient)
@@ -45,6 +46,19 @@ module.exports.getAllProfile = asyncHandler(async (req, res) => {
     message: "Not implemented yet"
   });
 });
+/**-----------------------------------------------------
+ * @desc Get any profile data
+ * @route  /api/profile/:id
+ * @access Private
+ ------------------------------------------------------*/
+ module.exports.getProfile=asyncHandler(async()=>{
+    const profile=await Student_profile.findOne({user:req.params.id});
+// const profileData={
+//   "name":`${profile.first_name} ${profile.father_name} ${profile.last_name}`
+//   ,"bio":profile.bio
+// }
+res.status(200).json({status:'success',message:'this is the profile'})
+ })
 
 /**-----------------------------------------------------
  * @desc Update user profile (student or patient)
