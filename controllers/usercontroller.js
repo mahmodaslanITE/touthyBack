@@ -4,7 +4,9 @@ const fs = require("fs");
 
 const Student_profile = require('../models/Student_profile');
 const Patient_profile = require('../models/Patient_profile');
-const { profile } = require('console');
+const { profile, error } = require('console');
+const { date } = require('joi');
+const { OverseerProfile } = require('../models/Overseer_profile');
 
 /**-----------------------------------------------------
  * @desc Get user profile (student or patient)
@@ -21,7 +23,11 @@ module.exports.showUserProfile = asyncHandler(async (req, res) => {
     profile = await Student_profile.findOne({ user: userId });
   } else if (userRole === 'patient') {
     profile = await Patient_profile.findOne({ user: userId });
-  } else {
+  } 
+   else if (userRole === 'overseer') {
+    profile = await OverseerProfile.findOne({ user: userId });
+  } 
+  else {
     return res.status(400).json({
       status: "error",
       message: 'نوع المستخدم غير صالح'
@@ -46,19 +52,35 @@ module.exports.getAllProfile = asyncHandler(async (req, res) => {
     message: "Not implemented yet"
   });
 });
+
 /**-----------------------------------------------------
- * @desc Get any profile data
+ * @desc Get any profiles
  * @route  /api/profile/:id
  * @access Private
  ------------------------------------------------------*/
- module.exports.getProfile=asyncHandler(async()=>{
-    const profile=await Student_profile.findOne({user:req.params.id});
-// const profileData={
-//   "name":`${profile.first_name} ${profile.father_name} ${profile.last_name}`
-//   ,"bio":profile.bio
-// }
-res.status(200).json({status:'success',message:'this is the profile'})
- })
+module.exports.getProfile = asyncHandler(async (req, res) => {
+  // 1. التأكد من أن المستخدم مسجل دخول (يأتي من middleware التحقق)
+  const user = req.user;
+  
+  if (!user) {
+    return res.status(401).json({ status: 'error', message: 'يجب تسجيل الدخول أولاً' });
+  }
+
+  // 2. البحث عن البروفايل باستخدام المعرف الموجود في الرابط (URL)
+  const profile = await Student_profile.findOne({ user: req.params.id });
+
+  // 3. التأكد من وجود البروفايل في قاعدة البيانات
+  if (!profile) {
+    return res.status(404).json({ status: 'error', message: 'هذا الحساب غير موجود' });
+  }
+  // 5. إرسال الرد الناجح
+  res.status(200).json({ 
+    status: 'success', 
+    message: 'تم جلب البيانات بنجاح', 
+    data: profile // تأكد من كتابتها data وليس date
+  });
+});
+
 
 /**-----------------------------------------------------
  * @desc Update user profile (student or patient)
@@ -77,7 +99,11 @@ module.exports.updateUserProfile = asyncHandler(async (req, res) => {
     profile = await Student_profile.findOne({ user: userId });
   } else if (userRole === 'patient') {
     profile = await Patient_profile.findOne({ user: userId });
-  } else {
+  } 
+  else if(userRole==='overseer'){
+    profile=await OverseerProfile.findOne({user:userId})
+  }
+  else {
     return res.status(400).json({
       status: "error",
       message: 'نوع المستخدم غير صالح'
@@ -127,7 +153,11 @@ module.exports.updateProfilePhoto = asyncHandler(async (req, res) => {
     profile = await Patient_profile.findOne({ user: req.user.id });
   } else if (req.user.role === "student") {
     profile = await Student_profile.findOne({ user: req.user.id });
-  } else {
+  } 
+  else if(req.user.role==='overseer'){
+    profile=await OverseerProfile.findOne({user:req.user.id})
+  }
+  else {
     return res.status(400).json({
       status: "error",
       message: 'نوع المستخدم غير صالح'

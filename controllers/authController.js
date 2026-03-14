@@ -5,6 +5,7 @@ const { validateUserRegister, validateUserLogin, User } = require('../models/Use
 // الموديلات بالأسماء الجديدة
 const Student_profile = require('../models/Student_profile');
 const Patient_profile = require('../models/Patient_profile');
+const { OverseerProfile } = require('../models/Overseer_profile');
 
 /**-----------------------------------------------------
  * @desc Register new user (JSON)
@@ -127,6 +128,12 @@ module.exports.loginUser = asyncHandler(async (req, res) => {
     profile = await Student_profile.findOne({ user: user._id });
   } else if (user.role === 'patient') {
     profile = await Patient_profile.findOne({ user: user._id });
+  }
+  else if(user.role=='overseer'){
+    profile=await OverseerProfile.findOne({user:user._id})
+  }
+  else{
+   return res.status(500).json({status:'error',message:'من هون المشكلة '})
   }
 
   const token = user.generateToken();

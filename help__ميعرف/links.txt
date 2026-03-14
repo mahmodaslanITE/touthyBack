@@ -47,41 +47,46 @@
     parameters:{date,hour,location}
 }
   ********************************************************************************
- 7: accept request
+ 8: update  request
 {
-    link:http://localhost:5000/api/request/accept/{id}
-    method: post
-    parameters:{date,hour,location}
+    link:http://localhost:5000/api/request/697250e38aeb555fd67b0a15
+    method: put
 }
   ********************************************************************************
- 7: accept request
+ 9: delete request
 {
     link:http://localhost:5000/api/request/accept/{id}
-    method: post
-    parameters:{date,hour,location}
+    method: delete
 }
   ********************************************************************************
- 7: accept request
+ 10: show all requests (student )
 {
-    link:http://localhost:5000/api/request/accept/{id}
-    method: post
-    parameters:{date,hour,location}
+    link:http://localhost:5000/api/request
+    method: get
 }
   ********************************************************************************
- 7: accept request
+ 11: show my requests (patient)
 {
-    link:http://localhost:5000/api/request/accept/{id}
-    method: post
+    link:http://localhost:5000/api/request/my
+    method: get
     parameters:{date,hour,location}
 }
 *******************************************************************
-8:update request 
-http://localhost:5000/api/request/id
-method PUT
-paraneters:{data}
-****************************************************************************
-9:delete request
-update request 
-http://localhost:5000/api/request/id
-method delete
-paraneters:null
+12: how my procissing requests (student)
+{
+    link:http://localhost:5000/api/request/myProcessing
+    method :get
+}
+******************************************************************
+13: show any profile :
+{
+    link:http://localhost:5000/api/users/69a697a28b36cdbf5ebc8390
+    method: get 
+}
+******************************************************************
+14 :create overseer:
+{
+    link :http://localhost:5000/api/admin/overseer
+    method :post 
+    paraneters{email password}
+}

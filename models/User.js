@@ -71,11 +71,19 @@ const validateUserLogin = (data) => {
 
   return schema.validate(data);
 };
+const validateAddOverseer=(data)=>{
+  const schema=Joi.object({
+    email:Joi.string().email().required(),
+    password:Joi.string().min(6).required()
+  })
+  return schema.validate(data)
+}
 
 const User = mongoose.model('User', UserSchema);
 
 module.exports = {
   User,
   validateUserRegister,
-  validateUserLogin
+  validateUserLogin,
+  validateAddOverseer
 };

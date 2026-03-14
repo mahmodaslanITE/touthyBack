@@ -39,8 +39,8 @@ const TreatmentRequestSchema = new mongoose.Schema(
       maxlength: 100,
       required: true
     },
-    notes: {
-      type: String,
+    moreDetails: {
+      type: Object,
       maxlength: 1000
     },
     age:{
