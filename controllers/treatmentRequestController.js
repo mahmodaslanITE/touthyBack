@@ -10,51 +10,57 @@ const InProcess = require('../models/InProcess');
  * @route POST /api/requestion
  * @access Private
  ------------------------------------------------------*/
-exports.createTreatmentRequest = asyncHandler(async (req, res) => {
+ exports.createTreatmentRequest = asyncHandler(async (req, res) => {
   const user = req.user;
+
+  // 1. التحقق من وجود المستخدم وصلاحياته أولاً
   if (!user) {
-    return res.status(401).json({
-      status: 'error',
-      message: 'توكن غير صالح أو غير موجود'
-    });
+    return res.status(401).json({ status: 'error', message: 'غير مصرح لك' });
+  }
+  if (user.role !== 'patient') {
+    return res.status(403).json({ status: 'error', message: 'يسمح فقط للمرضى بإنشاء طلب' });
   }
 
+  // 2. تنفيذ التحقق
   const { error } = validateTreatmentRequest(req.body);
+  console.log(`the error is .......${error}`)
   if (error) {
+    // إرجاع مصفوفة الأخطاء كاملة للتأكد من رؤيتها
     return res.status(400).json({
       status: 'error',
-      message: error.details.map(d => d.message).join(', ')
+      errors: error.details.map(d => d.message) 
     });
   }
-if(user.role!='patient'){
-  return res.status(403).json({
-    status:'error',
-    message:'you are not allowed only patients'
-  })
-}
-  let photoData=null
 
-  if (req.file) {
-    photoData = {
-      publicId: null,
-      url: `images/requests/${req.file.filename}`
-    };
+  // 3. تحويل moreDetails من String إلى JSON Object
+  let moreDetailsData = req.body.moreDetails;
+  if (typeof req.body.moreDetails === 'string') {
+    try {
+      moreDetailsData = JSON.parse(req.body.moreDetails);
+    } catch (e) {
+      return res.status(400).json({ status: 'error', message: 'حقل moreDetails ليس بتنسيق JSON صحيح' });
+    }
   }
 
+  // 4. معالجة الصورة
+  let photoData = req.file ? {
+    publicId: null,
+    url: `images/requests/${req.file.filename}`
+  } : null;
+
+  // 5. الحفظ في قاعدة البيانات
   const request = new TreatmentRequest({
     ...req.body,
+    moreDetails: moreDetailsData,
     user: user.id,
     photo: photoData
   });
 
   await request.save();
-
-  res.status(201).json({
-    status: 'success',
-    message: 'تم إنشاء الطلب بنجاح',
-    data: request
-  });
+  res.status(201).json({ status: 'success', data: request });
 });
+
+
 
 /**-----------------------------------------------------
  * @desc Show my requests

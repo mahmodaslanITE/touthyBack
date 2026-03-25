@@ -60,25 +60,30 @@ required:true,
   { timestamps: true }
 );
 const validateTreatmentRequest = (data) => {
-    const schema = Joi.object({
-      pain_severity: Joi.number().integer().min(0).max(10).required(),
-      pain_time: Joi.string().required(),
-      tooth_location: Joi.string().max(50).required(),
-      age:Joi.string().required(),
-      gender: Joi.string().valid('male', 'female', 'unknown').required(),
-      is_pregnant: Joi.boolean().when('gender', {
-        is: 'female',
-        then: Joi.required().messages({
-          'any.required': 'حقل الحمل مطلوب إذا كان الجنس أنثى'
-        }),
-        otherwise: Joi.optional()
+  const schema = Joi.object({
+    pain_severity: Joi.number().integer().min(0).max(10).required(),
+    pain_time: Joi.string().required(),
+    tooth_location: Joi.string().max(50).required(),
+    age: Joi.string().required(),
+    gender: Joi.string().valid('male', 'female', 'unknown').required(),
+    is_pregnant: Joi.boolean().when('gender', {
+      is: 'female',
+      then: Joi.required().messages({
+        'any.required': 'حقل الحمل مطلوب إذا كان الجنس أنثى'
       }),
-      caseImageUrl: Joi.string().uri().optional(),
-      case_type: Joi.string().max(100).required(),
-      notes: Joi.string().max(1000).optional()
-    }).options({ abortEarly: false });
-    return schema.validate(data)
-  }
+      otherwise: Joi.optional()
+    }),
+    caseImageUrl: Joi.string().uri().optional(),
+    case_type: Joi.string().max(100).required(),
+    
+    // إضافة حقل moreDetails هنا
+    // نقبل أن يكون نصاً (String) أو كائناً (Object)
+    moreDetails: Joi.alternatives().try(Joi.string(), Joi.object()).optional()
+    
+  }).options({ abortEarly: false });
+  return schema.validate(data);
+}
+
 const validateUpdateRequest = (data) => {
     const schema = Joi.object({
       pain_severity: Joi.number().integer().min(0).max(10),
