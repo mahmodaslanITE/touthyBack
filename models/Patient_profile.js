@@ -29,6 +29,9 @@ const profileSchema=mongoose.Schema({
       },
       gender:{
         type:String
+      },
+      phone_number:{
+        type:String
       }
 })
 const Patient_profil=mongoose.model('Patient_profil',profileSchema)

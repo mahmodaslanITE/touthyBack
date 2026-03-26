@@ -90,3 +90,19 @@
     method :post 
     paraneters{email password}
 }
+15:
+ * @description Account verification 
+ * @route /api/admin/verification/:id
+
+ 16:
+  * @description Get all patients
+ * @route /api/admin/patients
+
+ 17:
+  * @description Get all overseers
+ * @route /api/admin/overseers
+ 
+ 18:
+ * @description Get all students 
+ * @route /api/admin/students
+

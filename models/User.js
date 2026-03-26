@@ -55,7 +55,8 @@ const validateUserRegister = (data) => {
     role: Joi.string().valid('student', 'patient'),
     gender:Joi.required().valid("male","female"),
     bio: Joi.string().max(500),
-    isAdmin: Joi.boolean()
+    isAdmin: Joi.boolean(),
+    phone_number:Joi.string(),
   }).options({ abortEarly: false });
 
   return schema.validate(data);

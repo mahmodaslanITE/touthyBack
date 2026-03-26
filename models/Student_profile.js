@@ -35,6 +35,14 @@ const profileSchema=mongoose.Schema({
       } ,
       gender:{
         type:String,
+      },
+      is_verified:{
+        type:Boolean,
+        default:false
+      }
+      ,
+      phone_number:{
+        type:String
       }
 })
 const Student_profile=mongoose.model('Student_profile',profileSchema)
