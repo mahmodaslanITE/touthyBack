@@ -39,7 +39,7 @@ const TreatmentRequestSchema = new mongoose.Schema(
       maxlength: 100,
       required: true
     },
-    moreDetails: {
+    more_details: {
       type: Object,
       maxlength: 1000
     },
@@ -78,7 +78,7 @@ const validateTreatmentRequest = (data) => {
     
     // إضافة حقل moreDetails هنا
     // نقبل أن يكون نصاً (String) أو كائناً (Object)
-    moreDetails: Joi.alternatives().try(Joi.string(), Joi.object()).optional()
+    more_details: Joi.alternatives().try(Joi.string(), Joi.object()).optional()
     
   }).options({ abortEarly: false });
   return schema.validate(data);

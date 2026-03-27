@@ -33,10 +33,10 @@ const InProcess = require('../models/InProcess');
   }
 
   // 3. تحويل moreDetails من String إلى JSON Object
-  let moreDetailsData = req.body.moreDetails;
-  if (typeof req.body.moreDetails === 'string') {
+  let more_detailsData = req.body.more_details;
+  if (typeof req.body.more_details === 'string') {
     try {
-      moreDetailsData = JSON.parse(req.body.moreDetails);
+      more_detailsData = JSON.parse(req.body.more_details);
     } catch (e) {
       return res.status(400).json({ status: 'error', message: 'حقل moreDetails ليس بتنسيق JSON صحيح' });
     }
@@ -51,7 +51,7 @@ const InProcess = require('../models/InProcess');
   // 5. الحفظ في قاعدة البيانات
   const request = new TreatmentRequest({
     ...req.body,
-    moreDetails: moreDetailsData,
+    more_details: more_detailsData,
     user: user.id,
     photo: photoData
   });
@@ -343,7 +343,7 @@ module.exports.showAllRequesyions = asyncHandler(async (req, res) => {
  exports.getUserProcessingTreatmentRequests = asyncHandler(async (req, res) => {
   const user = req.user;
 
-  const requests = await InProcess.find({ student: user.id}).populate('Requestion','pain_severity pain_time tooth_location gender is_pregnant age photo').exec();
+  const requests = await InProcess.find({ student: user.id}).populate('Requestion','pain_severity pain_time tooth_location gender is_pregnant age photo case_type more_details').exec();
 
   res.status(200).json({
     status: 'success',
