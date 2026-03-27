@@ -76,8 +76,6 @@ const validateTreatmentRequest = (data) => {
     caseImageUrl: Joi.string().uri().optional(),
     case_type: Joi.string().max(100).required(),
     
-    // إضافة حقل moreDetails هنا
-    // نقبل أن يكون نصاً (String) أو كائناً (Object)
     more_details: Joi.alternatives().try(Joi.string(), Joi.object()).optional()
     
   }).options({ abortEarly: false });

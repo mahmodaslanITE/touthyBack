@@ -11,9 +11,22 @@ const storageProfile = multer.diskStorage({
         cb(null, uniqueName);
     }
 });
+
+//requests photo
 const storageRequest = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, path.join(__dirname, '../images/requests'));
+    },
+    filename: (req, file, cb) => {
+        const uniqueName = Date.now() + '-' + file.originalname.replace(/\s/g, '');
+        cb(null, uniqueName);
+    }
+});
+
+//verify request photo
+const storageVerifyRequest = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, path.join(__dirname, '../images/verify_requests'));
     },
     filename: (req, file, cb) => {
         const uniqueName = Date.now() + '-' + file.originalname.replace(/\s/g, '');
@@ -47,4 +60,11 @@ const uploadRequestPhoto = multer({
     limits: { fileSize: 1024 * 1024 * 5 } // حد 5 ميجا
 });
 
-module.exports = {uploadProfilePhoto,uploadRequestPhoto};
+// multer to upload verify request photo
+const uploadVerifyRequestPhoto = multer({
+    storage:storageVerifyRequest,
+    fileFilter,
+    limits: { fileSize: 1024 * 1024 * 5 } // حد 5 ميجا
+});
+
+module.exports = {uploadProfilePhoto,uploadRequestPhoto,uploadVerifyRequestPhoto};

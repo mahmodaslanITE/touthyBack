@@ -23,7 +23,6 @@ const InProcess = require('../models/InProcess');
 
   // 2. تنفيذ التحقق
   const { error } = validateTreatmentRequest(req.body);
-  console.log(`the error is .......${error}`)
   if (error) {
     // إرجاع مصفوفة الأخطاء كاملة للتأكد من رؤيتها
     return res.status(400).json({
