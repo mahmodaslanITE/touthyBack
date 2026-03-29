@@ -1,13 +1,18 @@
 const express=require('express');
-const { createOverseer, verify_account, get_all_patients, get_all_students, get_all_overseers } = require('../controllers/adminController');
+const { createOverseer, get_all_patients, get_all_students, get_all_overseers, verify_account_accept, verify_account_reject } = require('../controllers/adminController');
 const verifyToken = require('../Middlewares/verifyToken');
 const { getAllVerifyRequests } = require('../controllers/studentController');
 const router=express.Router();
 // add over seer 
 router.post('/overseer',verifyToken,createOverseer);
-router.post('/verification/:id',verifyToken,verify_account);
+//get verify requests
+router.get('/verify',verifyToken,getAllVerifyRequests);
+//verify account
+router.post('/verification/accept/:id',verifyToken,verify_account_accept);
+router.post('/verification/reject/:id',verifyToken,verify_account_reject);
+// get the users
 router.get('/patients',verifyToken,get_all_patients);
 router.get('/overseers',verifyToken,get_all_overseers);
 router.get('/students',verifyToken,get_all_students);
-router.get('/verify',verifyToken,getAllVerifyRequests)
+
 module.exports=router

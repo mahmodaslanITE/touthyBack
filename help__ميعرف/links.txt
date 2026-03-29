@@ -105,4 +105,16 @@
  18:
  * @description Get all students 
  * @route /api/admin/students
+ 
+ 19:
+ /**
+ * @description قبول  طلب توثيق حساب
+ * @route /api/admin/accept/reject/:id
+ */ parameters{first_name,last_name,father_name,university_number}
+
+ 20:
+ /**
+ * @description رفض طلب توثيق حساب
+ * @route /api/admin/verification/reject/:id
+ */parameters{reject_reason}
 

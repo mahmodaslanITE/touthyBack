@@ -1,6 +1,7 @@
 const Student_profile = require('../models/Student_profile');
 const asyncHandler=require('express-async-handler');
 const { Verify_request, validateVerifyRequest} = require('../models/VerifyRequest');
+const { date } = require('joi');
 
 
 /**
@@ -15,17 +16,19 @@ module.exports.addVerifyRequest = asyncHandler(async (req, res) => {
         return res.json({status:'error',message:'  🙂 لو بهمك كنت عرفت لحالك '})
 
     }
-    const exist=await Verify_request.findOne({student:studentProfile._id});
+    const exist=await Verify_request.findOne({student_profile:studentProfile.id});
     if(exist){
         return res.status(400).json({status:'error',message:'عندك طلب قيد المراجعة .............استنالك شوي '})
     }
+    console.log(`exist.........${exist}`)
     // 3. إنشاء الطلب وربطه بالبروفايل
     const request = await Verify_request.create({
-        student: studentProfile._id,
+        user:studentProfile.user,
+        student_profile: studentProfile._id,
         document: `images/verify_requests/${req.file.filename}`
     });
 
-    res.status(201).json(request);
+    res.status(201).json({status:'success',message:'ـم انشاء الطلب بنجاح',date:request});
 });
 
 module.exports.getAllVerifyRequests = asyncHandler(async (req, res) => {
@@ -35,8 +38,8 @@ module.exports.getAllVerifyRequests = asyncHandler(async (req, res) => {
     }
     // جلب الطلبات مع بيانات الطالب (الاسم، الرقم، الصورة) من مودل Student_profile
     const requests = await Verify_request.find()
-        .populate('student', 'first_name father_name last_name university_number profile_photo')
+        .populate('student_profile', 'user first_name father_name last_name university_number profile_photo')
         .sort('-createdAt');
 
-    res.status(200).json(requests);
+    res.status(200).json({status:'success',message:'هذه هي طلبات التوثيق أرسل لي الرقم الخاص بالطلب مع الموافقة أو الرفض',data:requests});
 });

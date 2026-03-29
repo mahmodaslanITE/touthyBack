@@ -3,7 +3,9 @@ const { OverseerProfile } = require('../models/Overseer_profile');
 const { User, validateAddOverseer } = require('../models/User');
 const bcrypt = require('bcryptjs'); 
 const Student_profile = require('../models/Student_profile');
-const Patient_profil=require('../models/Patient_profile')
+const Patient_profil=require('../models/Patient_profile');
+const { Verify_request } = require('../models/VerifyRequest');
+const socket = require('../socket/init');
 
 /**
  * @desc create new overseer 
@@ -64,52 +66,123 @@ module.exports.createOverseer = asyncHandler(async (req, res) => {
     });
 });
 
+const fs = require('fs');
+const path = require('path');
 /**
- * @description Account verification 
- * @route /api/admin/verification/:id
+ * @description قبول  طلب توثيق حساب
+ * @route /api/admin/accept/reject/:id
  */
-module.exports.verify_account = asyncHandler(async (req, res) => {
-    // 1. التحقق من الصلاحية (Admin Only)
+
+module.exports.verify_account_accept = asyncHandler(async (req, res) => {
+    // 1. Admin Authorization check
     if (!req.user || !req.user.isAdmin) {
-       return res.status(403).json({ 
-           status: 'error', 
-           message: 'تستهبل !!!! انت مش مدير' 
-       });
+       return res.status(403).json({ status: 'error', message: 'غير مسموح لك بالوصول' });
     }
- 
-    // 2. التأكد من وجود المستخدم ودوره
-    const user = await User.findById(req.params.id);
-    if (!user) {
-       return res.status(404).json({ status: 'error', message: 'المستخدم غير موجود' });
+
+    // 2. Find the verification request
+    const request = await Verify_request.findById(req.params.id);
+    if (!request) {
+       return res.status(404).json({ status: 'error', message: 'لا يوجد طلب بهذا المعرف' });
     }
- 
-    if (user.role === 'patient') {
-       return res.status(400).json({
-           status: 'error',
-           message: 'لا يمكنك توثيق حسابات المرضى'
-       });
-    }
- 
-    // 3. توثيق الحساب الخاص بالطالب (أضفنا await هنا)
-    const student = await Student_profile.findOne({ user: req.params.id });
- 
-    // 4. التأكد من وجود ملف الطالب قبل التعديل
+
+    // 3. Find the student profile
+    const student = await Student_profile.findById(request.student_profile);
     if (!student) {
-       return res.status(404).json({
-           status: 'error',
-           message: 'لم يتم العثور على ملف تعريف لهذا الطالب'
-       });
+        return res.status(404).json({ status: 'error', message: 'ملف الطالب غير موجود' });
     }
- 
+
+    // 4. Update student data from Admin input (req.body)
+    const { first_name, father_name, last_name, university_number } = req.body;
+    
+    if (first_name) student.first_name = first_name;
+    if (father_name) student.father_name = father_name;
+    if (last_name) student.last_name = last_name;
+    if (university_number) student.university_number = university_number;
+    
     student.is_verified = true;
-    const result = await student.save();
- 
+    await student.save();
+
+    // 5. Delete the uploaded document from the server
+    if (request.document) {
+        // Construct the full path (assuming 'document' stores the relative path)
+        const imagePath = path.join(__dirname, '..', request.document); 
+        
+        fs.unlink(imagePath, (err) => {
+            if (err) console.error("فشل حذف ملف الصورة:", err);
+            else console.log("تم حذف ملف طلب التوثيق من السيرفر");
+        });
+    }
+
+    // 6. Remove the request from the database
+    await Verify_request.findByIdAndDelete(req.params.id);
+
+    // 7. Socket Notification
+    const io = socket.getIO();
+    if (io) {
+        io.to(request.user.toString()).emit('VerifyAccepted', {
+            message: `تم توثيق حسابك وتحديث بياناتك بنجاح`,
+            timestamp: new Date()
+        });
+    }
+
     res.status(200).json({
         status: 'success',
-        message: "تم توثيق الحساب بنجاح",
-        data: result
+        message: "تم توثيق الحساب، تحديث البيانات، وحذف الطلب بنجاح",
+        data: student
     });
- });
+});
+
+
+/**
+ * @description رفض طلب توثيق حساب
+ * @route /api/admin/verification/reject/:id
+ */
+module.exports.verify_account_reject = asyncHandler(async (req, res) => {
+    // 1. التحقق من صلاحية الأدمن
+    if (!req.user || !req.user.isAdmin) {
+       return res.status(403).json({ status: 'error', message: 'غير مسموح لك بالوصول' });
+    }
+
+    // 2. البحث عن طلب التوثيق
+    const request = await Verify_request.findById(req.params.id);
+    if (!request) {
+       return res.status(404).json({ status: 'error', message: 'لا يوجد طلب بهذا المعرف' });
+    }
+
+    // 3. استلام سبب الرفض من الأدمن
+    const { reject_reason } = req.body;
+    if (!reject_reason) {
+        return res.status(400).json({ status: 'error', message: 'يرجى تقديم سبب لرفض الطلب' });
+    }
+
+    // 4. حذف ملف الصورة المرتبط بالطلب من السيرفر
+    if (request.document) {
+        const imagePath = path.join(__dirname, '..', request.document);
+        
+        fs.unlink(imagePath, (err) => {
+            if (err) console.error("فشل حذف ملف الصورة أثناء الرفض:", err);
+            else console.log("تم حذف مستند التوثيق المرفوض من السيرفر");
+        });
+    }
+
+    // 5. إرسال تنبيه للطالب عبر Socket قبل حذف الطلب
+    const io = socket.getIO();
+    if (io) {
+        io.to(request.user.toString()).emit('VerifyRejected', {
+            message: `للأسف، تم رفض طلب توثيق حسابك. السبب: ${reject_reason}`,
+            reason: reject_reason,
+            timestamp: new Date()
+        });
+    }
+
+    // 6. حذف الطلب من قاعدة البيانات
+    await Verify_request.findByIdAndDelete(req.params.id);
+
+    res.status(200).json({
+        status: 'success',
+        message: "تم رفض الطلب بنجاح وحذف البيانات المتعلقة به"
+    });
+});
 
 
  /**

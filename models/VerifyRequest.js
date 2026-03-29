@@ -5,9 +5,14 @@ const verify_request_schema=mongoose.Schema({
         type:String,
         required:true
     },
-    student: {
+    student_profile: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Student_profile', // الربط بملف الطالب وليس اليوزر
+        required: true
+    },
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'user', // الربط بملف الطالب وليس اليوزر
         required: true
     },
 }, { timestamps: true })
