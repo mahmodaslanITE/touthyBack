@@ -6,6 +6,8 @@ const Student_profile = require('../models/Student_profile');
 const Patient_profil=require('../models/Patient_profile');
 const { Verify_request } = require('../models/VerifyRequest');
 const socket = require('../socket/init');
+const Course = require('../models/Course');
+
 
 /**
  * @desc create new overseer 
@@ -238,5 +240,82 @@ module.exports.get_all_students = asyncHandler(async (req, res) => {
         status: 'success',
         results: students.length,
         data: students
+    });
+});
+
+
+/**
+ * @description add Cours 
+ * @route api/admin/cours 
+ * @method post
+ * @access private (admin)
+ */
+
+
+module.exports.createCourse = asyncHandler(async (req, res) => {
+    
+    // 1. التحقق من صلاحية الأدمن (isAdmin)
+    if (!req.user || !req.user.isAdmin) { // استخدام is_admin إذا كنت تتبع snake_case في اليوزر أيضاً
+        return res.status(403).json({
+            status: 'error',
+            message: 'غير مسموح! يجب أن تكون مسؤولاً لإضافة مادة'
+        });
+    }
+
+    // 2. استخراج البيانات بأسلوب snake_case
+    const { course_name, categories, overseers } = req.body;
+
+    // 3. التحقق من الحقول الأساسية
+    if (!course_name || !categories || !overseers) {
+        return res.status(400).json({
+            status: 'error',
+            message: 'يرجى تزويد اسم المادة (course_name)، الفئات، وقائمة معرفات المشرفين'
+        });
+    }
+
+    // 4. التحقق من وجود معرفات المشرفين في قاعدة البيانات
+    const all_overseer_ids = Object.values(overseers).flat();
+    const existing_overseers_count = await OverseerProfile.countDocuments({
+        _id: { $in: all_overseer_ids }
+    });
+
+    if (existing_overseers_count !== all_overseer_ids.length) {
+        return res.status(400).json({
+            status: 'error',
+            message: 'واحد أو أكثر من معرفات المشرفين غير موجود في النظام'
+        });
+    }
+
+    // 5. إنشاء المادة باستخدام التسميات الجديدة
+    const new_course = await Course.create({
+        course_name,
+        categories,
+        overseers 
+    });
+
+    // 6. استجابة النجاح
+    return res.status(201).json({
+        status: 'success',
+        message: 'تم إنشاء المادة وربط المشرفين بنجاح',
+        data: new_course
+    });
+});
+
+// @الوصف: جلب جميع المواد مع بيانات المشرفين (الاسم الأول، الكنية، واسم الأب)
+// @المسار: GET /api/courses
+exports.get_courses = asyncHandler(async (req, res) => {
+    const courses = await Course.find()
+        .populate({
+            path: 'overseers.$*', // الوصول للمصفوفات داخل الـ Map
+            select: 'first_name last_name father_name',
+        });
+
+    if (!courses || courses.length === 0) {
+        return res.status(404).json({ status: 'error', message: 'لا توجد مواد' });
+    }
+
+    return res.status(200).json({
+        status: 'success',
+        data: courses
     });
 });

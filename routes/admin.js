@@ -1,5 +1,5 @@
 const express=require('express');
-const { createOverseer, get_all_patients, get_all_students, get_all_overseers, verify_account_accept, verify_account_reject } = require('../controllers/adminController');
+const { createOverseer, get_all_patients, get_all_students, get_all_overseers, verify_account_accept, verify_account_reject, createCourse, get_courses } = require('../controllers/adminController');
 const verifyToken = require('../Middlewares/verifyToken');
 const { getAllVerifyRequests } = require('../controllers/studentController');
 const router=express.Router();
@@ -14,5 +14,9 @@ router.post('/verification/reject/:id',verifyToken,verify_account_reject);
 router.get('/patients',verifyToken,get_all_patients);
 router.get('/overseers',verifyToken,get_all_overseers);
 router.get('/students',verifyToken,get_all_students);
+
+//add coures 
+router.post('/course',verifyToken,createCourse);
+router.get('/course',verifyToken,get_courses)
 
 module.exports=router
