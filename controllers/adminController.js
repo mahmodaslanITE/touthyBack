@@ -7,6 +7,8 @@ const Patient_profil=require('../models/Patient_profile');
 const { Verify_request } = require('../models/VerifyRequest');
 const socket = require('../socket/init');
 const Course = require('../models/Course');
+const Treatment = require('../models/Treatment'); // استيراد مودل العلاج
+
 
 
 /**
@@ -319,3 +321,56 @@ exports.get_courses = asyncHandler(async (req, res) => {
         data: courses
     });
 });
+
+/**
+ * @description add Treatment
+ * @route api/admin/treatment
+ * @method post
+ * @access private only admin
+ */
+exports.addTreatment = async (req, res) => {
+    const user=req.user
+    if(!user.isAdmin){
+        return res.status(403).json({
+            status:'error',
+            message:' you are noyt admin'
+        })
+    }
+    try {
+        const { treatment_case, course } = req.body;
+
+        // 1. البحث عن المادة في جدول المواد باستخدام المعرف المرسل
+        const existingCourse = await Course.findById(course);
+        // 2. إذا لم يتم العثور على المادة، نرسل خطأ 404
+        if (!existingCourse) {
+            return res.status(404).json({
+                status:'error',
+                message: "المادة المطلوبة غير موجودة في قاعدة البيانات."
+            });
+        }
+
+        // 3. إذا وجدت المادة، نقوم بإنشاء سجل العلاج الجديد
+        const newTreatment = new Treatment({
+            treatment_case: treatment_case,
+            course: course // ربط العلاج بالمادة عبر الـ ID
+        });
+
+        // 4. حفظ البيانات
+        await newTreatment.save();
+
+        res.status(201).json({
+            status:'success',
+            message: "تمت إضافة سجل العلاج وربطه بالمادة بنجاح.",
+            data: newTreatment
+        });
+
+    } catch (error) {
+        // التعامل مع أخطاء السيرفر أو الـ ID غير الصحيح (Invalid ObjectId)
+        res.status(500).json({
+            status:'error',
+            message: "حدث خطأ أثناء معالجة الطلب.",
+            error: error.message
+        });
+    }
+};
+
