@@ -374,3 +374,48 @@ exports.addTreatment = async (req, res) => {
     }
 };
 
+// 1. عرض جميع المعالجات مع بيانات المواد المرتبطة
+exports.getAllTreatments = async (req, res) => {
+    try {
+        // استخدمنا populate لجلب بيانات المادة بدلاً من مجرد الـ ID
+        const treatments = await Treatment.find().populate('course'); 
+        
+        res.status(200).json({
+            success: true,
+            count: treatments.length,
+            data: treatments
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+};
+
+// 2. حذف معالجة محددة بواسطة الـ ID
+exports.deleteTreatment = async (req, res) => {
+    const user=req.user
+    if(!user.isAdmin){
+        return res.status(403).json({
+            status:'error',
+            message:' you are noyt admin'
+        })
+    }
+    try {
+        const treatment = await Treatment.findByIdAndDelete(req.params.id);
+
+        if (!treatment) {
+            return res.status(404).json({
+                success: false,
+                message: "المعالجة غير موجودة لحذفها."
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "تم حذف المعالجة بنجاح."
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+};
+
+
