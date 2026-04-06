@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const treatmentSchema = mongoose.Schema({
-    treatment_case: {
+    case_type: {
         type: String,
         required: true
     },

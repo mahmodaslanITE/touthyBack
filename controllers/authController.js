@@ -21,7 +21,7 @@ module.exports.createRegisterUser = asyncHandler(async (req, res) => {
     });
   }
 
-  const { email, password, first_name, last_name,father_name, role, university_number,gender } = req.body;
+  const { email, password, first_name, last_name,father_name, role, university_number,gender,category } = req.body;
 
   // منع تكرار الإيميل
   const existingUser = await User.findOne({ email });
@@ -54,7 +54,8 @@ module.exports.createRegisterUser = asyncHandler(async (req, res) => {
       last_name,
       university_number,
       user: newUser._id,
-      gender
+      gender,
+      category
     });
   } else if (role === 'patient') {
     profile = new Patient_profile({

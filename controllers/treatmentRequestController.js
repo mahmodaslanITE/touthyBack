@@ -4,6 +4,7 @@ const socket = require('../socket/init');
 // الموديل بالاسم الجديد
 const Student_profile = require('../models/Student_profile');
 const InProcess = require('../models/InProcess');
+const Treatment = require('../models/Treatment');
 
 /**-----------------------------------------------------
  * @desc Create treatment request
@@ -46,7 +47,14 @@ const InProcess = require('../models/InProcess');
     publicId: null,
     url: `images/requests/${req.file.filename}`
   } : null;
-
+const case_type=req.body.case_type
+const treatment=await Treatment.findById(case_type)
+if(!treatment){
+  return res.status(400).json({
+    status:'error',
+    message:'المعالجة التي طلبتها غير متاحة حاليا '
+  })
+}
   // 5. الحفظ في قاعدة البيانات
   const request = new TreatmentRequest({
     ...req.body,
@@ -249,7 +257,7 @@ module.exports.showAllRequesyions = asyncHandler(async (req, res) => {
     });
   }
 
-  const data = await TreatmentRequest.find({ status: 'pending' });
+  const data = await TreatmentRequest.find({ status: 'pending' }).populate('case_type','course');
 
   res.status(200).json({
     status: 'success',

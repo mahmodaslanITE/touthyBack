@@ -2,6 +2,7 @@ const express=require('express');
 const verifyToken = require('../Middlewares/verifyToken');
 const { createTreatmentRequest, showAllRequesyions, getUserTreatmentRequests, acceptRequest, updateRequest, deleteRequest, getUserProcessingTreatmentRequests } = require('../controllers/treatmentRequestController');
 const { uploadRequestPhoto } = require('../Middlewares/upload');
+const { getCourseOverseers } = require('../controllers/studentController');
 const router=express.Router();
 //add request
 router.post('/',verifyToken,uploadRequestPhoto.single('photo'),createTreatmentRequest);
@@ -21,4 +22,7 @@ router.put('/:id',verifyToken,uploadRequestPhoto.single('photo'),updateRequest)
 
 //delete request
 router.delete('/:id',verifyToken,deleteRequest)
+
+//
+router.get('/course-overseers/:id',verifyToken,getCourseOverseers)
 module.exports=router

@@ -35,7 +35,8 @@ const TreatmentRequestSchema = new mongoose.Schema(
       default:'pending'
     },
     case_type: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref:'Treatment',
       maxlength: 100,
       required: true
     },

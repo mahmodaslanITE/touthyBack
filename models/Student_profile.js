@@ -43,6 +43,9 @@ const profileSchema=mongoose.Schema({
       ,
       phone_number:{
         type:String
+      },
+      category:{
+        type:String
       }
 })
 const Student_profile=mongoose.model('Student_profile',profileSchema)

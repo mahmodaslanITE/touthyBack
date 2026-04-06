@@ -91,7 +91,7 @@ module.exports.updateUserProfile = asyncHandler(async (req, res) => {
   const userId = req.user.id;
   const userRole = req.user.role;
 
-  const { first_name, last_name,father_name, university_number, bio } = req.body;
+  const { first_name, last_name,father_name, university_number, bio ,category} = req.body;
 
   let profile;
 
@@ -122,6 +122,7 @@ module.exports.updateUserProfile = asyncHandler(async (req, res) => {
   if (last_name) profile.last_name = last_name;
   if (university_number) profile.university_number = university_number;
   if (bio) profile.bio = bio;
+  if(category) profile.category=category
 
   await profile.save();
 

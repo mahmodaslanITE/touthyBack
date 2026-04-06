@@ -2,6 +2,7 @@ const Student_profile = require('../models/Student_profile');
 const asyncHandler=require('express-async-handler');
 const { Verify_request, validateVerifyRequest} = require('../models/VerifyRequest');
 const { date } = require('joi');
+const Course = require('../models/Course');
 
 
 /**
@@ -42,4 +43,53 @@ module.exports.getAllVerifyRequests = asyncHandler(async (req, res) => {
         .sort('-createdAt');
 
     res.status(200).json({status:'success',message:'هذه هي طلبات التوثيق أرسل لي الرقم الخاص بالطلب مع الموافقة أو الرفض',data:requests});
+});
+
+
+// عرض المشرفين عن مادة معينة 
+
+/**
+ * @description Get overseers for a specific course based on student category
+ * @route GET /student/course-overseers/:courseName
+ */
+module.exports.getCourseOverseers = asyncHandler(async (req, res) => {
+    // 1. البحث عن بروفايل الطالب المرتبط باليوزر الحالي لجلب الفئة (category)
+    const studentProfile = await Student_profile.findOne({ user: req.user.id });
+    
+    if (!studentProfile) {
+        return res.status(404).json({ 
+            status: 'error', 
+            message: 'لم يتم العثور على ملف شخصي لهذا الطالب' 
+        });
+    }
+
+    const studentCategory = studentProfile.category; // تأكد أن الحقل بهذا الاسم في مودل الطالب
+
+    // 2. البحث عن المادة وعمل Populate لبيانات المشرفين في فئة الطالب فقط
+    const course = await Course.findById( req.params.id )
+        // .populate({
+        //     path: `overseers.${studentCategory}`,
+        //     select: 'first_name last_name profile_photo phone' // اختر الحقول التي تريد عرضها للمشرف
+        // });
+
+    if (!course) {
+        return res.status(404).json({ 
+            status: 'error', 
+            message: 'المادة غير موجودة' 
+        });
+    }
+
+    // 3. استخراج البيانات من الـ Map
+    const overseersList = course.overseers.get(studentCategory) || [];
+    const sessionTime = course.categories.get(studentCategory);
+
+    res.status(200).json({
+        status: 'success',
+        data: {
+            course_name: course.course_name,
+            category: studentCategory,
+            time: sessionTime,
+            overseers: overseersList
+        }
+    });
 });

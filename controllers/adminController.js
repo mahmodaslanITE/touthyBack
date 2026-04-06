@@ -337,7 +337,7 @@ exports.addTreatment = async (req, res) => {
         })
     }
     try {
-        const { treatment_case, course } = req.body;
+        const { case_type, course } = req.body;
 
         // 1. البحث عن المادة في جدول المواد باستخدام المعرف المرسل
         const existingCourse = await Course.findById(course);
@@ -351,7 +351,7 @@ exports.addTreatment = async (req, res) => {
 
         // 3. إذا وجدت المادة، نقوم بإنشاء سجل العلاج الجديد
         const newTreatment = new Treatment({
-            treatment_case: treatment_case,
+            case_type: case_type,
             course: course // ربط العلاج بالمادة عبر الـ ID
         });
 
@@ -381,8 +381,8 @@ exports.getAllTreatments = async (req, res) => {
         const treatments = await Treatment.find().populate('course'); 
         
         res.status(200).json({
-            success: true,
-            count: treatments.length,
+status:'success',
+count: treatments.length,
             data: treatments
         });
     } catch (error) {
@@ -404,13 +404,13 @@ exports.deleteTreatment = async (req, res) => {
 
         if (!treatment) {
             return res.status(404).json({
-                success: false,
+                status:'error',
                 message: "المعالجة غير موجودة لحذفها."
             });
         }
 
         res.status(200).json({
-            success: true,
+            status:'success',
             message: "تم حذف المعالجة بنجاح."
         });
     } catch (error) {
