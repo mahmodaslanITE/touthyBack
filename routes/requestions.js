@@ -15,7 +15,7 @@ router.get('/my',verifyToken,getUserTreatmentRequests);
 router.get('/myProcessing',verifyToken,getUserProcessingTreatmentRequests);
 
 // the student  can accept requests
-router.post('/accept/:id',verifyToken,acceptRequest)
+router.post('/accept/:id/:overseer',verifyToken,acceptRequest)
 
 //update the requests
 router.put('/:id',verifyToken,uploadRequestPhoto.single('photo'),updateRequest)

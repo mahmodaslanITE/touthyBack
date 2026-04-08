@@ -257,17 +257,15 @@ module.exports.get_all_students = asyncHandler(async (req, res) => {
 module.exports.createCourse = asyncHandler(async (req, res) => {
     
     // 1. التحقق من صلاحية الأدمن (isAdmin)
-    if (!req.user || !req.user.isAdmin) { // استخدام is_admin إذا كنت تتبع snake_case في اليوزر أيضاً
+    if (!req.user || !req.user.isAdmin) { 
         return res.status(403).json({
             status: 'error',
             message: 'غير مسموح! يجب أن تكون مسؤولاً لإضافة مادة'
         });
     }
 
-    // 2. استخراج البيانات بأسلوب snake_case
     const { course_name, categories, overseers } = req.body;
 
-    // 3. التحقق من الحقول الأساسية
     if (!course_name || !categories || !overseers) {
         return res.status(400).json({
             status: 'error',
@@ -276,26 +274,42 @@ module.exports.createCourse = asyncHandler(async (req, res) => {
     }
 
     // 4. التحقق من وجود معرفات المشرفين في قاعدة البيانات
-    const all_overseer_ids = Object.values(overseers).flat();
-    const existing_overseers_count = await OverseerProfile.countDocuments({
-        _id: { $in: all_overseer_ids }
+    // const all_overseer_ids = Object.values(overseers).flat();
+    // const existing_overseers_count = await OverseerProfile.countDocuments({
+    //     user: { $in: all_overseer_ids }
+    // });
+
+    // if (existing_overseers_count !== all_overseer_ids.length) {
+    //     return res.status(400).json({
+    //         status: 'error',
+    //         message: 'واحد أو أكثر من معرفات المشرفين غير موجود في النظام'
+    //     });
+    // }
+    const mongoose = require('mongoose');
+
+// 1. استخراج المعرفات وتحويلها لمصفوفة فريدة (بدون تكرار)
+const raw_ids = Object.values(overseers).flat();
+const unique_ids = [...new Set(raw_ids)];
+
+const formatted_ids = unique_ids.map(id => new mongoose.Types.ObjectId(id));
+
+// 3. البحث عن عدد الحسابات الموجودة فعلياً
+const existing_overseers_count = await OverseerProfile.countDocuments({
+    user: { $in: formatted_ids }
+});
+
+if (existing_overseers_count !== unique_ids.length) {
+    return res.status(404).json({ 
+        message: "واحد أو أكثر من المشرفين غير مسجل في النظام" 
     });
+}
 
-    if (existing_overseers_count !== all_overseer_ids.length) {
-        return res.status(400).json({
-            status: 'error',
-            message: 'واحد أو أكثر من معرفات المشرفين غير موجود في النظام'
-        });
-    }
-
-    // 5. إنشاء المادة باستخدام التسميات الجديدة
     const new_course = await Course.create({
         course_name,
         categories,
         overseers 
     });
 
-    // 6. استجابة النجاح
     return res.status(201).json({
         status: 'success',
         message: 'تم إنشاء المادة وربط المشرفين بنجاح',

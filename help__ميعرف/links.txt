@@ -42,7 +42,7 @@
   ********************************************************************************
  7: accept request
 {
-    link:http://localhost:5000/api/request/accept/{id}
+    link:http://localhost:5000/api/request/accept/{id}/:overseer
     method: post
     parameters:{date,hour,location}
 }
@@ -141,5 +141,35 @@
     ]
   }
 }
+23:
+اضافة معالجة 
+http://localhost:5000/api/admin/treatment
+{
+    "case_type": "علاج تقويم أسنان مرحلة أولى",
+    "course": "69d680bdf8088ffdd620dc98"
+}
 
+24:
+حذف معالجة 
+http://localhost:5000/api/admin/treatment/:id       delete
+
+25 
+عرض جميع المعالجات ( المريض  والادمن فقط )
+http://localhost:5000/api/admin/treatment   get 
+
+26 
+عرض المشرفين على مادة يعرضلك بس المشرفين على فئة الطالب صاحب الريكويست بالمادة الفلانية 
+http://localhost:5000/api/request/course-overseers/:id
+
+28:
+المشرف يعرض الحالات الي قبلوها الطلاب وحطوه مشرف عليها 
+http://localhost:5000/api/overseer/treatment 
+
+29 :
+المشرف يقبل الحالة يحط تقييم من 1 ل 5 وملاحظة 
+http://localhost:5000/api/overseer/treatment/complete/:id
+  {
+    "rating":"5",
+     "feedback":"good"
+}
 

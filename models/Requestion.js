@@ -31,7 +31,7 @@ const TreatmentRequestSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ['pending', 'processing'],
+      enum: ['pending', 'processing','done'],
       default:'pending'
     },
     case_type: {

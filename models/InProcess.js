@@ -13,6 +13,10 @@ const inProcessSchema=mongoose.Schema({
         ref:'TreatmentRequest',
         required:true
     },
+    overseer:{type:mongoose.Schema.Types.ObjectId,
+        ref:'Overseer',
+        required:true
+    },
     date_of_accepting:{
         type:String,
         required:true

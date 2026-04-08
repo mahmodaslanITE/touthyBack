@@ -5,6 +5,8 @@ const socket = require('../socket/init');
 const Student_profile = require('../models/Student_profile');
 const InProcess = require('../models/InProcess');
 const Treatment = require('../models/Treatment');
+const Course = require('../models/Course');
+const { OverseerProfile } = require('../models/Overseer_profile');
 
 /**-----------------------------------------------------
  * @desc Create treatment request
@@ -268,55 +270,91 @@ module.exports.showAllRequesyions = asyncHandler(async (req, res) => {
 
 /**-----------------------------------------------------
  * @desc Accept request
- * @route post /api/requestion/:id/accept
+ * @route post /api/requestion/:id/accept/:overseerId
  * @access Private (student)
  ------------------------------------------------------*/
  module.exports.acceptRequest = asyncHandler(async (req, res) => {
   const user = req.user;
   const role = req.user.role;
   const { date, hour, location } = req.body;
+  const { id, overseer } = req.params; // جلب الـ IDs من الرابط
 
-  if (!user) {
-    return res.status(401).json({ status: 'error', message: 'you have to login' });
+  // 1. التحقق من صلاحية المستخدم
+  if (!user || role !== 'student') {
+    return res.status(403).json({ status: 'error', message: 'غير مسموح.. للطلاب فقط' });
   }
 
-  if (role !== 'student') {
-    return res.status(403).json({ status: 'error', message: 'you are not allowed... only students' });
+  // 2. جلب بيانات الطالب والطلب
+  const student = await Student_profile.findOne({ user: user.id });
+  if (!student) {
+    return res.status(404).json({ status: 'error', message: 'ملف الطالب غير موجود' });
   }
 
-  // 1. جلب الطلب أولاً للحصول على نوع الحالة (case_type)
-  const request = await TreatmentRequest.findById(req.params.id);
-
+  const request = await TreatmentRequest.findById(id);
   if (!request) {
-    return res.status(404).json({ status: 'error', message: 'request not found' });
+    return res.status(404).json({ status: 'error', message: 'الطلب غير موجود' });
   }
 
   if (request.status !== 'pending') {
-    return res.status(409).json({ status: 'error', message: 'there is another student accepted this case' });
+    return res.status(409).json({ status: 'error', message: 'تم قبول هذه الحالة مسبقاً' });
   }
 
-  // 2. التحقق من "الحالات المفتوحة" للطالب (التصحيح هنا)
-  // نبحث عن أي سجل في InProcess يخص هذا الطالب ويحمل نفس نوع الحالة
-  // ملاحظة: تأكد أن موديل InProcess يحتوي على حقل case_type
+  // 3. التحقق من عدم وجود حالة مماثلة قيد التنفيذ
   const request_in_process = await InProcess.findOne({ 
     student: user.id, 
     case_type: request.case_type 
   });
+console.log(` request in process .....${request_in_process}`)
+const the_treatment = await Treatment.findById(request.case_type);
 
   if (request_in_process) {
     return res.status(403).json({
       status: 'error',
-      message: "لا تستطيع حجز هذه الحالة، لديك حالة " + request.case_type + " قيد التنفيذ حالياً"
+      message: `لديك حالة من نوع (${the_treatment.case_type}) قيد التنفيذ حالياً`
     });
   }
 
-  const student = await Student_profile.findOne({ user: user.id });
+  // 4. التحقق من المشرف بناءً على فئة الطالب وهيكل الـ Map
+  if (!the_treatment) {
+    return res.status(404).json({ status: 'error', message: 'بيانات المعالجة غير موجودة' });
+  }
 
-  // 3. تحديث حالة الطلب
+  const the_course = await Course.findById(the_treatment.course);
+  if (!the_course) {
+    return res.status(404).json({ status: 'error', message: 'المادة المرتبطة بهذه الحالة غير موجودة' });
+  }
+
+  // جلب قائمة المشرفين (مع معالجة الـ Map أو الـ Object)
+const category = student.category; 
+const rawOverseers = (the_course.overseers instanceof Map) 
+    ? the_course.overseers.get(category) 
+    : the_course.overseers[category];
+
+// التأكد من أن القائمة موجودة وهي مصفوفة
+if (!rawOverseers || !Array.isArray(rawOverseers)) {
+    return res.status(403).json({ 
+        status: 'error', 
+        message: `لا توجد قائمة مشرفين للمجموعة: ${category}` 
+    });
+}
+
+// الحل: فلترة المصفوفة من أي قيم فارغة قبل المقارنة لتجنب خطأ toString()
+const is_allowed = rawOverseers
+    .filter(id => id != null) // استبعاد أي قيمة null أو undefined داخل المصفوفة
+    .some(id => id.toString() === overseer.toString());
+
+if (!is_allowed) {
+    return res.status(403).json({
+        status: 'error',
+        message: 'المشرف المختار غير متاح لمجموعتك الدراسية'
+    });
+}
+
+  // 5. تحديث حالة الطلب
   request.status = 'processing';
   await request.save();
 
-  // 4. إرسال التنبيه عبر Socket
+  // 6. إرسال التنبيه عبر Socket
   const patientId = request.user.toString();
   const io = socket.getIO();
   if (io) {
@@ -325,13 +363,13 @@ module.exports.showAllRequesyions = asyncHandler(async (req, res) => {
       date, hour, location
     });
   }
-
-  // 5. إضافة السجل لجدول العمليات (يجب تخزين case_type لكي يعمل الفحص مستقبلاً)
+  // 7. إضافة السجل لجدول العمليات (InProcess)
   const in_process = new InProcess({
     patient: request.user,
     student: user.id,
     Requestion: request.id,
-    case_type: request.case_type, // ضروري جداً لنجاح الفحص في المرة القادمة
+    case_type: request.case_type,
+    overseer: overseer, // تخزين المشرف الذي تم اختياره
     date_of_accepting: new Date()
   });
   
@@ -339,9 +377,11 @@ module.exports.showAllRequesyions = asyncHandler(async (req, res) => {
 
   res.status(200).json({
     status: 'success',
-    message: 'request accepted and patient notified'
+    message: 'تم قبول الطلب بنجاح وتم إشعار المريض والمشرف'
   });
 });
+
+
 /**-----------------------------------------------------
  * @desc Show my procissing requests
  * @route GET /api/requestion/myProcissing

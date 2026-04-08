@@ -20,7 +20,8 @@ app.use('/api/users', userRoutes);
 app.use('/api/auth/', require('./routes/auth'));
 app.use('/api/profile', require('./routes/users'));
 app.use('/api/request', require('./routes/requestions'));
-app.use('/api/admin',require('./routes/admin'))
+app.use('/api/admin',require('./routes/admin'));
+app.use('/api/overseer',require('./routes/overseer'))
 
 // خطأ 404 لأي راوتر آخر
 app.use((req, res) => {
