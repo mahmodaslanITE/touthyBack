@@ -172,4 +172,8 @@ http://localhost:5000/api/overseer/treatment/complete/:id
     "rating":"5",
      "feedback":"good"
 }
+ 30:
+ المشرف يقبل الحالة يحط تقييم من 1 ل 5 وملاحظة 
+http://localhost:5000/api/overseer/treatment/reject/:id
+  {note}
 

@@ -3,6 +3,7 @@ const asyncHandler=require('express-async-handler');
 const { Verify_request, validateVerifyRequest} = require('../models/VerifyRequest');
 const { date } = require('joi');
 const Course = require('../models/Course');
+const { OverseerProfile } = require('../models/Overseer_profile');
 
 
 /**
@@ -67,10 +68,14 @@ module.exports.getCourseOverseers = asyncHandler(async (req, res) => {
 
     // 2. البحث عن المادة وعمل Populate لبيانات المشرفين في فئة الطالب فقط
     const course = await Course.findById( req.params.id )
-        // .populate({
-        //     path: `overseers.${studentCategory}`,
-        //     select: 'first_name last_name profile_photo phone' // اختر الحقول التي تريد عرضها للمشرف
-        // });
+    // 3. استخراج البيانات من الـ Map
+    const overseersList = course.overseers.get(studentCategory) || [];
+    const sessionTime = course.categories.get(studentCategory);
+
+      
+    const overseersData = await OverseerProfile.find({
+        user: { $in: overseersList }
+    }).select('first_name father_name last_name profile_photo phone');
 
     if (!course) {
         return res.status(404).json({ 
@@ -79,17 +84,14 @@ module.exports.getCourseOverseers = asyncHandler(async (req, res) => {
         });
     }
 
-    // 3. استخراج البيانات من الـ Map
-    const overseersList = course.overseers.get(studentCategory) || [];
-    const sessionTime = course.categories.get(studentCategory);
-
+    
     res.status(200).json({
         status: 'success',
         data: {
             course_name: course.course_name,
             category: studentCategory,
             time: sessionTime,
-            overseers: overseersList
+            overseers: overseersData
         }
     });
 });

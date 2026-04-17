@@ -1,6 +1,8 @@
 const asyncHandler=require('express-async-handler');
 const InProcess = require('../models/InProcess');
 const Finished = require('../models/Finished');
+const Patient_profil = require('../models/Patient_profile');
+const Student_profile = require('../models/Student_profile');
 const { TreatmentRequest } = require('../models/Requestion');
 /**
  * @description view the request wich the overseer overlocks on it 
@@ -9,23 +11,51 @@ const { TreatmentRequest } = require('../models/Requestion');
  * @access privte (only overseer)
  */
 module.exports.show_overseer_requests_in_process = asyncHandler(async (req, res) => {
-
+    // 1. التحقق من الصلاحية
     if (req.user.role !== 'overseer') {
-        return res.status(403).json({
-            status: 'error',
-            message: 'عذراً، هذه الصلاحية للمشرفين فقط'
-        });
+        return res.status(403).json({ status: 'error', message: 'عذراً، هذه الصلاحية للمشرفين فقط' });
     }
 
-    const requests = await InProcess.find({ overseer: req.user.id });
+    // 2. جلب الطلبات الأساسية
+    const requests = await InProcess.find({ overseer: req.user.id }).lean();
+    
+   
+
+    if (!requests || requests.length === 0) {
+        return res.status(200).json({ status: 'success', data: [] });
+    }
+
+    // 3. تحويل المعرفات لنصوص (Strings) لضمان مطابقتها
+    const patientUserIds = [...new Set(requests.map(r => r.patient?.toString()).filter(id => id))];
+    const studentUserIds = [...new Set(requests.map(r => r.student?.toString()).filter(id => id))];
+    const treatmentIds = [...new Set(requests.map(r => r.Requestion?.toString()).filter(id => id))];
+
+    // 4. جلب البيانات (تأكد من استيراد الموديلات بشكل صحيح في أعلى الملف)
+    const [patients, students, treatments] = await Promise.all([
+        Patient_profil.find({ user: { $in: patientUserIds } }).lean(),
+        Student_profile.find({ user: { $in: studentUserIds } }).lean(),
+        TreatmentRequest.find({ _id: { $in: treatmentIds } }).lean()
+    ]);
+
+   
+
+    // 5. دمج البيانات مع مقارنة ذكية (تحويل الكل لنصوص عند المقارنة)
+    const fullData = requests.map(reqItem => {
+        return {
+            ...reqItem,
+            patient_info: patients.find(p => p.user?.toString() === reqItem.patient?.toString()) || "بيانات المريض غير موجودة",
+            student_info: students.find(s => s.user?.toString() === reqItem.student?.toString()) || "بيانات الطالب غير موجودة",
+            treatment_info: treatments.find(t => t._id?.toString() === reqItem.Requestion?.toString()) || "تفاصيل العلاج غير موجودة"
+        };
+    });
 
     res.status(200).json({
         status: 'success',
-        message: 'تم جلب الطلبات قيد المعالجة بنجاح',
-        results: requests.length, 
-        data: requests
+        results: fullData.length,
+        data: fullData
     });
 });
+
 
 /**
  * @description إنهاء الطلب ونقله إلى جدول المنتهية مع التقييم
@@ -107,28 +137,52 @@ module.exports.reject_request = asyncHandler(async (req, res) => {
         return res.status(404).json({ message: 'الطلب غير موجود أو أنك لست المشرف المسؤول عنه' });
     }
 
-    // 3. تحديث الطلب الأصلي في جدول TreatmentRequests
-    // ملاحظة: نفترض أن InProcess يحمل حقل originalRequestId أو نفس الـ ID
-    const TreatmentRequest = require('../models/TreatmentRequest'); 
-    
-    const updatedTreatment = await TreatmentRequest.findByIdAndUpdate(
-        requestInProcess.originalRequestId || requestId, 
-        {
-            $set: { status: 'pending' },
-            $push: { 
-                more_details: { 
-                    overseer: overseerId,
-                    note: note || "تم الرفض وإعادة المعالجة",
-                    rejectedAt: new Date()
-                } 
-            }
-        },
-        { new: true }
-    );
+    // 3. جلب الطلب الأصلي لتحديد كيفية تحديث more_details
+    const targetId = requestInProcess.Requestion || requestId;
+    const originalDoc = await TreatmentRequest.findById(targetId);
 
-    if (!updatedTreatment) {
+    if (!originalDoc) {
         return res.status(404).json({ message: 'فشل العثور على الطلب الأصلي لتحديثه' });
     }
+
+    // تجهيز الملاحظة الجديدة
+    const newNote = { 
+        overseer: overseerId,
+        note: note || "تم الرفض وإعادة المعالجة",
+        rejectedAt: new Date()
+    };
+
+    let updateQuery;
+
+    // فحص الحقل: إذا كان مصفوفة نستخدم $push، وإذا كان كائن نحوله لمصفوفة مع الحفاظ عليه
+    if (Array.isArray(originalDoc.more_details)) {
+        updateQuery = {
+            $set: { status: 'pending' },
+            $push: { more_details: newNote }
+        };
+    } else if (originalDoc.more_details && typeof originalDoc.more_details === 'object' && Object.keys(originalDoc.more_details).length > 0) {
+        // إذا كان كائن (Object) قديم، ندمجه مع الملاحظة الجديدة في مصفوفة واحدة
+        updateQuery = {
+            $set: { 
+                status: 'pending',
+                more_details: [originalDoc.more_details, newNote] 
+            }
+        };
+    } else {
+        // إذا كان الحقل فارغاً تماماً
+        updateQuery = {
+            $set: { 
+                status: 'pending',
+                more_details: [newNote] 
+            }
+        };
+    }
+
+    const updatedTreatment = await TreatmentRequest.findByIdAndUpdate(
+        targetId,
+        updateQuery,
+        { new: true }
+    );
 
     // 4. حذف الطلب من جدول InProcess لأنه لم يعد "تحت المعالجة"
     await InProcess.findByIdAndDelete(requestId);
@@ -139,5 +193,3 @@ module.exports.reject_request = asyncHandler(async (req, res) => {
         data: updatedTreatment
     });
 });
-
-

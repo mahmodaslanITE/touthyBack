@@ -259,12 +259,46 @@ module.exports.showAllRequesyions = asyncHandler(async (req, res) => {
     });
   }
 
-  const data = await TreatmentRequest.find({ status: 'pending' }).populate('case_type','course');
+  const data = await TreatmentRequest.find({ status: 'pending' })
+  .populate({
+    path: 'case_type',
+    select: '_id case_type course',
+    populate: {
+      path: 'course',
+      select: '_id course_name'
+    }
+  });
+
+// إعادة فصل case_type و course
+const formattedData = data.map(item => ({
+  _id: item._id,
+  user: item.user,
+  pain_severity: item.pain_severity,
+  pain_time: item.pain_time,
+  tooth_location: item.tooth_location,
+  gender: item.gender,
+  status: item.status,
+  case_type: {
+    _id: item.case_type._id,
+    case_type: item.case_type.case_type
+  },
+  course: item.case_type.course
+    ? {
+        _id: item.case_type.course._id,
+        course_name: item.case_type.course.course_name
+      }
+    : null,
+  more_details: item.more_details,
+  age: item.age,
+  photo: item.photo,
+  createdAt: item.createdAt,
+  updatedAt: item.updatedAt
+}));
 
   res.status(200).json({
     status: 'success',
     message: 'this is all requests',
-    data
+    formattedData
   });
 });
 
