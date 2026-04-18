@@ -79,7 +79,10 @@ if(!treatment){
 exports.getUserTreatmentRequests = asyncHandler(async (req, res) => {
   const user = req.user;
 
-  const requests = await TreatmentRequest.find({ user: user.id });
+  const requests = await TreatmentRequest.find({ user: user.id }).populate({
+    path: 'case_type',
+    select: '_id case_type',
+  });
 
   res.status(200).json({
     status: 'success',

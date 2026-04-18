@@ -55,7 +55,8 @@ module.exports.createRegisterUser = asyncHandler(async (req, res) => {
       university_number,
       user: newUser._id,
       gender,
-      category
+      category,
+      
     });
   } else if (role === 'patient') {
     profile = new Patient_profile({
@@ -158,6 +159,7 @@ module.exports.loginUser = asyncHandler(async (req, res) => {
         gender:profile.gender,
         profile_photo:profile.profile_photo,
        university_number: profile.university_number,
+       is_verified:profile.is_verified,
         
       }
     : {
@@ -170,7 +172,9 @@ module.exports.loginUser = asyncHandler(async (req, res) => {
         bio:profile.bio,
         gender:profile.gender,
         profile_photo:profile.profile_photo,
-       university_number: profile.university_number,      };
+       university_number: profile.university_number, 
+       is_verified:profile.is_verified,
+      };
 
   res.status(200).json({
     status: "success",
