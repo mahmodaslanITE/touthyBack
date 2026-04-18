@@ -262,7 +262,7 @@ module.exports.showAllRequesyions = asyncHandler(async (req, res) => {
     });
   }
 
-  const data = await TreatmentRequest.find({ status: 'pending' })
+  const undata = await TreatmentRequest.find({ status: 'pending' })
   .populate({
     path: 'case_type',
     select: '_id case_type course',
@@ -273,7 +273,7 @@ module.exports.showAllRequesyions = asyncHandler(async (req, res) => {
   });
 
 // إعادة فصل case_type و course
-const formattedData = data.map(item => ({
+const data = undata.map(item => ({
   _id: item._id,
   user: item.user,
   pain_severity: item.pain_severity,
@@ -301,7 +301,7 @@ const formattedData = data.map(item => ({
   res.status(200).json({
     status: 'success',
     message: 'this is all requests',
-    formattedData
+    data
   });
 });
 
