@@ -67,7 +67,7 @@ module.exports.getProfile = asyncHandler(async (req, res) => {
   }
 
   // 2. البحث عن البروفايل باستخدام المعرف الموجود في الرابط (URL)
-  const profile = await Student_profile.findOne({ user: req.params.id });
+  const profile = await Student_profile.findOne({ user: req.params.id }).populate({path:'category',select:'category'});
 
   // 3. التأكد من وجود البروفايل في قاعدة البيانات
   if (!profile) {

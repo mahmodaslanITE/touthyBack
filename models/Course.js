@@ -7,14 +7,6 @@ const course_schema = new mongoose.Schema({
     required: true, 
     trim: true 
   },
-
-  // الفئات (خريطة تحتوي على الفئة والوقت)
-  categories: {
-    type: Map,
-    of: String, // القيمة هنا هي الوقت المقابل للفئة
-    required: true
-  },
-
   // المشرفين (خريطة تحتوي على الفئة ومصفوفة من المعرفات)
   overseers: {
     type: Map,

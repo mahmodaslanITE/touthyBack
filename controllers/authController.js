@@ -127,7 +127,10 @@ module.exports.loginUser = asyncHandler(async (req, res) => {
   // جلب البروفايل حسب الدور
   let profile;
   if (user.role === 'student') {
-    profile = await Student_profile.findOne({ user: user._id });
+    profile = await Student_profile.findOne({ user: user._id }).populate({
+      path:'category',
+      select:'category'
+    });
   } else if (user.role === 'patient') {
     profile = await Patient_profile.findOne({ user: user._id });
   }
@@ -157,9 +160,10 @@ module.exports.loginUser = asyncHandler(async (req, res) => {
         last_name:profile.last_name,
         bio:profile.bio,
         gender:profile.gender,
+        university_number: profile.university_number,
+        is_verified:profile.is_verified,
+        category:profile.category,
         profile_photo:profile.profile_photo,
-       university_number: profile.university_number,
-       is_verified:profile.is_verified,
         
       }
     : {
@@ -171,9 +175,11 @@ module.exports.loginUser = asyncHandler(async (req, res) => {
         last_name:profile.last_name,
         bio:profile.bio,
         gender:profile.gender,
+        university_number: profile.university_number, 
+        is_verified:profile.is_verified,
+        category:profile.category,
         profile_photo:profile.profile_photo,
-       university_number: profile.university_number, 
-       is_verified:profile.is_verified,
+
       };
 
   res.status(200).json({

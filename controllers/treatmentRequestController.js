@@ -137,13 +137,13 @@ exports.getUserTreatmentRequests = asyncHandler(async (req, res) => {
   }
 
   // validate body
-  const { error } = validateUpdateRequest(req.body);
-  if (error) {
-    return res.status(400).json({
-      status: 'error',
-      message: error.details[0].message
-    });
-  }
+  // const { error } = validateUpdateRequest(req.body);
+  // if (error) {
+  //   return res.status(400).json({
+  //     status: 'error',
+  //     message: error.details[0].message
+  //   });
+  // }
 
   // update fields
   const {
@@ -154,8 +154,10 @@ exports.getUserTreatmentRequests = asyncHandler(async (req, res) => {
     is_pregnant,
     case_type,
     notes,
-    age
-  } = req.body;
+    age,
+    more_details
+  } = req.body
+ // 3. تحويل moreDetails من String إلى JSON Object
 
   if (pain_severity !== undefined) request.pain_severity = pain_severity;
   if (pain_time !== undefined) request.pain_time = pain_time;
@@ -165,6 +167,14 @@ exports.getUserTreatmentRequests = asyncHandler(async (req, res) => {
   if (case_type !== undefined) request.case_type = case_type;
   if (notes !== undefined) request.notes = notes;
   if (age !== undefined) request.age = age;
+  if(more_details !== undefined ){ let more_detailsData = req.body.more_details;
+    if (typeof req.body.more_details === 'string') {
+      try {
+        more_detailsData = JSON.parse(req.body.more_details);
+      } catch (e) {
+        return res.status(400).json({ status: 'error', message: 'حقل moreDetails ليس بتنسيق JSON صحيح' });
+      }
+    }request.more_details= more_detailsData;}
 
   // update photo if exists
   if (req.file) {

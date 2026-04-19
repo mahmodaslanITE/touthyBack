@@ -1,4 +1,3 @@
-const { required } = require('joi');
 const mongoose=require('mongoose');
 const profileSchema=mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
@@ -45,7 +44,8 @@ const profileSchema=mongoose.Schema({
         type:String
       },
       category:{
-        type:String
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'Category'
       }
 })
 const Student_profile=mongoose.model('Student_profile',profileSchema)

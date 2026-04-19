@@ -72,6 +72,7 @@ module.exports.createOverseer = asyncHandler(async (req, res) => {
 
 const fs = require('fs');
 const path = require('path');
+const { Category, valedate_add_category } = require('../models/Category');
 /**
  * @description قبول  طلب توثيق حساب
  * @route /api/admin/accept/reject/:id
@@ -431,5 +432,74 @@ exports.deleteTreatment = async (req, res) => {
         res.status(500).json({ success: false, error: error.message });
     }
 };
+
+/**
+ * @description add  category 
+ * @route api/admin/category
+ * @method post 
+ * @access private( only admin)
+ */
+module.exports.add_category=asyncHandler(async(req,res)=>{
+    const {error}=valedate_add_category(req.body);
+    if(error){return res.status(400).json({status:'error',message:error.details[0].message})}
+const user =req.user;
+const isAdmin=req.user.isAdmin;
+if(!isAdmin){return res.status(403).json({status:'error', message:'انت لست مشرف '})};
+const result=await Category.create({
+    category:req.body.category
+})
+res.status(201).json({status:'success',message:'تمت اضافة الفئة بنجاح',result})
+})
+
+/**
+ * @description add  partial lesson 
+ * @route api/admin/category
+ * @method post 
+ * @access private( only admin)
+ */
+/**
+/**
+ * @description إضافة درس عملي جديد
+ * @route /api/admin/practical-lessons
+ * @method POST
+ * @access private (Admin only)
+ */
+module.exports.add_practical_lesson = asyncHandler(async (req, res) => {
+    // 1. التحقق من صحة البيانات المدخلة باستخدام Joi
+    const { error } = validate_practical_lesson(req.body);
+    if (error) {
+        return res.status(400).json({ 
+            status: 'error', 
+            message: error.details[0].message 
+        });
+    }
+
+    // 2. التحقق من الصلاحيات (يجب أن يكون Admin)
+    if (!req.user.isAdmin) {
+        return res.status(403).json({ 
+            status: 'error', 
+            message: 'عذراً، هذه الصلاحية للمشرفين فقط' 
+        });
+    }
+
+    // 3. إنشاء سجل الدرس العملي في قاعدة البيانات
+    const result = await Practial_lesson.create({
+        course: req.body.course,
+        category: req.body.category,
+        overseers: req.body.overseers,
+        time: req.body.time,
+        hall: req.body.hall
+    });
+
+    // 4. الرد بنجاح
+    res.status(201).json({
+        status: 'success',
+        message: 'تم إضافة الدرس العملي بنجاح',
+        result
+    });
+});
+
+
+
 
 

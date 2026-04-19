@@ -1,5 +1,5 @@
 const express=require('express');
-const { createOverseer, get_all_patients, get_all_students, get_all_overseers, verify_account_accept, verify_account_reject, createCourse, get_courses, addTreatment, getAllTreatments, deleteTreatment } = require('../controllers/adminController');
+const { createOverseer, get_all_patients, get_all_students, get_all_overseers, verify_account_accept, verify_account_reject, createCourse, get_courses, addTreatment, getAllTreatments, deleteTreatment, add_category, add_practical_lesson } = require('../controllers/adminController');
 const verifyToken = require('../Middlewares/verifyToken');
 const { getAllVerifyRequests } = require('../controllers/studentController');
 const router=express.Router();
@@ -23,5 +23,11 @@ router.get('/course',verifyToken,get_courses)
 router.post('/treatment',verifyToken,addTreatment)
 router.get('/treatment',verifyToken,getAllTreatments)
 router.delete('/treatment/:id',verifyToken,deleteTreatment)
+
+//categories
+router.post('/catrgory',verifyToken,add_category)
+
+//practical-lessons
+router.post('practical-lessons',verifyToken,add_practical_lesson)
 
 module.exports=router
