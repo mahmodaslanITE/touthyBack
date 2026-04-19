@@ -14,7 +14,7 @@ const lesson_schema = mongoose.Schema({
   // قائمة بـ IDs المشرفين
   overseers: [{
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'OverseerProfile',
+    ref: 'User',
   }],
 
   time:{

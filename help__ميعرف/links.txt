@@ -177,3 +177,17 @@ http://localhost:5000/api/overseer/treatment/complete/:id
 http://localhost:5000/api/overseer/treatment/reject/:id
   {note}
 
+31:
+/**
+ * @description إضافة درس عملي جديد
+ * @route /api/admin/practical-lessons
+ * @method POST
+ * @access private (Admin only)
+
+ 32:
+ /**
+ * @description add  category 
+ * @route api/admin/category
+ * @method post 
+ * @access private( only admin)
+ */

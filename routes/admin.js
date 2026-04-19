@@ -28,6 +28,6 @@ router.delete('/treatment/:id',verifyToken,deleteTreatment)
 router.post('/catrgory',verifyToken,add_category)
 
 //practical-lessons
-router.post('practical-lessons',verifyToken,add_practical_lesson)
+router.post('/practical-lessons',verifyToken,add_practical_lesson)
 
 module.exports=router

@@ -73,6 +73,7 @@ module.exports.createOverseer = asyncHandler(async (req, res) => {
 const fs = require('fs');
 const path = require('path');
 const { Category, valedate_add_category } = require('../models/Category');
+const { validate_practical_lesson, Practial_lesson } = require('../models/Practical_lesson');
 /**
  * @description قبول  طلب توثيق حساب
  * @route /api/admin/accept/reject/:id
@@ -265,55 +266,20 @@ module.exports.createCourse = asyncHandler(async (req, res) => {
         });
     }
 
-    const { course_name, categories, overseers } = req.body;
+    const { course_name } = req.body;
 
-    if (!course_name || !categories || !overseers) {
-        return res.status(400).json({
-            status: 'error',
-            message: 'يرجى تزويد اسم المادة (course_name)، الفئات، وقائمة معرفات المشرفين'
-        });
-    }
 
-    // 4. التحقق من وجود معرفات المشرفين في قاعدة البيانات
-    // const all_overseer_ids = Object.values(overseers).flat();
-    // const existing_overseers_count = await OverseerProfile.countDocuments({
-    //     user: { $in: all_overseer_ids }
-    // });
+ 
 
-    // if (existing_overseers_count !== all_overseer_ids.length) {
-    //     return res.status(400).json({
-    //         status: 'error',
-    //         message: 'واحد أو أكثر من معرفات المشرفين غير موجود في النظام'
-    //     });
-    // }
-    const mongoose = require('mongoose');
-
-// 1. استخراج المعرفات وتحويلها لمصفوفة فريدة (بدون تكرار)
-const raw_ids = Object.values(overseers).flat();
-const unique_ids = [...new Set(raw_ids)];
-
-const formatted_ids = unique_ids.map(id => new mongoose.Types.ObjectId(id));
-
-// 3. البحث عن عدد الحسابات الموجودة فعلياً
-const existing_overseers_count = await OverseerProfile.countDocuments({
-    user: { $in: formatted_ids }
-});
-
-if (existing_overseers_count !== unique_ids.length) {
-    return res.status(404).json({ 
-        message: "واحد أو أكثر من المشرفين غير مسجل في النظام" 
-    });
-}
 
     const new_course = await Course.create({
         course_name,
-        categories,
-        overseers 
+       
     });
 
     return res.status(201).json({
         status: 'success',
-        message: 'تم إنشاء المادة وربط المشرفين بنجاح',
+        message: 'تم',
         data: new_course
     });
 });
@@ -451,13 +417,7 @@ const result=await Category.create({
 res.status(201).json({status:'success',message:'تمت اضافة الفئة بنجاح',result})
 })
 
-/**
- * @description add  partial lesson 
- * @route api/admin/category
- * @method post 
- * @access private( only admin)
- */
-/**
+
 /**
  * @description إضافة درس عملي جديد
  * @route /api/admin/practical-lessons

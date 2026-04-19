@@ -4,6 +4,7 @@ const { Verify_request, validateVerifyRequest} = require('../models/VerifyReques
 const { date } = require('joi');
 const Course = require('../models/Course');
 const { OverseerProfile } = require('../models/Overseer_profile');
+const { Practial_lesson } = require('../models/Practical_lesson');
 
 
 /**
@@ -66,32 +67,19 @@ module.exports.getCourseOverseers = asyncHandler(async (req, res) => {
 
     const studentCategory = studentProfile.category; // تأكد أن الحقل بهذا الاسم في مودل الطالب
 
-    // 2. البحث عن المادة وعمل Populate لبيانات المشرفين في فئة الطالب فقط
-    const course = await Course.findById( req.params.id )
-    // 3. استخراج البيانات من الـ Map
-    const overseersList = course.overseers.get(studentCategory) || [];
-    const sessionTime = course.categories.get(studentCategory);
+  // 1. جلب الدرس أولاً للحصول على أرقام المعرفات
+const lesson = await Practial_lesson.findOne({
+    category: studentCategory,
+    course: req.params.id
+}).select('overseers');
 
-      
-    const overseersData = await OverseerProfile.find({
-        user: { $in: overseersList }
-    }).select('first_name father_name last_name profile_photo phone');
+if (lesson) {
+    // 2. البحث في جدول البروفايل عن كل المعرفات الموجودة في مصفوفة overseers
+    const overseersProfiles = await OverseerProfile.find({
+        user: { $in: lesson.overseers }
+    }).select('first_name last_name user profile_photo');
 
-    if (!course) {
-        return res.status(404).json({ 
-            status: 'error', 
-            message: 'المادة غير موجودة' 
-        });
-    }
+    res.json(overseersProfiles);
+}
 
-    
-    res.status(200).json({
-        status: 'success',
-        data: {
-            course_name: course.course_name,
-            category: studentCategory,
-            time: sessionTime,
-            overseers: overseersData
-        }
-    });
 });
