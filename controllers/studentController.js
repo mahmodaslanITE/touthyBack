@@ -71,15 +71,20 @@ module.exports.getCourseOverseers = asyncHandler(async (req, res) => {
 const lesson = await Practial_lesson.findOne({
     category: studentCategory,
     course: req.params.id
-}).select('overseers');
-
+})
+console.log(`the lesson is ${lesson}`)
+const course_name=await Course.findById(lesson.course)
+let overseersProfiles=null
 if (lesson) {
     // 2. البحث في جدول البروفايل عن كل المعرفات الموجودة في مصفوفة overseers
-    const overseersProfiles = await OverseerProfile.find({
+     overseersProfiles = await OverseerProfile.find({
         user: { $in: lesson.overseers }
     }).select('first_name last_name user profile_photo');
-
-    res.json(overseersProfiles);
 }
+else{
+    return res.status(500).json({status:'error',message:'لم يتم تعيين موعد لفئتك بعد في هذه المادة'})
+}
+console.log(` the lesson is ${lesson}`)
+res.status(200).json({status:'success',message:`المشرفين المسؤولين عن فئتك في مادة  ${course_name.course_name}`,data:overseersProfiles});
 
 });

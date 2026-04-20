@@ -7,6 +7,7 @@ const InProcess = require('../models/InProcess');
 const Treatment = require('../models/Treatment');
 const Course = require('../models/Course');
 const { OverseerProfile } = require('../models/Overseer_profile');
+const { Practial_lesson } = require('../models/Practical_lesson');
 
 /**-----------------------------------------------------
  * @desc Create treatment request
@@ -351,7 +352,6 @@ const data = undata.map(item => ({
     student: user.id, 
     case_type: request.case_type 
   });
-console.log(` request in process .....${request_in_process}`)
 const the_treatment = await Treatment.findById(request.case_type);
 
   if (request_in_process) {
@@ -371,31 +371,18 @@ const the_treatment = await Treatment.findById(request.case_type);
     return res.status(404).json({ status: 'error', message: 'المادة المرتبطة بهذه الحالة غير موجودة' });
   }
 
-  // جلب قائمة المشرفين (مع معالجة الـ Map أو الـ Object)
-const category = student.category; 
-const rawOverseers = (the_course.overseers instanceof Map) 
-    ? the_course.overseers.get(category) 
-    : the_course.overseers[category];
+  const lesson=await Practial_lesson.findOne({course:the_treatment.course,category:student.category})
+  const overseers=lesson.overseers
+  if( ! overseers.includes(overseer)){
+    return res.status(400).json({
+      status:'error',
+      message:'المشرف الذي اخترته غير مسؤول عن فئتك'
+    })
+  }
+  
+  
 
-// التأكد من أن القائمة موجودة وهي مصفوفة
-if (!rawOverseers || !Array.isArray(rawOverseers)) {
-    return res.status(403).json({ 
-        status: 'error', 
-        message: `لا توجد قائمة مشرفين للمجموعة: ${category}` 
-    });
-}
 
-// الحل: فلترة المصفوفة من أي قيم فارغة قبل المقارنة لتجنب خطأ toString()
-const is_allowed = rawOverseers
-    .filter(id => id != null) // استبعاد أي قيمة null أو undefined داخل المصفوفة
-    .some(id => id.toString() === overseer.toString());
-
-if (!is_allowed) {
-    return res.status(403).json({
-        status: 'error',
-        message: 'المشرف المختار غير متاح لمجموعتك الدراسية'
-    });
-}
 
   // 5. تحديث حالة الطلب
   request.status = 'processing';

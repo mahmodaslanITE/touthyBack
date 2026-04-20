@@ -417,7 +417,21 @@ const result=await Category.create({
 res.status(201).json({status:'success',message:'تمت اضافة الفئة بنجاح',result})
 })
 
+/**
+ * @description get  categories
+ * @route api/admin/category
+ * @method post 
+ * @access private( only admin)
+ */
+module.exports.get_categorirs=asyncHandler(async(req,res)=>{
+    const user =req.user;
+const isAdmin=req.user.isAdmin;
+if(!isAdmin){return res.status(403).json({status:'error', message:'انت لست مشرف '})};
+const result=await Category.find();
+res.status(201).json({status:'success',message:'هذه هي الفئات لدينا ',result})
 
+
+})
 /**
  * @description إضافة درس عملي جديد
  * @route /api/admin/practical-lessons
