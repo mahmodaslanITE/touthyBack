@@ -1,10 +1,11 @@
 const express=require('express');
-const { createOverseer, get_all_patients, get_all_students, get_all_overseers, verify_account_accept, verify_account_reject, createCourse, get_courses, addTreatment, getAllTreatments, deleteTreatment, add_category, add_practical_lesson, get_categorirs } = require('../controllers/adminController');
+const { createOverseer, get_all_patients, get_all_students, get_all_overseers, verify_account_accept, verify_account_reject, createCourse, get_courses, addTreatment, getAllTreatments, deleteTreatment, add_category, add_practical_lesson, get_categorirs, assign_overseer } = require('../controllers/adminController');
 const verifyToken = require('../Middlewares/verifyToken');
 const { getAllVerifyRequests } = require('../controllers/studentController');
 const router=express.Router();
 // add over seer 
 router.post('/overseer',verifyToken,createOverseer);
+router.put('/overseer/assign',verifyToken,assign_overseer)
 //get verify requests
 router.get('/verify',verifyToken,getAllVerifyRequests);
 //verify account

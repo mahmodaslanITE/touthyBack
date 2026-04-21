@@ -34,7 +34,7 @@ module.exports.createOverseer = asyncHandler(async (req, res) => {
     }
 
     // 3. استخراج البيانات من الطلب (هذا يمنع خطأ undefined)
-    const { email, password } = req.body;
+    const { email, password,first_name,last_name,father_name } = req.body;
 
     // 4. التحقق من وجود المستخدم مسبقاً
     const userExists = await User.findOne({ email });
@@ -54,8 +54,11 @@ module.exports.createOverseer = asyncHandler(async (req, res) => {
     });
 
     // 7. إنشاء ملف شخصي للمشرف وربطه بحسابه
-    await OverseerProfile.create({
+    const profile= await OverseerProfile.create({
         user: overseer._id,
+        first_name:first_name,
+        last_name:last_name,
+        father_name:father_name,
         is_verified:true
     });
 
@@ -65,7 +68,9 @@ module.exports.createOverseer = asyncHandler(async (req, res) => {
         message: 'تم إنشاء حساب المشرف وملفه الشخصي بنجاح',
         data: {
             id: overseer._id,
-            email: overseer.email
+            email: overseer.email,
+            profile:profile
+
         }
     });
 });
@@ -427,8 +432,8 @@ module.exports.get_categorirs=asyncHandler(async(req,res)=>{
     const user =req.user;
 const isAdmin=req.user.isAdmin;
 if(!isAdmin){return res.status(403).json({status:'error', message:'انت لست مشرف '})};
-const result=await Category.find();
-res.status(201).json({status:'success',message:'هذه هي الفئات لدينا ',result})
+const data=await Category.find();
+res.status(201).json({status:'success',message:'هذه هي الفئات لدينا ',data})
 
 
 })
@@ -457,7 +462,7 @@ module.exports.add_practical_lesson = asyncHandler(async (req, res) => {
     }
 
     // 3. إنشاء سجل الدرس العملي في قاعدة البيانات
-    const result = await Practial_lesson.create({
+    const data = await Practial_lesson.create({
         course: req.body.course,
         category: req.body.category,
         overseers: req.body.overseers,
@@ -469,7 +474,53 @@ module.exports.add_practical_lesson = asyncHandler(async (req, res) => {
     res.status(201).json({
         status: 'success',
         message: 'تم إضافة الدرس العملي بنجاح',
-        result
+        data
+    });
+});
+
+/** 
+ * @description assign overseer on lesson 
+ * @route PUT api/admin/overseer/assign 
+ * @access private (only admin)
+ */
+module.exports.assign_overseer = asyncHandler(async (req, res) => {
+    // 1. التحقق من الصلاحيات (يفضل أن يكون ذلك في Middleware منفصل)
+    if (!req.user.isAdmin) {
+        return res.status(403).json({ status: 'error', message: 'عذراً، هذه الصلاحية للمشرفين فقط' });
+    }
+
+    // 2. استقبال البيانات من req.body
+    const { lessonId, overseerId } = req.body;
+
+    // 3. البحث عن الحصة
+    const lesson = await Practial_lesson.findById(lessonId);
+    if (!lesson) {
+        return res.status(404).json({ status: 'error', message: 'الحصة غير موجودة' });
+    }
+
+    // 4. التحقق من عدد المشرفين (أقصى حد 2)
+    if (lesson.overseers.length >= 2) {
+        return res.status(400).json({ 
+            status: 'error', 
+            message: 'غير مسموح بتعيين أكثر من مشرفين على هذه المادة' 
+        });
+    }
+
+    // 5. إضافة المشرف باستخدام push (مع التأكد من عدم تكراره إذا أردت)
+    if (lesson.overseers.includes(overseerId)) {
+        return res.status(400).json({ status: 'error', message: 'هذا المشرف معين بالفعل لهذه المادة' });
+    }
+    const course=await Course.findById(lesson.course);
+    const overseer_profile= await OverseerProfile.findOne({user:overseerId});
+    const category= await Category.findById(lesson.category)
+    lesson.overseers.push(overseerId);
+    await lesson.save();
+console.log(overseer_profile)
+const overseer_name=overseer_profile.first_name;
+    res.status(200).json({ 
+        status: 'success', 
+        message:`تم تكليف المشرف ${overseer_name} ${overseer_profile.last_name} بالمادة ${course.course_name} للفئة ${category.category}`,
+        data: lesson 
     });
 });
 
