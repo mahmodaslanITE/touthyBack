@@ -416,21 +416,4 @@ const the_treatment = await Treatment.findById(request.case_type);
 });
 
 
-/**-----------------------------------------------------
- * @desc Show my procissing requests
- * @route GET /api/requestion/myProcissing
- * @access Private
- ------------------------------------------------------*/
- exports.getUserProcessingTreatmentRequests = asyncHandler(async (req, res) => {
-  const user = req.user;
 
-  const requests = await InProcess.find({ student: user.id}).populate('Requestion','pain_severity pain_time tooth_location gender is_pregnant age photo case_type more_details').populate({
-    path:'case_type'
-  }).exec();
-
-  res.status(200).json({
-    status: 'success',
-    message: 'this is your procissing requests',
-    data: requests
-  });
-});

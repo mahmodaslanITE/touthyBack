@@ -128,17 +128,7 @@
 الواصفات 
 {
   "course_name": "هندسة البرمجيات المتقدمة",
-  "categories": {
-    "المجموعة الصباحية": "08:30 AM",
-    "المجموعة المسائية": "06:00 PM"
-  },
-  "overseers": {
-    "المجموعة الصباحية": [
-      "69b51bb9e79edf4e0b894daf"
-    ],
-    "المجموعة المسائية": [
-      "69c4e8436c62669c644346a8"
-    ]
+
   }
 }
 23:
@@ -173,7 +163,7 @@ http://localhost:5000/api/overseer/treatment/complete/:id
      "feedback":"good"
 }
  30:
- المشرف يقبل الحالة يحط تقييم من 1 ل 5 وملاحظة 
+ يرفض الحالة مع ذكر السبب 
 http://localhost:5000/api/overseer/treatment/reject/:id
   {note}
 
@@ -190,4 +180,25 @@ http://localhost:5000/api/overseer/treatment/reject/:id
  * @route api/admin/category
  * @method post 
  * @access private( only admin)
+ */
+ 33:
+ /**
+ * @description get all practial lesson 
+ * @route api/admin/practical-lessons
+ * @method get 
+ * @access private (only admin )
+ */
+
+ 34 :
+ /**
+ * @description get  categories
+ * @route api/admin/category
+ * @method post 
+ * @access private( only admin)
+ */
+ 35:
+ /** 
+ * @description assign overseer on lesson 
+ * @route PUT api/admin/overseer/assign 
+ * @access private (only admin)
  */

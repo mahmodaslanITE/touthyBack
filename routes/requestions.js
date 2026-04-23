@@ -1,8 +1,8 @@
 const express=require('express');
 const verifyToken = require('../Middlewares/verifyToken');
-const { createTreatmentRequest, showAllRequesyions, getUserTreatmentRequests, acceptRequest, updateRequest, deleteRequest, getUserProcessingTreatmentRequests } = require('../controllers/treatmentRequestController');
+const { createTreatmentRequest, getUserTreatmentRequests,  updateRequest, deleteRequest } = require('../controllers/treatmentRequestController');
 const { uploadRequestPhoto } = require('../Middlewares/upload');
-const { getCourseOverseers } = require('../controllers/studentController');
+const { getCourseOverseers, getUserProcessingTreatmentRequests, acceptRequest, showAllRequesyions } = require('../controllers/studentController');
 const router=express.Router();
 //add request
 router.post('/',verifyToken,uploadRequestPhoto.single('photo'),createTreatmentRequest);
