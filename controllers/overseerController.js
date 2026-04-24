@@ -11,50 +11,67 @@ const { TreatmentRequest } = require('../models/Requestion');
  * @access privte (only overseer)
  */
 module.exports.show_overseer_requests_in_process = asyncHandler(async (req, res) => {
-    // 1. التحقق من الصلاحية
-    if (req.user.role !== 'overseer') {
-        return res.status(403).json({ status: 'error', message: 'عذراً، هذه الصلاحية للمشرفين فقط' });
-    }
+    const user = req.user;
+  
+    const requests = await InProcess.find({ overseer: user.id })
+    .select('-overseer -__v') 
+    .populate({
+        path: 'Requestion',
+        // حذفنا -_id من هنا لإظهار ID الـ Requestion نفسه
+        select: 'pain_severity pain_time tooth_location gender is_pregnant age photo case_type more_details',
+        populate: {
+            path: 'case_type',
+            // حذفنا -_id لإظهار ID نوع المعالجة
+            select: 'case_type course', 
+            populate: { 
+                path: 'course', 
+                select: 'course_name', // سيظهر الـ ID تلقائياً هنا أيضاً
+            }
+        }
+    })
+    .populate({
+        path: 'patient',
+        model: 'Patient_profil',
+        foreignField: 'user',
+        localField: 'patient',
+        select: '-_id first_name father_name last_name'
+    })
+    .populate({
+        path: 'student',
+        model: 'Student_profile',
+        foreignField: 'user',
+        localField: 'student',
+        select: '-_id first_name father_name last_name'
+    })
+    .lean();
 
-    // 2. جلب الطلبات الأساسية
-    const requests = await InProcess.find({ overseer: req.user.id }).lean();
-    
-   
+// إعادة هيكلة البيانات مع الحفاظ على الـ IDs
+const formattedRequests = requests.map(req => {
+    const requestionData = req.Requestion || {};
+    const caseTypeData = requestionData.case_type || {};
+    const courseData = caseTypeData.course || {};
 
-    if (!requests || requests.length === 0) {
-        return res.status(200).json({ status: 'success', data: [] });
-    }
-
-    // 3. تحويل المعرفات لنصوص (Strings) لضمان مطابقتها
-    const patientUserIds = [...new Set(requests.map(r => r.patient?.toString()).filter(id => id))];
-    const studentUserIds = [...new Set(requests.map(r => r.student?.toString()).filter(id => id))];
-    const treatmentIds = [...new Set(requests.map(r => r.Requestion?.toString()).filter(id => id))];
-
-    // 4. جلب البيانات (تأكد من استيراد الموديلات بشكل صحيح في أعلى الملف)
-    const [patients, students, treatments] = await Promise.all([
-        Patient_profil.find({ user: { $in: patientUserIds } }).lean(),
-        Student_profile.find({ user: { $in: studentUserIds } }).lean(),
-        TreatmentRequest.find({ _id: { $in: treatmentIds } }).lean()
-    ]);
-
-   
-
-    // 5. دمج البيانات مع مقارنة ذكية (تحويل الكل لنصوص عند المقارنة)
-    const fullData = requests.map(reqItem => {
-        return {
-            ...reqItem,
-            patient_info: patients.find(p => p.user?.toString() === reqItem.patient?.toString()) || "بيانات المريض غير موجودة",
-            student_info: students.find(s => s.user?.toString() === reqItem.student?.toString()) || "بيانات الطالب غير موجودة",
-            treatment_info: treatments.find(t => t._id?.toString() === reqItem.Requestion?.toString()) || "تفاصيل العلاج غير موجودة"
-        };
-    });
-
-    res.status(200).json({
-        status: 'success',
-        results: fullData.length,
-        data: fullData
-    });
+    return {
+        ...req,
+        // إظهار المعلومات بشكل منفصل مع الـ IDs الخاصة بها
+        // case_type_id: caseTypeData._id || null,
+        case_type_title: caseTypeData.case_type || null,
+        course_id: courseData._id || null,
+        course_name: courseData.course_name || null,
+        
+        // تنظيف الكائن من التداخل القديم
+        Requestion: {
+            ...requestionData,
+            case_type: undefined 
+        }
+    };
 });
+
+res.status(200).json({ 
+    status: 'success', 
+    message: 'هذه  هي الطلبات التي انت مسؤول عن الاشراف عنها', 
+    data: formattedRequests 
+});});
 
 
 /**
