@@ -15,7 +15,7 @@ const inProcessSchema=mongoose.Schema({
     },
     overseer:{type:mongoose.Schema.Types.ObjectId,
         ref:'Overseer',
-        required:true
+        
     },
     date_of_accepting:{
         type:String,
