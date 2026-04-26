@@ -360,11 +360,18 @@ exports.addTreatment = async (req, res) => {
     }
 };
 
+
+
 // 1. عرض جميع المعالجات مع بيانات المواد المرتبطة
 exports.getAllTreatments = async (req, res) => {
     try {
+        let treatments
         // استخدمنا populate لجلب بيانات المادة بدلاً من مجرد الـ ID
-        const treatments = await Treatment.find().populate('course'); 
+        if(req.user.role==='patient'){treatments = await Treatment.find();}
+        else {treatments = await Treatment.find().populate({
+            path:'course',
+            select:'course_name'
+        })}
         
         res.status(200).json({
 status:'success',

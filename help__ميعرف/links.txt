@@ -201,4 +201,26 @@ http://localhost:5000/api/overseer/treatment/reject/:id
  * @description assign overseer on lesson 
  * @route PUT api/admin/overseer/assign 
  * @access private (only admin)
+ parameters{{
+    "lessonId":"69e7d9c4b9426f163bbe1cd4",
+    "overseerId":"69b180f814b0ad386202e9dd"
+}}
+ *
+ /
+
+ 36:
+ /** 
+ * @desc إضافة تقييم مرحلي للطلب
+ * @route /api/overseer/add-evaluation/:id
+ * @method post
+ * @access private (Overseer only)
+ */
+ 
+
+ 37:
+ /**
+ * @desc إعادة تعيين مشرف للطلب بعد تغيير نوع الحالة
+ * @route /api/student/reassign-overseer/:id/overseer
+ * @method put
+ * @access private (Student only)
  */

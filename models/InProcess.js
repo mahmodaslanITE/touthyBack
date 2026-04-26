@@ -24,7 +24,14 @@ const inProcessSchema=mongoose.Schema({
     case_type:{
         type:String,
         
-    }
+    },
+    stage_evaluations: [
+        {
+            text: { type: String, required: true },
+            date: { type: Date, default: Date.now }
+        }
+    ]
+    
 })
 const InProcess=mongoose.model('InProcess',inProcessSchema);
 module.exports=InProcess;

@@ -282,3 +282,51 @@ console.log(`the note is ${note}`)
     }
     
 });
+
+
+/** 
+ * @desc إضافة تقييم مرحلي للطلب
+ * @route /api/overseer/add-evaluation/:id
+ * @method post
+ * @access private (Overseer only)
+ */
+module.exports.add_stage_evaluation = asyncHandler(async (req, res) => {
+    const requestId = req.params.id; // ID الطلب في InProcess
+    const { evaluationText } = req.body;
+    const overseerId = req.user.id;
+
+    if (!evaluationText) {
+        return res.status(400).json({ message: "يرجى كتابة نص التقييم" });
+    }
+
+    // 1. العثور على الطلب والتأكد أن هذا المشرف هو المسؤول عنه
+    const requestInProcess = await InProcess.findOne({ _id: requestId, overseer: overseerId });
+
+    if (!requestInProcess) {
+        return res.status(404).json({ message: "الطلب غير موجود أو أنك لست المشرف المسؤول عنه" });
+    }
+
+    // 2. تجهيز كائن التقييم الجديد
+    const newEvaluation = {
+        text: evaluationText,
+        date: new Date()
+    };
+
+    // 3. الإضافة إلى المصفوفة في جدول InProcess
+    requestInProcess.stage_evaluations.push(newEvaluation);
+    await requestInProcess.save();
+
+    // 4. (مهم) تحديث الجدول الأصلي TreatmentRequest لضمان مزامنة البيانات
+    if (requestInProcess.Requestion) {
+        await TreatmentRequest.findByIdAndUpdate(requestInProcess.Requestion, {
+            $push: { stage_evaluations: newEvaluation }
+        });
+    }
+
+    res.status(200).json({
+        status: 'success',
+        message: 'تم إضافة التقييم المرحلي بنجاح',
+        data: requestInProcess.stage_evaluations
+    });
+});
+
