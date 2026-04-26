@@ -234,7 +234,7 @@ console.log(`the student ${requestInProcess.student} and the request in process 
         rejectedAt: new Date()
     };
     originalDoc.status='rejected',
-    originalDoc.overseer_note=newNote
+    originalDoc.overseer_note=newNote,
     await originalDoc.save();
     // 4. حذف الطلب من جدول InProcess لأنه لم يعد "تحت المعالجة"
     await InProcess.findByIdAndDelete(requestId);
@@ -256,6 +256,10 @@ console.log(`the student ${requestInProcess.student} and the request in process 
         the_new_request.case_type = cleanOption; 
         the_new_request.overseer = null; 
         await the_new_request.save();
+
+        const the_request_in_treatmentRequest=await TreatmentRequest.findById(the_new_request.Requestion);
+        the_request_in_treatmentRequest.case_type=cleanOption
+        await the_request_in_treatmentRequest.save();
     
         // 3. واستخدامها هنا أيضاً للبحث في موديل Treatment
         const treatment = await Treatment.findById(cleanOption);
