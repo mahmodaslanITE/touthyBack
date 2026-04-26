@@ -156,7 +156,7 @@ module.exports.reject_request = asyncHandler(async (req, res) => {
     }
 
     // 3. جلب الطلب الأصلي لتحديد كيفية تحديث more_details
-    const targetId = requestInProcess.Requestion || requestId;
+    const targetId = requestInProcess.Requestion ;
     const originalDoc = await TreatmentRequest.findById(targetId);
 
     if (!originalDoc) {
@@ -169,38 +169,10 @@ module.exports.reject_request = asyncHandler(async (req, res) => {
         note: note || "تم الرفض وإعادة المعالجة",
         rejectedAt: new Date()
     };
+    originalDoc.status='rejected',
+    originalDoc.overseer_note=newNote
+    await originalDoc.save();
 
-    let updateQuery;
-
-    // فحص الحقل: إذا كان مصفوفة نستخدم $push، وإذا كان كائن نحوله لمصفوفة مع الحفاظ عليه
-    if (Array.isArray(originalDoc.more_details)) {
-        updateQuery = {
-            $set: { status: 'rejected' },
-            $push: { more_details: newNote }
-        };
-    } else if (originalDoc.more_details && typeof originalDoc.more_details === 'object' && Object.keys(originalDoc.more_details).length > 0) {
-        // إذا كان كائن (Object) قديم، ندمجه مع الملاحظة الجديدة في مصفوفة واحدة
-        updateQuery = {
-            $set: { 
-                status: 'rejected',
-                more_details: [originalDoc.more_details, newNote] 
-            }
-        };
-    } else {
-        // إذا كان الحقل فارغاً تماماً
-        updateQuery = {
-            $set: { 
-                status: 'rejected',
-                more_details: [newNote] 
-            }
-        };
-    }
-
-    const updatedTreatment = await TreatmentRequest.findByIdAndUpdate(
-        targetId,
-        updateQuery,
-        { new: true }
-    );
 
     // 4. حذف الطلب من جدول InProcess لأنه لم يعد "تحت المعالجة"
     await InProcess.findByIdAndDelete(requestId);
@@ -208,7 +180,7 @@ module.exports.reject_request = asyncHandler(async (req, res) => {
     res.status(200).json({
         status: 'success',
         message: 'تم رفض الطلب وإعادته لقائمة الانتظار بنجاح',
-        data: updatedTreatment
+        
     });
 });
 
@@ -220,7 +192,7 @@ module.exports.reject_request = asyncHandler(async (req, res) => {
   * @access private (only overseer )
   */
  module.exports.reject_request_with_option = asyncHandler(async (req, res) => {
-    const { note } = req.body; // الملاحظة الجديدة من المشرف
+    const { note } = req.body.note; // الملاحظة الجديدة من المشرف
     const requestId = req.params.id; // ID الطلب الموجود في InProcess
     const overseerId = req.user.id;
 
@@ -236,7 +208,7 @@ module.exports.reject_request = asyncHandler(async (req, res) => {
         return res.status(404).json({ message: 'الطلب غير موجود أو أنك لست المشرف المسؤول عنه' });
     }
 
-
+console.log(`the student ${requestInProcess.student} and the request in process ${requestInProcess} and case type ${req.params.option}`)
     /**
      * 
      * 
@@ -245,6 +217,7 @@ module.exports.reject_request = asyncHandler(async (req, res) => {
     const request_in_process=await InProcess.findOne({case_type:req.params.option,student:requestInProcess.student}
     )
 
+    console.log(request_in_process)
     if(request_in_process){
     // 3. جلب الطلب الأصلي لتحديد كيفية تحديث more_details
     const targetId = requestInProcess.Requestion || requestId;
@@ -260,39 +233,9 @@ module.exports.reject_request = asyncHandler(async (req, res) => {
         note: note || "تم الرفض وإعادة المعالجة",
         rejectedAt: new Date()
     };
-
-    let updateQuery;
-
-    // فحص الحقل: إذا كان مصفوفة نستخدم $push، وإذا كان كائن نحوله لمصفوفة مع الحفاظ عليه
-    if (Array.isArray(originalDoc.more_details)) {
-        updateQuery = {
-            $set: { status: 'rejected' },
-            $push: { more_details: newNote }
-        };
-    } else if (originalDoc.more_details && typeof originalDoc.more_details === 'object' && Object.keys(originalDoc.more_details).length > 0) {
-        // إذا كان كائن (Object) قديم، ندمجه مع الملاحظة الجديدة في مصفوفة واحدة
-        updateQuery = {
-            $set: { 
-                status: 'rejected',
-                more_details: [originalDoc.more_details, newNote] 
-            }
-        };
-    } else {
-        // إذا كان الحقل فارغاً تماماً
-        updateQuery = {
-            $set: { 
-                status: 'rejected',
-                more_details: [newNote] 
-            }
-        };
-    }
-
-    const updatedTreatment = await TreatmentRequest.findByIdAndUpdate(
-        targetId,
-        updateQuery,
-        { new: true }
-    );
-
+    originalDoc.status='rejected',
+    originalDoc.overseer_note=newNote
+    await originalDoc.save();
     // 4. حذف الطلب من جدول InProcess لأنه لم يعد "تحت المعالجة"
     await InProcess.findByIdAndDelete(requestId);
 

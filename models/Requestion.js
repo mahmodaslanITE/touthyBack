@@ -31,7 +31,7 @@ const TreatmentRequestSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ['pending', 'processing','done'],
+      enum: ['pending', 'processing','done','rejected'],
       default:'pending'
     },
     case_type: {
@@ -41,6 +41,10 @@ const TreatmentRequestSchema = new mongoose.Schema(
       required: true
     },
     more_details: {
+      type: Object,
+      maxlength: 1000
+    },
+    overseer_note: {
       type: Object,
       maxlength: 1000
     },

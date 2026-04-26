@@ -1,6 +1,5 @@
 const { TreatmentRequest, validateTreatmentRequest, validateUpdateRequest } = require('../models/Requestion');
 const asyncHandler = require('express-async-handler');
-const socket = require('../socket/init');
 // الموديل بالاسم الجديد
 const Student_profile = require('../models/Student_profile');
 const InProcess = require('../models/InProcess');
