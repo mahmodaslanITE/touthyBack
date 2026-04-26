@@ -331,3 +331,46 @@ res.status(200).json({
     data: formattedRequests 
 });
  })
+
+
+ /**
+ * @desc إعادة تعيين مشرف للطلب بعد تغيير نوع الحالة
+ * @route /api/student/reassign-overseer/:id
+ * @method put
+ * @access private (Student only)
+ */
+module.exports.reassign_overseer = asyncHandler(async (req, res) => {
+  const requestId = req.params.id; // ID الطلب في جدول InProcess
+  const overseerId  = req.params.overseer; // ID المشرف الجديد الذي اختاره الطالب
+  const studentId = req.user.id;   // ID الطالب من التوكن
+
+  // 1. التحقق من وجود الطلب في InProcess وتأكيد ملكيته للطالب
+  const requestInProcess = await InProcess.findOne({ _id: requestId, student: studentId });
+
+  if (!requestInProcess) {
+      return res.status(404).json({ 
+          message: 'الطلب غير موجود أو لا يخصك، لا يمكنك تعديله' 
+      });
+  }
+
+  
+ 
+  if (requestInProcess.overseer !== null) {
+      return res.status(400).json({ 
+          message: 'هذا الطلب لديه مشرف بالفعل، لا يمكنك تعيين مشرف جديد حالياً' 
+      });
+  }
+
+  // 3. تحديث المشرف في جدول InProcess
+  requestInProcess.overseer = overseerId;
+  await requestInProcess.save();
+
+
+  
+
+  res.status(200).json({
+      status: 'success',
+      message: 'تم تعيين المشرف الجديد بنجاح، الطلب الآن قيد المراجعة',
+      data: requestInProcess
+  });
+});

@@ -192,10 +192,10 @@ module.exports.reject_request = asyncHandler(async (req, res) => {
   * @access private (only overseer )
   */
  module.exports.reject_request_with_option = asyncHandler(async (req, res) => {
-    const { note } = req.body.note; // الملاحظة الجديدة من المشرف
+    const  note  = req.body.note; // الملاحظة الجديدة من المشرف
     const requestId = req.params.id; // ID الطلب الموجود في InProcess
     const overseerId = req.user.id;
-
+console.log(`the note is ${note}`)
     // 1. التحقق من الصلاحية
     if (req.user.role !== 'overseer') {
         return res.status(403).json({ message: 'غير مسموح لك بالقيام بهذا الإجراء' });
@@ -208,7 +208,6 @@ module.exports.reject_request = asyncHandler(async (req, res) => {
         return res.status(404).json({ message: 'الطلب غير موجود أو أنك لست المشرف المسؤول عنه' });
     }
 
-console.log(`the student ${requestInProcess.student} and the request in process ${requestInProcess} and case type ${req.params.option}`)
     /**
      * 
      * 
@@ -256,9 +255,16 @@ console.log(`the student ${requestInProcess.student} and the request in process 
         the_new_request.case_type = cleanOption; 
         the_new_request.overseer = null; 
         await the_new_request.save();
+        // تجهيز الملاحظة الجديدة
+    const newNote = { 
+        overseer: overseerId,
+        note: note || "تم الرفض وإعادة المعالجة",
+        rejectedAt: new Date()
+    };
 
         const the_request_in_treatmentRequest=await TreatmentRequest.findById(the_new_request.Requestion);
         the_request_in_treatmentRequest.case_type=cleanOption
+        the_request_in_treatmentRequest.overseer_note=newNote
         await the_request_in_treatmentRequest.save();
     
         // 3. واستخدامها هنا أيضاً للبحث في موديل Treatment
