@@ -241,7 +241,7 @@ console.log(`the note is ${note}`)
     res.status(200).json({
         status: 'success',
         message: 'تم رفض الطلب ورفض اقتراح حالة جديدة له لأن الأفندي حاجز حالة تانيو من نفس النوع الي حضرتك اقترحتو ف ريح حالك نم رفض الطلب نهائيا  وإعادته لقائمة الانتظار بنجاح',
-        data: updatedTreatment
+        
     });} 
     
     
@@ -292,7 +292,7 @@ console.log(`the note is ${note}`)
  */
 module.exports.add_stage_evaluation = asyncHandler(async (req, res) => {
     const requestId = req.params.id; // ID الطلب في InProcess
-    const { evaluationText } = req.body;
+    const  evaluationText  = req.body.evaluationText;
     const overseerId = req.user.id;
 
     if (!evaluationText) {
