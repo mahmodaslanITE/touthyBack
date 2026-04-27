@@ -5,6 +5,9 @@ const Patient_profil = require('../models/Patient_profile');
 const Student_profile = require('../models/Student_profile');
 const { TreatmentRequest } = require('../models/Requestion');
 const Treatment = require('../models/Treatment');
+const socket = require('../socket/init');
+const { Practial_lesson } = require('../models/Practical_lesson');
+
 /**
  * @description view the request wich the overseer overlocks on it 
  * @route api/overseer/treatment
@@ -176,7 +179,19 @@ module.exports.reject_request = asyncHandler(async (req, res) => {
 
     // 4. حذف الطلب من جدول InProcess لأنه لم يعد "تحت المعالجة"
     await InProcess.findByIdAndDelete(requestId);
-
+const patient=originalDoc.user.toString();
+const studentID=requestInProcess.student.toString()
+    const io = socket.getIO();
+    if (io) {
+      io.to(patient).emit('requestAccepted', {
+        message: `تم رفض حالتك من المعالجة في الكلية للسبب التالي `,
+        note
+      });
+      io.to(studentID).emit('requestAccepted',{
+        message: `تم رفض حالتك من المعالجة في الكلية للسبب التالي `,
+        note
+      })
+    }
     res.status(200).json({
         status: 'success',
         message: 'تم رفض الطلب وإعادته لقائمة الانتظار بنجاح',
@@ -238,6 +253,19 @@ console.log(`the note is ${note}`)
     // 4. حذف الطلب من جدول InProcess لأنه لم يعد "تحت المعالجة"
     await InProcess.findByIdAndDelete(requestId);
 
+    const io = socket.getIO();
+    const patient=originalDoc.user.toString();
+const studentID=requestInProcess.student.toString()
+    if (io) {
+      io.to(patient).emit('requestAccepted', {
+        message: `تم رفض حالتك من المعالجة في الكلية للسبب التالي `,
+        note
+      });
+      io.to(studentID).emit('requestAccepted',{
+        message: `تم رفض حالتك من المعالجة في الكلية للسبب التالي `,
+        note
+      })
+    }
     res.status(200).json({
         status: 'success',
         message: 'تم رفض الطلب ورفض اقتراح حالة جديدة له لأن الأفندي حاجز حالة تانيو من نفس النوع الي حضرتك اقترحتو ف ريح حالك نم رفض الطلب نهائيا  وإعادته لقائمة الانتظار بنجاح',
@@ -273,8 +301,35 @@ console.log(`the note is ${note}`)
         if (!treatment) {
             return res.status(404).json({ message: 'نوع الحالة (option) غير موجود' });
         }
-    
+        const originalDoc = await TreatmentRequest.findById(the_new_request.Requestion);
+
+        if (!originalDoc) {
+            return res.status(404).json({ message: 'فشل العثور على الطلب الأصلي لتحديثه' });
+        }
         const case_type = treatment.case_type;
+        const io = socket.getIO();
+        const student= await Student_profile.findOne({user:requestInProcess.student})
+        console.log(`the student is ${student.category}`)
+        const course=treatment.course;
+        const lesson=await Practial_lesson.findOne({course:course,category:student.category})
+        console.log(`the lesson is ${lesson}`)
+        const patient=originalDoc.user.toString()
+        const studentID=requestInProcess.student.toString();
+        console.log(`the student is ${studentID}`)
+        console.log(`the ptient is ${patient}`)
+        if (io) {
+          io.to(patient).emit('updatecasetype', {
+            message: ` ${lesson.time }تم تغيير موعد معالجتك الى موعد اخر  في القاعة ${lesson.hall}`,
+            time:lesson.time,
+            location:lesson.hall
+            
+          });
+
+          io.to(studentID).emit('updatecasetype',{
+            message: `${ case_type}تم تغيير نوع المعالجة الى معالجة اخرى لذلك يتوجب عليك تعيين مشرف جديد لحالتك`,
+            treatment
+          })
+        }
         res.status(200).json({ 
             status: 'success', 
             message: `تم تغيير الحالة الى ${case_type} يتوجب من الطالب تعيين مشرف جديد لحالته` 

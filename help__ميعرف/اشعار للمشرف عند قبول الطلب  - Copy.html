@@ -21,16 +21,12 @@
       console.log("متصل بالسيرفر عبر socket.io, id:", socket.id);
 
       // سجل المريض بغرفته (ضع معرف المريض الحقيقي هنا)
-      const patientId = '69a696ea8b36cdbf5ebc8386'; 
+      const patientId = '69b180f814b0ad386202e9dd'; 
       socket.emit("registerPatient", patientId);
     });
 
     // استقبال الإشعار من السيرفر
     socket.on("requestAccepted", (data) => {
-      console.log("وصل إشعار:", data);
-      alert(data.message);
-    });
-    socket.on("updatecasetype", (data) => {
       console.log("وصل إشعار:", data);
       alert(data.message);
     });
