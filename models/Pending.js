@@ -6,6 +6,12 @@ const TreatmentRequestSchema = new mongoose.Schema(
         type:mongoose.Schema.Types.ObjectId,
         ref:"User"
     },
+    case_type: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref:'Treatment',
+      maxlength: 100,
+      required: true
+    },
     pain_severity: {
       type: Number,
       min: 0,
@@ -29,22 +35,7 @@ const TreatmentRequestSchema = new mongoose.Schema(
     is_pregnant: {
       type: Boolean,
     },
-    status: {
-      type: String,
-      enum: ['pending', 'processing','done','rejected'],
-      default:'pending'
-    },
-    case_type: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref:'Treatment',
-      maxlength: 100,
-      required: true
-    },
     more_details: {
-      type: Object,
-      maxlength: 1000
-    },
-    overseer_note: {
       type: Object,
       maxlength: 1000
     },
@@ -109,5 +100,5 @@ const validateUpdateRequest = (data) => {
     return schema.validate(data);
   };
 
- const TreatmentRequest= mongoose.model('TreatmentRequest', TreatmentRequestSchema);
-module.exports ={TreatmentRequest,validateTreatmentRequest,validateUpdateRequest};
+ const Pending_request= mongoose.model('Pending_request', TreatmentRequestSchema);
+module.exports ={Pending_request,validateTreatmentRequest,validateUpdateRequest};

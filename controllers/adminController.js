@@ -367,11 +367,22 @@ exports.getAllTreatments = async (req, res) => {
     try {
         let treatments
         // استخدمنا populate لجلب بيانات المادة بدلاً من مجرد الـ ID
-        if(req.user.role==='patient'){treatments = await Treatment.find();}
-        else {treatments = await Treatment.find().populate({
+        if(req.user.role==='patient'){treatments = await Treatment.find().select('-course');}
+        else {const treats = await Treatment.find().populate({
             path:'course',
             select:'course_name'
-        })}
+        })
+        treatments=treats.map(item=>({
+            case_info:{
+                _id:item._id,
+                case_type:item.case_type
+            },
+            course_info:{
+                _id:item.course._id,
+                course_name:item.course.course_name
+            }
+        }))
+    }
         
         res.status(200).json({
 status:'success',

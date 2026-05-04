@@ -2,8 +2,13 @@ const asyncHandler = require('express-async-handler');
 const Conversation = require('../../models/Correspondence/Conversation');
 const Message = require('../../models/Correspondence/Message');
 const Student_profile = require('../../models/Student_profile');
-
-// Route: post /api/conversations/:receiverId
+const {User}=require('../../models/User');
+const Patient_profil=require('../../models/Patient_profile')
+const {OverseerProfile}=require('../../models/Overseer_profile')
+/**
+ * @description open  conversations
+ * @route : post /api/conversations/:receiverId
+ */
 exports.open_conversation = asyncHandler(async (req, res) => {
     const senderId = req.user.id; // القادم من الـ middleware (verifyToken)
     const receiverId = req.params.receiverId; // القادم من الرابط
@@ -49,7 +54,10 @@ exports.open_conversation = asyncHandler(async (req, res) => {
     });
 });
 
-
+/**
+ * @description get user   conversations
+ * @get : post /api/conversations
+ */
 
 exports.get_user_conversations = asyncHandler(async (req, res) => {
     const userId = req.user.id;
@@ -58,13 +66,26 @@ exports.get_user_conversations = asyncHandler(async (req, res) => {
         participants: { $in: [userId] }
     }).sort({ updatedAt: -1 });
 
+    
+
     const formattedConversations = await Promise.all(conversations.map(async (conv) => {
         // الإصلاح الجوهري: تحويل الـ ID إلى String للمقارنة الصحيحة
         const otherPartyId = conv.participants.find(id => id.toString() !== userId.toString());
-
-        const otherPartyProfile = await Student_profile.findOne({ user: otherPartyId })
+        const userOtherParty=await User.findOne({_id:otherPartyId})
+        const role=userOtherParty.role;
+        let otherPartyProfile
+        if(role==='student'){
+         otherPartyProfile = await Student_profile.findOne({ user: otherPartyId })
             .select('user first_name father_name last_name profile_photo');
-
+        }
+        else if(role==='patient'){
+            otherPartyProfile = await Patient_profil.findOne({ user: otherPartyId })
+            .select('user first_name father_name last_name profile_photo');
+        }
+        else if(role==='overseer'){
+            otherPartyProfile = await OverseerProfile.findOne({ user: otherPartyId })
+            .select('user first_name father_name last_name profile_photo');
+        }
         return {
             conversationId: conv._id,
             otherParty: otherPartyProfile ? {
@@ -78,3 +99,6 @@ exports.get_user_conversations = asyncHandler(async (req, res) => {
 
     res.status(200).json(formattedConversations);
 });
+
+
+

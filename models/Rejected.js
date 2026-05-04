@@ -1,4 +1,3 @@
-const { object } = require('joi');
 const mongoose = require('mongoose');
 
 const FinishedSchema = new mongoose.Schema({
@@ -29,7 +28,7 @@ const FinishedSchema = new mongoose.Schema({
     },
 
     // حقول التقييم والإغلاق الجديدة
-    rating: {
+    note: {
         type: Number,
         required: [true, 'الرجاء إضافة تقييم'],
         min: 1,
@@ -50,6 +49,6 @@ const FinishedSchema = new mongoose.Schema({
     timestamps: true // لإنشاء createdAt و updatedAt تلقائياً
 });
 
-const Finished = mongoose.model('Finished', FinishedSchema);
+const Rejected = mongoose.model('Rejected', FinishedSchema);
 
-module.exports = Finished;
+module.exports = Rejected;

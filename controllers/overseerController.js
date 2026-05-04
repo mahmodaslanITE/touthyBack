@@ -1,12 +1,12 @@
 const asyncHandler=require('express-async-handler');
 const InProcess = require('../models/InProcess');
 const Finished = require('../models/Finished');
-const Patient_profil = require('../models/Patient_profile');
 const Student_profile = require('../models/Student_profile');
-const { TreatmentRequest } = require('../models/Requestion');
+const { Pending_request } = require('../models/Pending');
 const Treatment = require('../models/Treatment');
 const socket = require('../socket/init');
 const { Practial_lesson } = require('../models/Practical_lesson');
+const Rejected = require('../models/Rejected');
 
 /**
  * @description view the request wich the overseer overlocks on it 
@@ -16,67 +16,61 @@ const { Practial_lesson } = require('../models/Practical_lesson');
  */
 module.exports.show_overseer_requests_in_process = asyncHandler(async (req, res) => {
     const user = req.user;
-  
+
     const requests = await InProcess.find({ overseer: user.id })
-    .select('-overseer -__v') 
-    .populate({
-        path: 'Requestion',
-        // حذفنا -_id من هنا لإظهار ID الـ Requestion نفسه
-        select: 'pain_severity pain_time tooth_location gender is_pregnant age photo case_type more_details',
-        populate: {
+        .select('-overseer -__v')
+        .populate({
             path: 'case_type',
-            // حذفنا -_id لإظهار ID نوع المعالجة
-            select: 'case_type course', 
-            populate: { 
-                path: 'course', 
-                select: 'course_name', // سيظهر الـ ID تلقائياً هنا أيضاً
+            model: 'Treatment',
+            populate: {
+                path: 'course',
+                model: 'Course',
+                select: 'course_name'
             }
-        }
-    })
-    .populate({
-        path: 'patient',
-        model: 'Patient_profil',
-        foreignField: 'user',
-        localField: 'patient',
-        select: '-_id first_name father_name last_name'
-    })
-    .populate({
-        path: 'student',
-        model: 'Student_profile',
-        foreignField: 'user',
-        localField: 'student',
-        select: '-_id first_name father_name last_name'
-    })
-    .lean();
+        })
+        .populate({
+            path: 'patient',
+            model: 'Patient_profil',
+            foreignField: 'user',
+            localField: 'patient',
+            select: '-_id first_name father_name last_name'
+        })
+        .populate({
+            path: 'student',
+            model: 'Student_profile',
+            foreignField: 'user',
+            localField: 'student',
+            select: '-_id first_name father_name last_name'
+        })
+        .lean();
 
-// إعادة هيكلة البيانات مع الحفاظ على الـ IDs
-const formattedRequests = requests.map(req => {
-    const requestionData = req.Requestion || {};
-    const caseTypeData = requestionData.case_type || {};
-    const courseData = caseTypeData.course || {};
+    // إعادة هيكلة البيانات لفصل الكائنات
+    const formattedRequests = requests.map(doc => {
+        const item = { ...doc };
 
-    return {
-        ...req,
-        // إظهار المعلومات بشكل منفصل مع الـ IDs الخاصة بها
-        // case_type_id: caseTypeData._id || null,
-        case_type_title: caseTypeData.case_type || null,
-        course_id: courseData._id || null,
-        course_name: courseData.course_name || null,
-        
-        // تنظيف الكائن من التداخل القديم
-        Requestion: {
-            ...requestionData,
-            case_type: undefined 
+        if (item.case_type) {
+            // 1. فصل معلومات الكورس
+            item.course_info = item.case_type.course || null;
+
+            // 2. فصل معلومات الحالة (بدون تداخل الكورس داخلها)
+            item.case_info = {
+                _id: item.case_type._id,
+                case_type: item.case_type.case_type
+            };
+
+            // 3. حذف الحقل الأصلي المتداخل
+            delete item.case_type;
         }
-    };
+
+        return item;
+    });
+
+    res.status(200).json({
+        status: 'success',
+        message: 'هذه هي الطلبات التي انت مسؤول عن الاشراف عنها',
+        data: formattedRequests
+    });
 });
-
-res.status(200).json({ 
-    status: 'success', 
-    message: 'هذه  هي الطلبات التي انت مسؤول عن الاشراف عنها', 
-    data: formattedRequests 
-});});
-
 
 /**
  * @description إنهاء الطلب ونقله إلى جدول المنتهية مع التقييم
@@ -110,20 +104,18 @@ module.exports.complete_request = asyncHandler(async (req, res) => {
 
     // 4. نقل البيانات لجدول المعالجات المنتهية (نفترض وجود Model باسم Finished)
     const finishedRequest = await Finished.create({
-        user:requestInProcess.patient,
+        patient:requestInProcess.patient,
         overseer:req.user.id,
+        Requestion:requestInProcess.Requestion,
         student:requestInProcess.student, 
+        case_type:requestInProcess.case_type,
         _id: undefined,           
         rating: rating,           
         feedback: feedback,      
         completedAt: Date.now()   
     });
 
-    //تعديل الحالة في جدول 
-const treatment_request=await TreatmentRequest.findById(requestInProcess.Requestion);
-treatment_request.status='done';
-console.log(`this is treatment request ......${treatment_request}`)
-await treatment_request.save();
+
 
     // 5. حذف الطلب من جدول "تحت المعالجة"
     await InProcess.findByIdAndDelete(requestId);
@@ -142,8 +134,8 @@ await treatment_request.save();
  * @access Private (Overseer only)
  */
 module.exports.reject_request = asyncHandler(async (req, res) => {
-    const { note } = req.body; // الملاحظة الجديدة من المشرف
-    const requestId = req.params.id; // ID الطلب الموجود في InProcess
+    const {note} = req.body; // استلام التقييم والملاحظات من الـ Body
+    const requestId = req.params.id;
     const overseerId = req.user.id;
 
     // 1. التحقق من الصلاحية
@@ -151,51 +143,55 @@ module.exports.reject_request = asyncHandler(async (req, res) => {
         return res.status(403).json({ message: 'غير مسموح لك بالقيام بهذا الإجراء' });
     }
 
-    // 2. العثور على الطلب في جدول InProcess لضمان المسؤولية
+    // 2. البحث عن الطلب والتأكد أن هذا المشرف هو المسؤول عنه
     const requestInProcess = await InProcess.findOne({ _id: requestId, overseer: overseerId });
 
     if (!requestInProcess) {
-        return res.status(404).json({ message: 'الطلب غير موجود أو أنك لست المشرف المسؤول عنه' });
+        return res.status(404).json({ 
+            message: 'الطلب غير موجود أو أنك لست المشرف المسؤول عنه' 
+        });
     }
 
-    // 3. جلب الطلب الأصلي لتحديد كيفية تحديث more_details
-    const targetId = requestInProcess.Requestion ;
-    const originalDoc = await TreatmentRequest.findById(targetId);
-
-    if (!originalDoc) {
-        return res.status(404).json({ message: 'فشل العثور على الطلب الأصلي لتحديثه' });
+    // 3. التحقق من وجود التقييم
+    if (!note) {
+        return res.status(400).json({ message: `يرجى ذكر سبب الرفض `});
     }
 
-    // تجهيز الملاحظة الجديدة
-    const newNote = { 
-        overseer: overseerId,
-        note: note || "تم الرفض وإعادة المعالجة",
-        rejectedAt: new Date()
-    };
-    originalDoc.status='rejected',
-    originalDoc.overseer_note=newNote
-    await originalDoc.save();
+    // 4. نقل البيانات لجدول المعالجات المنتهية (نفترض وجود Model باسم Finished)
+    const rejectedRequest = await Rejected.create({
+        patient:requestInProcess.patient,
+        overseer:req.user.id,
+        Requestion:requestInProcess.Requestion,
+        student:requestInProcess.student, 
+        case_type:requestInProcess.case_type,
+        note    :note,
+        _id: undefined,           
+        completedAt: Date.now()   
+    });
 
 
-    // 4. حذف الطلب من جدول InProcess لأنه لم يعد "تحت المعالجة"
+
+    // 5. حذف الطلب من جدول "تحت المعالجة"
     await InProcess.findByIdAndDelete(requestId);
-const patient=originalDoc.user.toString();
+
+    
+const patient=requestInProcess.patient.toString();
 const studentID=requestInProcess.student.toString()
     const io = socket.getIO();
     if (io) {
-      io.to(patient).emit('requestAccepted', {
+      io.to(patient).emit('request_rejected', {
         message: `تم رفض حالتك من المعالجة في الكلية للسبب التالي `,
         note
       });
-      io.to(studentID).emit('requestAccepted',{
+      io.to(studentID).emit('request_rejected',{
         message: `تم رفض حالتك من المعالجة في الكلية للسبب التالي `,
         note
       })
     }
     res.status(200).json({
         status: 'success',
-        message: 'تم رفض الطلب وإعادته لقائمة الانتظار بنجاح',
-        
+        message: 'تم رفض الحالة ونقلها للأرشيف ',
+        data: rejectedRequest
     });
 });
 
@@ -218,7 +214,6 @@ console.log(`the note is ${note}`)
 
     // 2. العثور على الطلب في جدول InProcess لضمان المسؤولية
     const requestInProcess = await InProcess.findOne({ _id: requestId, overseer: overseerId });
-
     if (!requestInProcess) {
         return res.status(404).json({ message: 'الطلب غير موجود أو أنك لست المشرف المسؤول عنه' });
     }
@@ -231,48 +226,45 @@ console.log(`the note is ${note}`)
     const request_in_process=await InProcess.findOne({case_type:req.params.option,student:requestInProcess.student}
     )
 
-    console.log(request_in_process)
+    console.log(`the request in process ${request_in_process}`)
+
+    //the first 
     if(request_in_process){
-    // 3. جلب الطلب الأصلي لتحديد كيفية تحديث more_details
-    const targetId = requestInProcess.Requestion || requestId;
-    const originalDoc = await TreatmentRequest.findById(targetId);
+        const rejectedRequest = await Pending_request.create({
+        user:requestInProcess.patient,
+        ...requestInProcess.Requestion,
+        case_type:requestInProcess.case_type,
+        completedAt: Date.now()   
+    });
 
-    if (!originalDoc) {
-        return res.status(404).json({ message: 'فشل العثور على الطلب الأصلي لتحديثه' });
-    }
 
-    // تجهيز الملاحظة الجديدة
-    const newNote = { 
-        overseer: overseerId,
-        note: note || "تم الرفض وإعادة المعالجة",
-        rejectedAt: new Date()
-    };
-    originalDoc.status='rejected',
-    originalDoc.overseer_note=newNote,
-    await originalDoc.save();
-    // 4. حذف الطلب من جدول InProcess لأنه لم يعد "تحت المعالجة"
+
+    // 5. حذف الطلب من جدول "تحت المعالجة"
     await InProcess.findByIdAndDelete(requestId);
 
-    const io = socket.getIO();
-    const patient=originalDoc.user.toString();
+    
+const patient=requestInProcess.patient.toString();
 const studentID=requestInProcess.student.toString()
+    const io = socket.getIO();
     if (io) {
-      io.to(patient).emit('requestAccepted', {
+      io.to(patient).emit('request_rejected', {
         message: `تم رفض حالتك من المعالجة في الكلية للسبب التالي `,
         note
       });
-      io.to(studentID).emit('requestAccepted',{
+      io.to(studentID).emit('request_rejected',{
         message: `تم رفض حالتك من المعالجة في الكلية للسبب التالي `,
         note
       })
-    }
+    
     res.status(200).json({
         status: 'success',
-        message: 'تم رفض الطلب ورفض اقتراح حالة جديدة له لأن الأفندي حاجز حالة تانيو من نفس النوع الي حضرتك اقترحتو ف ريح حالك نم رفض الطلب نهائيا  وإعادته لقائمة الانتظار بنجاح',
-        
-    });} 
+        message: 'تم رفض الحالة واعادتها الى رتل الانتظار ورفض اقتراحك بتغيير الحالة ',
+        data: rejectedRequest
+    });
+}}
     
-    
+
+//the last
     else {
         // 1. تنظيف الـ option من أي مسافات أو أسطر زائدة
         const cleanOption = req.params.option.trim(); 
@@ -284,24 +276,16 @@ const studentID=requestInProcess.student.toString()
         the_new_request.overseer = null; 
         await the_new_request.save();
         // تجهيز الملاحظة الجديدة
-    const newNote = { 
-        overseer: overseerId,
-        note: note || "تم الرفض وإعادة المعالجة",
-        rejectedAt: new Date()
-    };
 
-        const the_request_in_treatmentRequest=await TreatmentRequest.findById(the_new_request.Requestion);
-        the_request_in_treatmentRequest.case_type=cleanOption
-        the_request_in_treatmentRequest.overseer_note=newNote
-        await the_request_in_treatmentRequest.save();
-    
+
+        
         // 3. واستخدامها هنا أيضاً للبحث في موديل Treatment
         const treatment = await Treatment.findById(cleanOption);
         
         if (!treatment) {
             return res.status(404).json({ message: 'نوع الحالة (option) غير موجود' });
         }
-        const originalDoc = await TreatmentRequest.findById(the_new_request.Requestion);
+        const originalDoc = the_new_request.Requestion;
 
         if (!originalDoc) {
             return res.status(404).json({ message: 'فشل العثور على الطلب الأصلي لتحديثه' });
@@ -336,7 +320,7 @@ const studentID=requestInProcess.student.toString()
         });
     }
     
-});
+    });
 
 
 /** 
@@ -371,9 +355,9 @@ module.exports.add_stage_evaluation = asyncHandler(async (req, res) => {
     requestInProcess.stage_evaluations.push(newEvaluation);
     await requestInProcess.save();
 
-    // 4. (مهم) تحديث الجدول الأصلي TreatmentRequest لضمان مزامنة البيانات
+    // 4. (مهم) تحديث الجدول الأصلي Pending_request لضمان مزامنة البيانات
     if (requestInProcess.Requestion) {
-        await TreatmentRequest.findByIdAndUpdate(requestInProcess.Requestion, {
+        await Pending_request.findByIdAndUpdate(requestInProcess.Requestion, {
             $push: { stage_evaluations: newEvaluation }
         });
     }

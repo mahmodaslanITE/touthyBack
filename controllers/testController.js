@@ -1,5 +1,5 @@
 const InProcess = require("../models/InProcess");
-const { TreatmentRequest } = require("../models/Requestion");
+const { TreatmentRequest } = require("../models/Pending");
 const Treatment = require("../models/Treatment");
 const asyncHandler=require('express-async-handler')
 const socket = require('../socket/init');

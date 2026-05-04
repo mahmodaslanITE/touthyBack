@@ -2,7 +2,7 @@ const express=require('express');
 const verifyToken = require('../Middlewares/verifyToken');
 const { createTreatmentRequest, getUserTreatmentRequests,  updateRequest, deleteRequest } = require('../controllers/treatmentRequestController');
 const { uploadRequestPhoto } = require('../Middlewares/upload');
-const { getCourseOverseers, getUserProcessingTreatmentRequests, acceptRequest, showAllRequesyions, reassign_overseer } = require('../controllers/studentController');
+const { getCourseOverseers, getUserProcessingTreatmentRequests, acceptRequest, showAllRequesyions, reassign_overseer, get_student_finished_requests } = require('../controllers/studentController');
 const router=express.Router();
 //add request
 router.post('/',verifyToken,uploadRequestPhoto.single('photo'),createTreatmentRequest);
@@ -12,7 +12,12 @@ router.get('/',verifyToken,showAllRequesyions)
 
 // the user can see his own requests
 router.get('/my',verifyToken,getUserTreatmentRequests);
+// student processing request 
 router.get('/myProcessing',verifyToken,getUserProcessingTreatmentRequests);
+// student finished request
+router.get('/myfinished',verifyToken,get_student_finished_requests);
+
+
 
 // the student  can accept requests
 router.post('/accept/:id/:overseer',verifyToken,acceptRequest)

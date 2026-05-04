@@ -1,4 +1,4 @@
-const { required, string } = require('joi');
+const { required, string, object } = require('joi');
 const mongoose=require('mongoose');
 const inProcessSchema=mongoose.Schema({
     patient:{type:mongoose.Schema.Types.ObjectId,
@@ -9,9 +9,8 @@ const inProcessSchema=mongoose.Schema({
         ref:'User',
         required:true
     },
-    Requestion:{type:mongoose.Schema.Types.ObjectId,
-        ref:'TreatmentRequest',
-        required:true
+    Requestion:{
+        type:Object
     },
     overseer:{type:mongoose.Schema.Types.ObjectId,
         ref:'Overseer',

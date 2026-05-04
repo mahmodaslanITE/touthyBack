@@ -1,12 +1,7 @@
-const { TreatmentRequest, validateTreatmentRequest, validateUpdateRequest } = require('../models/Requestion');
+const { Pending_request,  validateUpdateRequest, validateTreatmentRequest } = require('../models/Pending');
 const asyncHandler = require('express-async-handler');
 // الموديل بالاسم الجديد
-const Student_profile = require('../models/Student_profile');
-const InProcess = require('../models/InProcess');
 const Treatment = require('../models/Treatment');
-const Course = require('../models/Course');
-const { OverseerProfile } = require('../models/Overseer_profile');
-const { Practial_lesson } = require('../models/Practical_lesson');
 
 /**-----------------------------------------------------
  * @desc Create treatment request
@@ -64,7 +59,7 @@ if(req.body.gender==='male'&&req.body.is_pregnant==='true'){ return res.status(7
   message :'ذكر وحامل يا خرا       ما تستحي على وجهك'
 })}
   // 5. الحفظ في قاعدة البيانات
-  const request = new TreatmentRequest({
+  const request = new Pending_request({
     ...req.body,
     more_details: more_detailsData,
     user: user.id,
@@ -85,7 +80,7 @@ if(req.body.gender==='male'&&req.body.is_pregnant==='true'){ return res.status(7
 exports.getUserTreatmentRequests = asyncHandler(async (req, res) => {
   const user = req.user;
 
-  const requests = await TreatmentRequest.find({ user: user.id }).populate({
+  const requests = await Pending_request.find({ user: user.id }).populate({
     path: 'case_type',
     select: '_id case_type',
   });
@@ -116,7 +111,7 @@ exports.getUserTreatmentRequests = asyncHandler(async (req, res) => {
   }
 
   // find request
-  const request = await TreatmentRequest.findById(req.params.id);
+  const request = await Pending.findById(req.params.id);
 
   // check if request exists
   if (!request) {
@@ -134,13 +129,7 @@ exports.getUserTreatmentRequests = asyncHandler(async (req, res) => {
     });
   }
 
-  // check status
-  if (request.status !== 'pending') {
-    return res.status(403).json({
-      status: 'error',
-      message: 'لا يمكن تعديل الحالة بعد قبولها أو رفضها'
-    });
-  }
+  
 
   // validate body
   // const { error } = validateUpdateRequest(req.body);
@@ -216,7 +205,7 @@ exports.getUserTreatmentRequests = asyncHandler(async (req, res) => {
   }
 
   // find request
-  const request = await TreatmentRequest.findById(req.params.id);
+  const request = await Pending.findById(req.params.id);
 
   // check if request exists
   if (!request) {
@@ -234,14 +223,6 @@ if (request.user!= userId) {
   });
 }
 
-  // check status (optional but recommended)
-  if (request.status !== 'pending') {
-    return res.status(403).json({
-      status: 'error',
-      message: 'لا يمكن حذف الحالة بعد قبولها أو رفضها'
-    });
-  }
-
   // delete request
   await request.deleteOne();
 
@@ -250,8 +231,3 @@ if (request.user!= userId) {
     message: 'تم حذف الحالة بنجاح'
   });
 });
-
-
-/* **************************************************************************************************************
-                                                      الروتات الخاصة بالطالب                                   
-******************************************************************************************************************/
