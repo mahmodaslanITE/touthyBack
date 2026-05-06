@@ -45,12 +45,22 @@ exports.open_conversation = asyncHandler(async (req, res) => {
             messages: [] 
         });
     }
-
+const formattedMessage=messages.map((message)=>{
+   return {_id:message.id,
+    conversationId: message.conversationId,
+    sender: message.sender,
+    content: message.content,
+    messageType: message.messageType,
+    isRead: message.isRead,
+    createdAt: message.createdAt,
+    is_from_me:(message.sender==senderId)?true:false
+}
+})
     // 5. إرسال المحادثة والرسائل بنجاح
     res.status(200).json({ 
         status:'success',
         conversationId: conversation._id, 
-        messages: messages 
+        data: formattedMessage
     });
 });
 

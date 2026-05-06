@@ -373,7 +373,7 @@ exports.getAllTreatments = async (req, res) => {
             select:'course_name'
         })
         treatments=treats.map(item=>({
-            case_info:{
+            case_type:{
                 _id:item._id,
                 case_type:item.case_type
             },

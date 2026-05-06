@@ -53,13 +53,13 @@ module.exports.show_overseer_requests_in_process = asyncHandler(async (req, res)
             item.course_info = item.case_type.course || null;
 
             // 2. فصل معلومات الحالة (بدون تداخل الكورس داخلها)
-            item.case_info = {
+            item.case_type = {
                 _id: item.case_type._id,
                 case_type: item.case_type.case_type
             };
 
             // 3. حذف الحقل الأصلي المتداخل
-            delete item.case_type;
+            // delete item.case_type;
         }
 
         return item;

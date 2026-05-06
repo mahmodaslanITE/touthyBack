@@ -224,3 +224,14 @@ http://localhost:5000/api/overseer/treatment/reject/:id
  * @method put
  * @access private (Student only)
  */
+ 
+ 38:/**
+ * @description open  conversations
+ * @route : post /api/conversations/:receiverId
+ */
+
+ 39:
+ /**
+ * @description get user   conversations
+ * @get : post /api/conversations
+ */
