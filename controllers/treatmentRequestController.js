@@ -111,7 +111,7 @@ exports.getUserTreatmentRequests = asyncHandler(async (req, res) => {
   }
 
   // find request
-  const request = await Pending.findById(req.params.id);
+  const request = await Pending_request.findById(req.params.id);
 
   // check if request exists
   if (!request) {
@@ -205,7 +205,7 @@ exports.getUserTreatmentRequests = asyncHandler(async (req, res) => {
   }
 
   // find request
-  const request = await Pending.findById(req.params.id);
+  const request = await Pending_request.findById(req.params.id);
 
   // check if request exists
   if (!request) {
