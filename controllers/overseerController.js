@@ -273,7 +273,7 @@ const studentID=requestInProcess.student.toString()
         
         // 2. استخدام القيمة المنظفة هنا
         the_new_request.case_type = cleanOption; 
-        the_new_request.overseer = null; 
+        the_new_request.overseer = null;
         await the_new_request.save();
         // تجهيز الملاحظة الجديدة
 
@@ -293,26 +293,22 @@ const studentID=requestInProcess.student.toString()
         const case_type = treatment.case_type;
         const io = socket.getIO();
         const student= await Student_profile.findOne({user:requestInProcess.student})
-        console.log(`the student is ${student.category}`)
         const course=treatment.course;
         const lesson=await Practial_lesson.findOne({course:course,category:student.category})
-        console.log(`the lesson is ${lesson}`)
-        const patient=originalDoc.user.toString()
+        const patient=requestInProcess.patient.toString()
         const studentID=requestInProcess.student.toString();
-        console.log(`the student is ${studentID}`)
-        console.log(`the ptient is ${patient}`)
         if (io) {
-          io.to(patient).emit('updatecasetype', {
+        io.to(patient).emit('updatecasetype', {
             message: ` ${lesson.time }تم تغيير موعد معالجتك الى موعد اخر  في القاعة ${lesson.hall}`,
             time:lesson.time,
             location:lesson.hall
             
-          });
+        });
 
-          io.to(studentID).emit('updatecasetype',{
+        io.to(studentID).emit('updatecasetype',{
             message: `${ case_type}تم تغيير نوع المعالجة الى معالجة اخرى لذلك يتوجب عليك تعيين مشرف جديد لحالتك`,
             treatment
-          })
+        })
         }
         res.status(200).json({ 
             status: 'success', 
@@ -355,12 +351,7 @@ module.exports.add_stage_evaluation = asyncHandler(async (req, res) => {
     requestInProcess.stage_evaluations.push(newEvaluation);
     await requestInProcess.save();
 
-    // 4. (مهم) تحديث الجدول الأصلي Pending_request لضمان مزامنة البيانات
-    if (requestInProcess.Requestion) {
-        await Pending_request.findByIdAndUpdate(requestInProcess.Requestion, {
-            $push: { stage_evaluations: newEvaluation }
-        });
-    }
+   
 
     res.status(200).json({
         status: 'success',
