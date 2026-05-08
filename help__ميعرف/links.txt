@@ -235,3 +235,9 @@ http://localhost:5000/api/overseer/treatment/reject/:id
  * @description get user   conversations
  * @get : post /api/conversations
  */
+ 40:
+ show finished request 
+ http://localhost:5000/api/request/myfinished
+ 41:
+ show reject request 
+ http://localhost:5000/api/request/myrejected

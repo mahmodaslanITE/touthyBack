@@ -11,6 +11,7 @@ const { Pending_request } = require('../models/Pending');
 const Treatment = require('../models/Treatment');
 const { model } = require('mongoose');
 const Finished = require('../models/Finished');
+const Rejected=require('../models/Rejected')
 
 
 /**
@@ -396,6 +397,68 @@ const formattedRequests = requests.map(doc => {
 res.status(200).json({
     status: 'success',
     message: 'this is your finished  requests',
+    data: formattedRequests
+});
+});
+
+ /**
+/**
+ * get rejected  treatment for student 
+ */
+module.exports.get_student_rejected_requests=asyncHandler(async(req,res)=>{
+const user = req.user;
+    
+const requests = await Rejected.find({ student: user.id })
+    .select('-student -__v')
+    .populate({
+        path: 'case_type',
+        model: 'Treatment',
+        populate: {
+            path: 'course',
+            model: 'Course',
+            select: 'course_name' // سيجلب الـ _id تلقائياً مع الاسم
+        }
+    })
+    .populate({
+        path: 'patient',
+        model: 'Patient_profil',
+        foreignField: 'user',
+        localField: 'patient',
+        select: '-_id first_name father_name last_name'
+    })
+    .populate({
+        path: 'overseer',
+        model: 'OverseerProfile',
+        foreignField: 'user',
+        localField: 'overseer',
+        select: '-_id first_name father_name last_name'
+    })
+    .lean();
+
+// إعادة تشكيل البيانات لفصل case_type عن course
+const formattedRequests = requests.map(doc => {
+    const item = { ...doc };
+    
+    if (item.case_type) {
+        // 1. استخراج الـ course في كائن منفصل
+        item.course_info = item.case_type.course;
+        
+        // 2. تحديث كائن case_type ليحتوي فقط على بياناته وحذف التداخل
+        item.case_type = {
+            _id: item.case_type._id,
+            case_type: item.case_type.case_type
+        };
+        
+        // 3. حذف الكائن الأصلي المتداخل
+        // delete item.case_type;
+    }
+
+    return item;
+});
+
+res.status(200).json({
+    status: 'success',
+    message: 'this is your rejected   requests',
     data: formattedRequests
 });
 });

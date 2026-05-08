@@ -2,7 +2,7 @@ const express=require('express');
 const verifyToken = require('../Middlewares/verifyToken');
 const { createTreatmentRequest, getUserTreatmentRequests,  updateRequest, deleteRequest } = require('../controllers/treatmentRequestController');
 const { uploadRequestPhoto } = require('../Middlewares/upload');
-const { getCourseOverseers, getUserProcessingTreatmentRequests, acceptRequest, showAllRequesyions, reassign_overseer, get_student_finished_requests } = require('../controllers/studentController');
+const { getCourseOverseers, getUserProcessingTreatmentRequests, acceptRequest, showAllRequesyions, reassign_overseer, get_student_finished_requests, get_student_rejected_requests } = require('../controllers/studentController');
 const router=express.Router();
 //add request
 router.post('/',verifyToken,uploadRequestPhoto.single('photo'),createTreatmentRequest);
@@ -16,6 +16,8 @@ router.get('/my',verifyToken,getUserTreatmentRequests);
 router.get('/myProcessing',verifyToken,getUserProcessingTreatmentRequests);
 // student finished request
 router.get('/myfinished',verifyToken,get_student_finished_requests);
+// student rejected request
+router.get('/myrejected',verifyToken,get_student_rejected_requests);
 
 
 

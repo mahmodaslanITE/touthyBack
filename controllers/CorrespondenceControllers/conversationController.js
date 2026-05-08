@@ -50,7 +50,7 @@ const formattedMessage=messages.map((message)=>{
     conversationId: message.conversationId,
     sender: message.sender,
     content: message.content,
-    messageType: message.messageType,
+    message_type: message.message_type,
     isRead: message.isRead,
     createdAt: message.createdAt,
     is_from_me:(message.sender==senderId)?true:false
