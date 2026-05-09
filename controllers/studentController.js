@@ -283,8 +283,10 @@ delete requestData.__v;
    */
   exports.getUserProcessingTreatmentRequests = asyncHandler(async (req, res) => {
     const user = req.user;
-    
-    const requests = await InProcess.find({ student: user.id })
+    const role =user.role;
+    let requests;
+    if(role=='student'){
+     requests = await InProcess.find({ student: user.id })
         .select('-student -__v')
         .populate({
             path: 'case_type',
@@ -310,7 +312,34 @@ delete requestData.__v;
             select: '-_id first_name father_name last_name'
         })
         .lean();
-
+      }else if(role=='patient'){
+         requests = await InProcess.find({ patient: user.id })
+        .select('-student -__v')
+        .populate({
+            path: 'case_type',
+            model: 'Treatment',
+            populate: {
+                path: 'course',
+                model: 'Course',
+                select: 'course_name' // سيجلب الـ _id تلقائياً مع الاسم
+            }
+        })
+        .populate({
+            path: 'student',
+            model: 'Student_profile',
+            foreignField: 'user',
+            localField: 'student',
+            select: '-_id first_name father_name last_name'
+        })
+        .populate({
+            path: 'overseer',
+            model: 'OverseerProfile',
+            foreignField: 'user',
+            localField: 'overseer',
+            select: '-_id first_name father_name last_name'
+        })
+        .lean();
+      }
     // إعادة تشكيل البيانات لفصل case_type عن course
     const formattedRequests = requests.map(doc => {
         const item = { ...doc };
@@ -341,12 +370,14 @@ delete requestData.__v;
 
 
 /**
- * get finished treatment for student 
+ * get finished treatment for student  and patient
  */
 module.exports.get_student_finished_requests=asyncHandler(async(req,res)=>{
 const user = req.user;
-    
-const requests = await Finished.find({ student: user.id })
+const role =user.role;
+let requests;
+if(role=='student'){
+ requests = await Finished.find({ student: user.id })
     .select('-student -__v')
     .populate({
         path: 'case_type',
@@ -372,7 +403,35 @@ const requests = await Finished.find({ student: user.id })
         select: '-_id first_name father_name last_name'
     })
     .lean();
-
+  }
+  else if(role=='patient'){
+    requests = await Finished.find({ patient: user.id })
+    .select('-student -__v')
+    .populate({
+        path: 'case_type',
+        model: 'Treatment',
+        populate: {
+            path: 'course',
+            model: 'Course',
+            select: 'course_name' // سيجلب الـ _id تلقائياً مع الاسم
+        }
+    })
+    .populate({
+        path: 'student',
+        model: 'Student_profile',
+        foreignField: 'user',
+        localField: 'student',
+        select: '-_id first_name father_name last_name'
+    })
+    .populate({
+        path: 'overseer',
+        model: 'OverseerProfile',
+        foreignField: 'user',
+        localField: 'overseer',
+        select: '-_id first_name father_name last_name'
+    })
+    .lean();
+  }
 // إعادة تشكيل البيانات لفصل case_type عن course
 const formattedRequests = requests.map(doc => {
     const item = { ...doc };
@@ -407,8 +466,11 @@ res.status(200).json({
  */
 module.exports.get_student_rejected_requests=asyncHandler(async(req,res)=>{
 const user = req.user;
+const role =user.role;
+let requests;
+if(role=='student'){
     
-const requests = await Rejected.find({ student: user.id })
+requests = await Rejected.find({ student: user.id })
     .select('-student -__v')
     .populate({
         path: 'case_type',
@@ -434,7 +496,35 @@ const requests = await Rejected.find({ student: user.id })
         select: '-_id first_name father_name last_name'
     })
     .lean();
-
+  }
+  else if (role=='patient'){
+    requests = await Rejected.find({ patient: user.id })
+    .select('-student -__v')
+    .populate({
+        path: 'case_type',
+        model: 'Treatment',
+        populate: {
+            path: 'course',
+            model: 'Course',
+            select: 'course_name' // سيجلب الـ _id تلقائياً مع الاسم
+        }
+    })
+    .populate({
+        path: 'student',
+        model: 'Student_profile',
+        foreignField: 'user',
+        localField: 'student',
+        select: '-_id first_name father_name last_name'
+    })
+    .populate({
+        path: 'overseer',
+        model: 'OverseerProfile',
+        foreignField: 'user',
+        localField: 'overseer',
+        select: '-_id first_name father_name last_name'
+    })
+    .lean();
+  }
 // إعادة تشكيل البيانات لفصل case_type عن course
 const formattedRequests = requests.map(doc => {
     const item = { ...doc };

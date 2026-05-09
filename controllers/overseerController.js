@@ -85,7 +85,7 @@ module.exports.complete_request = asyncHandler(async (req, res) => {
 
     // 1. التحقق من الصلاحية
     if (req.user.role !== 'overseer') {
-        return res.status(403).json({ message: 'غير مسموح لك بالقيام بهذا الإجراء' });
+        return res.status(403).json({ status:'error',message: 'غير مسموح لك بالقيام بهذا الإجراء' });
     }
 
     // 2. البحث عن الطلب والتأكد أن هذا المشرف هو المسؤول عنه
@@ -93,13 +93,13 @@ module.exports.complete_request = asyncHandler(async (req, res) => {
 
     if (!requestInProcess) {
         return res.status(404).json({ 
-            message: 'الطلب غير موجود أو أنك لست المشرف المسؤول عنه' 
+            status:'error',  message: 'الطلب غير موجود أو أنك لست المشرف المسؤول عنه' 
         });
     }
 
     // 3. التحقق من وجود التقييم
     if (!rating) {
-        return res.status(400).json({ message: 'يرجى وضع تقييم للطلب قبل الإغلاق' });
+        return res.status(400).json({ status:'error',message: 'يرجى وضع تقييم للطلب قبل الإغلاق' });
     }
 
     // 4. نقل البيانات لجدول المعالجات المنتهية (نفترض وجود Model باسم Finished)
@@ -140,7 +140,7 @@ module.exports.reject_request = asyncHandler(async (req, res) => {
 
     // 1. التحقق من الصلاحية
     if (req.user.role !== 'overseer') {
-        return res.status(403).json({ message: 'غير مسموح لك بالقيام بهذا الإجراء' });
+        return res.status(403).json({ status:'error',message: 'غير مسموح لك بالقيام بهذا الإجراء' });
     }
 
     // 2. البحث عن الطلب والتأكد أن هذا المشرف هو المسؤول عنه
@@ -148,13 +148,14 @@ module.exports.reject_request = asyncHandler(async (req, res) => {
 
     if (!requestInProcess) {
         return res.status(404).json({ 
+            status:'error',
             message: 'الطلب غير موجود أو أنك لست المشرف المسؤول عنه' 
         });
     }
 
     // 3. التحقق من وجود التقييم
     if (!note) {
-        return res.status(400).json({ message: `يرجى ذكر سبب الرفض `});
+        return res.status(400).json({status:'error', message: `يرجى ذكر سبب الرفض `});
     }
 
     // 4. نقل البيانات لجدول المعالجات المنتهية (نفترض وجود Model باسم Finished)
@@ -166,7 +167,7 @@ module.exports.reject_request = asyncHandler(async (req, res) => {
         case_type:requestInProcess.case_type,
         note    :note,
         _id: undefined,           
-        completedAt: Date.now()   
+        rejected_At: Date.now()   
     });
 
 
@@ -209,13 +210,13 @@ const studentID=requestInProcess.student.toString()
 console.log(`the note is ${note}`)
     // 1. التحقق من الصلاحية
     if (req.user.role !== 'overseer') {
-        return res.status(403).json({ message: 'غير مسموح لك بالقيام بهذا الإجراء' });
+        return res.status(403).json({ status:'error',message: 'غير مسموح لك بالقيام بهذا الإجراء' });
     }
 
     // 2. العثور على الطلب في جدول InProcess لضمان المسؤولية
     const requestInProcess = await InProcess.findOne({ _id: requestId, overseer: overseerId });
     if (!requestInProcess) {
-        return res.status(404).json({ message: 'الطلب غير موجود أو أنك لست المشرف المسؤول عنه' });
+        return res.status(404).json({ status:'error',message: 'الطلب غير موجود أو أنك لست المشرف المسؤول عنه' });
     }
 
     /**
@@ -283,12 +284,12 @@ const studentID=requestInProcess.student.toString()
         const treatment = await Treatment.findById(cleanOption);
         
         if (!treatment) {
-            return res.status(404).json({ message: 'نوع الحالة (option) غير موجود' });
+            return res.status(404).json({status:'error', message: 'نوع الحالة (option) غير موجود' });
         }
         const originalDoc = the_new_request.Requestion;
 
         if (!originalDoc) {
-            return res.status(404).json({ message: 'فشل العثور على الطلب الأصلي لتحديثه' });
+            return res.status(404).json({status:'error', message: 'فشل العثور على الطلب الأصلي لتحديثه' });
         }
         const case_type = treatment.case_type;
         const io = socket.getIO();

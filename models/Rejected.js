@@ -29,16 +29,15 @@ const FinishedSchema = new mongoose.Schema({
 
     // حقول التقييم والإغلاق الجديدة
     note: {
-        type: Number,
+        type: String,
         required: [true, 'الرجاء إضافة تقييم'],
-        min: 1,
-        max: 5
+      
     },
     feedback: {
         type: String,
         trim: true
     },
-    completedAt: {
+    rejected_At: {
         type: Date,
         default: Date.now
     },
