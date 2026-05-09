@@ -98,11 +98,14 @@ exports.get_user_conversations = asyncHandler(async (req, res) => {
         }
         return {
             conversationId: conv._id,
+            last_message:conv.last_message,
             otherParty: otherPartyProfile ? {
                 userId: otherPartyProfile.user,
                 full_name: `${otherPartyProfile.first_name} ${otherPartyProfile.father_name} ${otherPartyProfile.last_name}`,
-                profile_photo: otherPartyProfile.profile_photo
-            } : { userId: otherPartyId, info: "Profile not found" },
+                profile_photo: otherPartyProfile.profile_photo,
+                role:role,
+            } : { userId: otherPartyId, info: "Profile not found" },            
+            
             updatedAt: conv.updatedAt
         };
     }));

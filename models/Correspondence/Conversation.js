@@ -8,10 +8,8 @@ const conversationSchema = new mongoose.Schema({
     required: true
   }],
   // لتسهيل عرض آخر رسالة في قائمة المحادثات دون استعلام إضافي
-  lastMessage: {
-    text: String,
-    sender: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-    createdAt: { type: Date, default: Date.now }
+  last_message: {
+    type: String,
   }
 }, { timestamps: true });
 

@@ -314,7 +314,7 @@ delete requestData.__v;
         .lean();
       }else if(role=='patient'){
          requests = await InProcess.find({ patient: user.id })
-        .select('-student -__v')
+        .select('-patient -__v')
         .populate({
             path: 'case_type',
             model: 'Treatment',
@@ -406,7 +406,7 @@ if(role=='student'){
   }
   else if(role=='patient'){
     requests = await Finished.find({ patient: user.id })
-    .select('-student -__v')
+    .select('-patient -__v')
     .populate({
         path: 'case_type',
         model: 'Treatment',
@@ -499,7 +499,7 @@ requests = await Rejected.find({ student: user.id })
   }
   else if (role=='patient'){
     requests = await Rejected.find({ patient: user.id })
-    .select('-student -__v')
+    .select('-patient -__v')
     .populate({
         path: 'case_type',
         model: 'Treatment',

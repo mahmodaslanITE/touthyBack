@@ -38,11 +38,15 @@ let content;
 let message_type;
 if(req.file){
 content=`images/conversation/${req.file.filename}`;
-message_type='file'
+message_type='file';
+conversation.last_message='file';
+
 }
 else{ 
     content=req.body.text;
-    message_type="text"
+    message_type="text",
+    conversation.last_message=content;
+
 }
 const newMessage=await Message.create({
     conversationId:conversationId,
@@ -50,6 +54,8 @@ const newMessage=await Message.create({
     message_type:message_type,
     sender:userId
 })
+await conversation.save();
+
 console.log(`the other party is ${otherPartyId}`)
 const io = socket.getIO();
 console.log(`the io is ${io}`)

@@ -33,10 +33,6 @@ const FinishedSchema = new mongoose.Schema({
         required: [true, 'الرجاء إضافة تقييم'],
       
     },
-    feedback: {
-        type: String,
-        trim: true
-    },
     rejected_At: {
         type: Date,
         default: Date.now
