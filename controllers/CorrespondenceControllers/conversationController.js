@@ -17,8 +17,22 @@ exports.open_conversation = asyncHandler(async (req, res) => {
     let conversation = await Conversation.findOne({ 
         participants: { $all: [senderId, receiverId] } 
     });
-
-    // 2. إذا لم توجد محادثة، قم بإنشاء واحدة جديدة
+    const userOtherParty=await User.findById(receiverId);
+    console.log(`the other party is ${userOtherParty}`)
+    const role=userOtherParty.role;
+    let otherPartyProfile
+    if(role==='student'){
+     otherPartyProfile = await Student_profile.findOne({ user:receiverId })
+        .select('user first_name father_name last_name profile_photo');
+    }
+    else if(role==='patient'){
+        otherPartyProfile = await Patient_profil.findOne({ user: receiverId })
+        .select('user first_name father_name last_name profile_photo');
+    }
+    else if(role==='overseer'){
+        otherPartyProfile = await OverseerProfile.findOne({ user: receiverId })
+        .select('user first_name father_name last_name profile_photo');}
+        // 2. إذا لم توجد محادثة، قم بإنشاء واحدة جديدة
     if (!conversation) {
         conversation = await Conversation.create({ 
             participants: [senderId, receiverId] 
@@ -26,23 +40,25 @@ exports.open_conversation = asyncHandler(async (req, res) => {
         return res.status(201).json({ 
             status:'success',
             message: "هذه المحادثة فارغة", 
+            data:{otherPartyProfile,
             conversationId: conversation._id, 
-            messages: [] 
+            messages: [] }
         });
     }
 
     // 3. إذا وجدت، اجلب الرسائل المرتبطة بها
     const messages = await Message.find({ 
         conversationId: conversation._id 
-    }).sort({ createdAt: 1 });
+    }).select('-converersationId').sort({ createdAt: 1 });
 
     // 4. إرجاع الرسائل أو تنبيه بأنها فارغة
     if (messages.length === 0) {
         return res.status(200).json({ 
             status:'success',
             message: "هذه المحادثة فارغة", 
+           data:{ otherPartyProfile,
             conversationId: conversation._id, 
-            messages: [] 
+            messages: [] }
         });
     }
 const formattedMessage=messages.map((message)=>{
@@ -59,8 +75,11 @@ const formattedMessage=messages.map((message)=>{
     // 5. إرسال المحادثة والرسائل بنجاح
     res.status(200).json({ 
         status:'success',
+        messages:'هذه هي محادثتك',
+    data:{
         conversationId: conversation._id, 
-        data: formattedMessage
+        otherPartyProfile,
+         formattedMessage}
     });
 });
 
@@ -110,7 +129,7 @@ exports.get_user_conversations = asyncHandler(async (req, res) => {
         };
     }));
 
-    res.status(200).json(formattedConversations);
+    res.status(200).json({status:' success',message:'this is your convrsation',data:formattedConversations});
 });
 
 
