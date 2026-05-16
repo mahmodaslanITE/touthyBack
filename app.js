@@ -13,12 +13,8 @@ const server = http.createServer(app);
 // لدعم JSON
 app.use(express.json());
 // في أعلى الملف مع باقي الاستيرادات
-const aiRoutes = require('./routes/aiRoutes');
 
-// بعد تعريف app وقبل app.listen
-// أضف هذا السطر مع باقي الـ middleware
-app.use('/api/ai', aiRoutes);
-// جعل مجلد الصور متاح
+
 app.use('/images', express.static(path.join(__dirname, 'images')));
 // راوتر المستخدمين
 app.use('/api/users', userRoutes);

@@ -101,9 +101,10 @@ exports.getUserTreatmentRequests = asyncHandler(async (req, res) => {
  module.exports.updateRequest = asyncHandler(async (req, res) => {
   const userId = req.user.id;
   const role = req.user.role;
+  const isAdmin=req.user.isAdmin
 
   // check role
-  if (role !== 'patient') {
+  if (role !== 'patient' &&!isAdmin) {
     return res.status(403).json({
       status: 'error',
       message: 'انت مش مريض علشان تعدل الحالة'
@@ -122,7 +123,7 @@ exports.getUserTreatmentRequests = asyncHandler(async (req, res) => {
   }
 
   // check ownership
-  if (request.user!= userId) {
+  if (request.user!= userId && !isAdmin) {
     return res.status(403).json({
       status: 'error',
       message: 'هذه الحالة ليست لك'
@@ -195,9 +196,10 @@ exports.getUserTreatmentRequests = asyncHandler(async (req, res) => {
  module.exports.deleteRequest = asyncHandler(async (req, res) => {
   const userId = req.user.id;
   const role = req.user.role;
+  const isAdmin=req.user.isAdmin
 
   // check role
-  if (role !== 'patient') {
+  if (role !== 'patient' && !isAdmin) {
     return res.status(403).json({
       status: 'error',
       message: 'انت مش مريض علشان تحذف الحالة'
@@ -216,7 +218,7 @@ exports.getUserTreatmentRequests = asyncHandler(async (req, res) => {
   }
 
 // check ownership
-if (request.user!= userId) {
+if (request.user!= userId && !isAdmin) {
   return res.status(403).json({
     status: 'error',
     message: 'هذه الحالة ليست لك'

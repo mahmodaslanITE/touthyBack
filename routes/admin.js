@@ -3,6 +3,7 @@ const { createOverseer, get_all_patients, get_all_students, get_all_overseers, v
 const verifyToken = require('../Middlewares/verifyToken');
 const { getAllVerifyRequests } = require('../controllers/studentController');
 const { get_all_lessons } = require('../controllers/adminControllers/courses_and_treatments');
+const { adminUpdateInProcess } = require('../controllers/adminControllers/requestions_controller');
 const router=express.Router();
 // add over seer 
 router.post('/overseer',verifyToken,createOverseer);
@@ -33,5 +34,8 @@ router.get('/category',verifyToken,get_categorirs)
 //practical-lessons
 router.post('/practical-lessons',verifyToken,add_practical_lesson)
 router.get('/practical-lessons',verifyToken,get_all_lessons)
+
+// inprocess 
+router.put('/in_proccess/:id',verifyToken,adminUpdateInProcess)
 
 module.exports=router

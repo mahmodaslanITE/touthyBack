@@ -47,7 +47,7 @@ exports.open_conversation = asyncHandler(async (req, res) => {
     }
 
     // 3. إذا وجدت، اجلب الرسائل المرتبطة بها
-    const messages = await Message.find({ 
+    let messages = await Message.find({ 
         conversationId: conversation._id 
     }).select('-converersationId').sort({ createdAt: 1 });
 
@@ -61,7 +61,7 @@ exports.open_conversation = asyncHandler(async (req, res) => {
             messages: [] }
         });
     }
-const formattedMessage=messages.map((message)=>{
+ messages=messages.map((message)=>{
    return {_id:message.id,
     conversationId: message.conversationId,
     sender: message.sender,
@@ -79,7 +79,7 @@ const formattedMessage=messages.map((message)=>{
     data:{
         conversationId: conversation._id, 
         otherPartyProfile,
-         formattedMessage}
+         messages}
     });
 });
 
@@ -118,7 +118,7 @@ exports.get_user_conversations = asyncHandler(async (req, res) => {
         return {
             conversationId: conv._id,
             last_message:conv.last_message,
-            otherParty: otherPartyProfile ? {
+            otherPartyProfile: otherPartyProfile ? {
                 userId: otherPartyProfile.user,
                 full_name: `${otherPartyProfile.first_name} ${otherPartyProfile.father_name} ${otherPartyProfile.last_name}`,
                 profile_photo: otherPartyProfile.profile_photo,
