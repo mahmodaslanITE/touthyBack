@@ -32,6 +32,12 @@ exports.open_conversation = asyncHandler(async (req, res) => {
     else if(role==='overseer'){
         otherPartyProfile = await OverseerProfile.findOne({ user: receiverId })
         .select('user first_name father_name last_name profile_photo');}
+       const  otherPartyProfile_formate={
+             userId:req.params.receiverId,
+            full_name:` ${otherPartyProfile.first_name} ${otherPartyProfile.father_name} ${otherPartyProfile.last_name}`
+        ,profile_photo:otherPartyProfile.profile_photo,
+        role:role
+        }
         // 2. إذا لم توجد محادثة، قم بإنشاء واحدة جديدة
     if (!conversation) {
         conversation = await Conversation.create({ 
@@ -40,7 +46,7 @@ exports.open_conversation = asyncHandler(async (req, res) => {
         return res.status(201).json({ 
             status:'success',
             message: "هذه المحادثة فارغة", 
-            data:{otherPartyProfile,
+            data:{otherPartyProfile:otherPartyProfile_formate,
             conversationId: conversation._id, 
             messages: [] }
         });
@@ -49,14 +55,14 @@ exports.open_conversation = asyncHandler(async (req, res) => {
     // 3. إذا وجدت، اجلب الرسائل المرتبطة بها
     let messages = await Message.find({ 
         conversationId: conversation._id 
-    }).select('-converersationId').sort({ createdAt: 1 });
+    }).select('-conversationId').sort({ createdAt: 1 });
 
     // 4. إرجاع الرسائل أو تنبيه بأنها فارغة
     if (messages.length === 0) {
         return res.status(200).json({ 
             status:'success',
             message: "هذه المحادثة فارغة", 
-           data:{ otherPartyProfile,
+           data:{ otherPartyProfile:otherPartyProfile_formate,
             conversationId: conversation._id, 
             messages: [] }
         });
@@ -78,7 +84,7 @@ exports.open_conversation = asyncHandler(async (req, res) => {
         messages:'هذه هي محادثتك',
     data:{
         conversationId: conversation._id, 
-        otherPartyProfile,
+        otherPartyProfile:otherPartyProfile_formate,
          messages}
     });
 });

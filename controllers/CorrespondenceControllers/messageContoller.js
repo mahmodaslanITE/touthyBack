@@ -61,8 +61,7 @@ const io = socket.getIO();
 console.log(`the io is ${io}`)
 if (io) {
   io.to(otherPartyId.toString()).emit('send_message', {
-    message: `وصلتك رسالة من احدى المحادثات `,
-    content:req.body
+    message: ' وصلتك رسالة من احدى المحادثات ',    content:newMessage
   });
  
 }

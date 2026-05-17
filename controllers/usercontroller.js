@@ -1,12 +1,13 @@
 const asyncHandler = require('express-async-handler');
 const path = require('path');
 const fs = require("fs");
-
+const {User}=require("../models/User")
 const Student_profile = require('../models/Student_profile');
 const Patient_profile = require('../models/Patient_profile');
 const { profile, error } = require('console');
 const { date } = require('joi');
 const { OverseerProfile } = require('../models/Overseer_profile');
+const Patient_profil = require('../models/Patient_profile');
 
 /**-----------------------------------------------------
  * @desc Get user profile (student or patient)
@@ -65,19 +66,39 @@ module.exports.getProfile = asyncHandler(async (req, res) => {
   if (!user) {
     return res.status(401).json({ status: 'error', message: 'يجب تسجيل الدخول أولاً' });
   }
-
+const the_user=await User.findById(req.params.id)
+const user_role=the_user.role;
+let profile;
   // 2. البحث عن البروفايل باستخدام المعرف الموجود في الرابط (URL)
-  const profile = await Student_profile.findOne({ user: req.params.id }).populate({path:'category',select:'category'});
+  if(user_role=='student'){
+   profile = await Student_profile.findOne({ user: req.params.id }).populate({path:'category',select:'category'});}
+else if(user_role=='patient'){
+  profile = await Patient_profil.findOne({ user: req.params.id });}
+else if(user_role=='overseer'){  profile = await OverseerProfile.findOne({ user: req.params.id });}
+else{return res.status(500).json({satus:'error',message:'ما لقينا المستخدم'})}
 
   // 3. التأكد من وجود البروفايل في قاعدة البيانات
   if (!profile) {
     return res.status(404).json({ status: 'error', message: 'هذا الحساب غير موجود' });
   }
+const formate={
+  user:profile.user,
+  first_name:profile.first_name,
+  father_name:profile.father_name,
+  last_name:profile.last_name,
+  bio:profile.bio,
+  profile_photo:profile.profile_photo,
+  gender:profile.gender,
+  role:profile.user_role,
+  category:profile.category,
+  university_number:profile.university_number,
+  age:profile.age
+}
   // 5. إرسال الرد الناجح
   res.status(200).json({ 
     status: 'success', 
     message: 'تم جلب البيانات بنجاح', 
-    data: profile // تأكد من كتابتها data وليس date
+    data:formate// تأكد من كتابتها data وليس date
   });
 });
 
