@@ -1,8 +1,8 @@
 const express=require('express');
 const verifyToken = require('../Middlewares/verifyToken');
-const { createTreatmentRequest, getUserTreatmentRequests,  updateRequest, deleteRequest } = require('../controllers/treatmentRequestController');
+const { createTreatmentRequest, getUserTreatmentRequests,  updateRequest, deleteRequest, getUserProcessingTreatmentRequests } = require('../controllers/treatmentRequestController');
 const { uploadRequestPhoto } = require('../Middlewares/upload');
-const { getCourseOverseers, getUserProcessingTreatmentRequests, acceptRequest, showAllRequesyions, reassign_overseer, get_student_finished_requests, get_student_rejected_requests } = require('../controllers/studentController');
+const { getCourseOverseers, acceptRequest, showAllRequesyions, reassign_overseer, get_student_finished_requests, get_student_rejected_requests } = require('../controllers/studentController');
 const router=express.Router();
 //add request
 router.post('/',verifyToken,uploadRequestPhoto.single('photo'),createTreatmentRequest);
@@ -13,11 +13,11 @@ router.get('/',verifyToken,showAllRequesyions)
 // the user can see his own requests
 router.get('/my',verifyToken,getUserTreatmentRequests);
 // student processing request 
-router.get('/myProcessing',verifyToken,getUserProcessingTreatmentRequests);
+router.get('/Processing',verifyToken,getUserProcessingTreatmentRequests);
 // student finished request
-router.get('/myfinished',verifyToken,get_student_finished_requests);
+router.get('/finished',verifyToken,get_student_finished_requests);
 // student rejected request
-router.get('/myrejected',verifyToken,get_student_rejected_requests);
+router.get('/rejected',verifyToken,get_student_rejected_requests);
 
 
 

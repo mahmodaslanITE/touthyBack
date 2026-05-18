@@ -2,6 +2,7 @@ const { Pending_request,  validateUpdateRequest, validateTreatmentRequest } = re
 const asyncHandler = require('express-async-handler');
 // الموديل بالاسم الجديد
 const Treatment = require('../models/Treatment');
+const InProcess = require('../models/InProcess');
 
 /**-----------------------------------------------------
  * @desc Create treatment request
@@ -231,5 +232,132 @@ if (request.user!= userId && !isAdmin) {
   res.status(200).json({
     status: 'success',
     message: 'تم حذف الحالة بنجاح'
+  });
+});
+
+ /**
+   * @desc get user proceccing request
+   * @route api/requests/proccissing
+   */
+exports.getUserProcessingTreatmentRequests = asyncHandler(async (req, res) => {
+  const user = req.user;
+  const role =user.role;
+  const isAdmin=user.isAdmin
+  let requests;
+  if(isAdmin){
+    requests = await InProcess.find()
+    .select('-student -__v')
+    .populate({
+        path: 'case_type',
+        model: 'Treatment',
+        populate: {
+            path: 'course',
+            model: 'Course',
+            select: 'course_name' // سيجلب الـ _id تلقائياً مع الاسم
+        }
+    })
+    .populate({
+        path: 'patient',
+        model: 'Patient_profil',
+        foreignField: 'user',
+        localField: 'patient',
+        select: '-_id first_name father_name last_name'
+    })
+    .populate({
+        path: 'overseer',
+        model: 'OverseerProfile',
+        foreignField: 'user',
+        localField: 'overseer',
+        select: '-_id first_name father_name last_name'
+    })
+    .populate({
+      path: 'student',
+      model: 'Student_profile',
+      foreignField: 'user',
+      localField: 'student',
+      select: '-_id first_name father_name last_name'
+  })
+    .lean();
+  }
+  else if(role=='student'){
+   requests = await InProcess.find({ student: user.id })
+      .select('-student -__v')
+      .populate({
+          path: 'case_type',
+          model: 'Treatment',
+          populate: {
+              path: 'course',
+              model: 'Course',
+              select: 'course_name' // سيجلب الـ _id تلقائياً مع الاسم
+          }
+      })
+      .populate({
+          path: 'patient',
+          model: 'Patient_profil',
+          foreignField: 'user',
+          localField: 'patient',
+          select: '-_id first_name father_name last_name'
+      })
+      .populate({
+          path: 'overseer',
+          model: 'OverseerProfile',
+          foreignField: 'user',
+          localField: 'overseer',
+          select: '-_id first_name father_name last_name'
+      })
+      .lean();
+    }else if(role=='patient'){
+       requests = await InProcess.find({ patient: user.id })
+      .select('-patient -__v')
+      .populate({
+          path: 'case_type',
+          model: 'Treatment',
+          populate: {
+              path: 'course',
+              model: 'Course',
+              select: 'course_name' // سيجلب الـ _id تلقائياً مع الاسم
+          }
+      })
+      .populate({
+          path: 'student',
+          model: 'Student_profile',
+          foreignField: 'user',
+          localField: 'student',
+          select: '-_id first_name father_name last_name'
+      })
+      .populate({
+          path: 'overseer',
+          model: 'OverseerProfile',
+          foreignField: 'user',
+          localField: 'overseer',
+          select: '-_id first_name father_name last_name'
+      })
+      .lean();
+    }
+  // إعادة تشكيل البيانات لفصل case_type عن course
+  const formattedRequests = requests.map(doc => {
+      const item = { ...doc };
+      
+      if (item.case_type) {
+          // 1. استخراج الـ course في كائن منفصل
+          item.course_info = item.case_type.course;
+          
+          // 2. تحديث كائن case_type ليحتوي فقط على بياناته وحذف التداخل
+          item.case_type = {
+              _id: item.case_type._id,
+              case_type: item.case_type.case_type
+          };
+          
+          // 3. حذف الكائن الأصلي المتداخل
+          // delete item.case_type;
+      }
+
+      return item;
+  });
+
+  res.status(200).json({
+      status: 'success',
+      message: 'this is your processing requests',
+      data: formattedRequests
   });
 });

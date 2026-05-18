@@ -89,7 +89,7 @@ const formate={
   bio:profile.bio,
   profile_photo:profile.profile_photo,
   gender:profile.gender,
-  role:profile.user_role,
+  role:user_role,
   category:profile.category,
   university_number:profile.university_number,
   age:profile.age
