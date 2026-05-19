@@ -8,6 +8,8 @@ const { profile, error } = require('console');
 const { date } = require('joi');
 const { OverseerProfile } = require('../models/Overseer_profile');
 const Patient_profil = require('../models/Patient_profile');
+const { param } = require('../routes/requestions');
+const getUserProfile = require('../functions/users');
 
 /**-----------------------------------------------------
  * @desc Get user profile (student or patient)
@@ -68,14 +70,15 @@ module.exports.getProfile = asyncHandler(async (req, res) => {
   }
 const the_user=await User.findById(req.params.id)
 const user_role=the_user.role;
-let profile;
+let profile=await getUserProfile(req.params.id,user_role);
+console.log(`profile${profile}`)
   // 2. البحث عن البروفايل باستخدام المعرف الموجود في الرابط (URL)
-  if(user_role=='student'){
-   profile = await Student_profile.findOne({ user: req.params.id }).populate({path:'category',select:'category'});}
-else if(user_role=='patient'){
-  profile = await Patient_profil.findOne({ user: req.params.id });}
-else if(user_role=='overseer'){  profile = await OverseerProfile.findOne({ user: req.params.id });}
-else{return res.status(500).json({satus:'error',message:'ما لقينا المستخدم'})}
+//   if(user_role=='student'){
+//    profile = await Student_profile.findOne({ user: req.params.id }).populate({path:'category',select:'category'});}
+// else if(user_role=='patient'){
+//   profile = await Patient_profil.findOne({ user: req.params.id });}
+// else if(user_role=='overseer'){  profile = await OverseerProfile.findOne({ user: req.params.id });}
+// else{return res.status(500).json({satus:'error',message:'ما لقينا المستخدم'})}
 
   // 3. التأكد من وجود البروفايل في قاعدة البيانات
   if (!profile) {

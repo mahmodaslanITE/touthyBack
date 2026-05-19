@@ -3,6 +3,7 @@ const router = express.Router();
 const {uploadProfilePhoto}=require('../Middlewares/upload')
 const verifyToken = require('../Middlewares/verifyToken');
 const { updateProfilePhoto, updateUserProfile, showUserProfile, getProfile } = require('../controllers/usercontroller');
+const { createReport } = require('../controllers/reportController');
 
 // update profile photo
 router.put('/photo', verifyToken,uploadProfilePhoto.single('profile_photo'),updateProfilePhoto);
@@ -15,5 +16,8 @@ router.get('/',verifyToken,showUserProfile)
 
 // get profile
 router.get('/:id',verifyToken,getProfile)
+
+// report any one
+router.post('/report/:id',verifyToken,createReport) 
 
 module.exports = router;

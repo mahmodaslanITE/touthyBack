@@ -82,6 +82,7 @@ const { validate_practical_lesson, Practial_lesson } = require('../models/Practi
 /**
  * @description قبول  طلب توثيق حساب
  * @route /api/admin/accept/reject/:id
+ * 
  */
 
 module.exports.verify_account_accept = asyncHandler(async (req, res) => {
@@ -293,11 +294,7 @@ module.exports.createCourse = asyncHandler(async (req, res) => {
 // @المسار: GET /api/courses
 exports.get_courses = asyncHandler(async (req, res) => {
     const courses = await Course.find()
-        .populate({
-            path: 'overseers.$*', // الوصول للمصفوفات داخل الـ Map
-            select: 'first_name last_name father_name',
-        });
-
+    
     if (!courses || courses.length === 0) {
         return res.status(404).json({ status: 'error', message: 'لا توجد مواد' });
     }
