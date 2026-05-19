@@ -84,12 +84,25 @@ exports.getUserTreatmentRequests = asyncHandler(async (req, res) => {
     path: 'case_type',
     select: '_id case_type',
   });
-
+const formated=requests.map((requestion)=>{
+  return{
+    _id:requestion._id,
+    Requestion:{
+      pain_severity:requestion.pain_severity,
+      pain_time:requestion.pain_time,
+      tooth_location:requestion.tooth_location,
+      gender:requestion.gender,
+      age:requestion.age,
+      photo:requestion.photo,
+      more_details:requestion.more_details
+    },
+    case_type:requestion.case_type
+  }
+})
   res.status(200).json({
     status: 'success',
     message: 'this is your requests',
-    data: requests
-  });
+    data: formated  });
 });
 
 /**________________________________________________________________________________

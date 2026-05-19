@@ -72,14 +72,6 @@ const the_user=await User.findById(req.params.id)
 const user_role=the_user.role;
 let profile=await getUserProfile(req.params.id,user_role);
 console.log(`profile${profile}`)
-  // 2. البحث عن البروفايل باستخدام المعرف الموجود في الرابط (URL)
-//   if(user_role=='student'){
-//    profile = await Student_profile.findOne({ user: req.params.id }).populate({path:'category',select:'category'});}
-// else if(user_role=='patient'){
-//   profile = await Patient_profil.findOne({ user: req.params.id });}
-// else if(user_role=='overseer'){  profile = await OverseerProfile.findOne({ user: req.params.id });}
-// else{return res.status(500).json({satus:'error',message:'ما لقينا المستخدم'})}
-
   // 3. التأكد من وجود البروفايل في قاعدة البيانات
   if (!profile) {
     return res.status(404).json({ status: 'error', message: 'هذا الحساب غير موجود' });
@@ -95,7 +87,9 @@ const formate={
   role:user_role,
   category:profile.category,
   university_number:profile.university_number,
-  age:profile.age
+  age:profile.age,
+  is_verified:profile.is_verified
+  
 }
   // 5. إرسال الرد الناجح
   res.status(200).json({ 

@@ -64,16 +64,15 @@ module.exports.createReport = asyncHandler(async (req, res) => {
         reason: reason.trim(),
         type: type || 'other'
     });
-    const user_profie=getUserProfile(reporterId,role)
-    console.log(`the reporter is ${user_profie}`)
+    const reporter=await getUserProfile(reporterId,role)
     const admins=await User.find({isAdmin:true})
-admins.map((admin)=>{
-    const admin_id=admin._id;
     const io = socket.getIO();
+
+admins.map((admin)=>{
+    const admin_id=admin._id.toString();
     if (io) {
-        io.to(admin_id).emit('send_message', {
-        //   message:`وصل بلاغ من ${reporter.first_name} ${reporter.last_name} ${reporter.last}`
-        message:",وصل بلاغ",
+        io.to(admin_id).emit('report', {
+          message:`وصل بلاغ من ${reporter.first_name} ${reporter.last_name} ${reporter.last}`,
         content:report
     })}});
 

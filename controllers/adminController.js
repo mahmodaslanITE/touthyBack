@@ -428,7 +428,6 @@ exports.deleteTreatment = async (req, res) => {
 module.exports.add_category=asyncHandler(async(req,res)=>{
     const {error}=valedate_add_category(req.body);
     if(error){return res.status(400).json({status:'error',message:error.details[0].message})}
-const user =req.user;
 const isAdmin=req.user.isAdmin;
 if(!isAdmin){return res.status(403).json({status:'error', message:'انت لست مشرف '})};
 const result=await Category.create({
