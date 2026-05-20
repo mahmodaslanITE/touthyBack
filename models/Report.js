@@ -21,12 +21,11 @@ const reportSchema = new mongoose.Schema({
     },
     type: {
         type: String,
-        enum: ['spam', 'harassment', 'inappropriate_content', 'fake_account', 'other'],
         default: 'other'
     },
     status: {
         type: String,
-        enum: ['pending', 'reviewed', 'resolved', 'rejected'],
+        enum: ['pending', 'reviewed'],
         default: 'pending'
     },
     adminNotes: {
