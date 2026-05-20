@@ -1,5 +1,5 @@
 // utils/getUserProfile.js
-const OverseerProfile = require("../models/Overseer_profile");
+const {OverseerProfile} = require("../models/Overseer_profile");
 const PatientProfile = require("../models/Patient_profile");
 const StudentProfile = require("../models/Student_profile");
 
