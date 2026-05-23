@@ -33,19 +33,10 @@ module.exports.createReport = asyncHandler(async (req, res) => {
             message: 'لا يمكنك الإبلاغ عن نفسك'
         });
     }
-
-    // 3. التحقق من وجود سبب الإبلاغ
-    if (!reason || reason.trim().length < 5) {
-        return res.status(400).json({
-            status: 'error',
-            message: 'سبب الإبلاغ مطلوب ويجب أن يكون 5 أحرف على الأقل'
-        });
-    }
-
     // 4. منع التكرار (يمكن للمستخدم الإبلاغ عن نفس الشخص مرة كل 24 ساعة)
     const existingReport = await Report.findOne({
         reporter: reporterId,
-        reportedUser: reported,
+        reported: reported,
         createdAt: { $gte: new Date(Date.now() - 24 * 60 * 60 * 1000) },
         status: 'pending'
     });
@@ -61,7 +52,7 @@ module.exports.createReport = asyncHandler(async (req, res) => {
     const report = await Report.create({
         reporter: reporterId,
         reported: reported,
-        reason: reason.trim(),
+        reason: reason,
         type: type || 'other'
     });
     const reporter=await getUserProfile(reporterId,role)
@@ -92,7 +83,7 @@ admins.map((admin)=>{
 
 
 /**
- * @desc Get all reports (Admin only)
+ * @desc Get pending reports (Admin only)
  * @route GET /api/reports
  * @access Private (Admin only)
  */
@@ -127,6 +118,7 @@ module.exports.get_pending_reports = asyncHandler(async (req, res) => {
         console.log(`the repored profile is ${reported_profile}`)
         
         return {
+            _id:report._id,
             reason: report.reason,
             type: report.type,
             status: report.status,
@@ -145,3 +137,44 @@ module.exports.get_pending_reports = asyncHandler(async (req, res) => {
         data: formated_reports
     });
 });
+
+/**
+ * @description rewiw reports
+ * @route api/reporst/:id
+ * @method put 
+ * @access private (only admin )
+ */
+module.exports.review_report=asyncHandler(async(req,res)=>{
+    const note=req.body.note;
+    const admin_id=req.user.id;
+    const isAdmin=req.user.isAdmin;
+    const report_id=req.params.id;
+    const report=await Report.findById(report_id);
+    if(!isAdmin){
+        return res.status(403).json({
+            status:'error',
+            message:'انت مش ادمن '
+        })
+    }
+    if(!report){
+        return res.status(404).json({
+            status:'error',
+            message:'الابلاغ غير موجود '
+        })
+    }
+    if(report.status=='reviewed'){
+        return res.status(404).json({
+            status:'error',
+            message:' هذا الابلاغ تم حله مسبقا '
+        })
+    }
+    report.status='reviewed';
+    report.reviewedBy=admin_id;
+    report.reviewedAt=Date.now();
+    if(note){report.adminNotes=note};
+    await report.save();
+    res.status(200).json({
+        status:'success',
+        message:'تمت مراجعة الابلاغ بنجاح '
+    })
+})

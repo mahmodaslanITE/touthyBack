@@ -14,10 +14,6 @@ const reportSchema = new mongoose.Schema({
     },
     reason: {
         type: String,
-        required: [true, 'سبب الإبلاغ مطلوب'],
-        trim: true,
-        minlength: [5, 'سبب الإبلاغ يجب أن لا يقل عن 5 أحرف'],
-        maxlength: [500, 'سبب الإبلاغ يجب أن لا يزيد عن 500 حرف']
     },
     type: {
         type: String,

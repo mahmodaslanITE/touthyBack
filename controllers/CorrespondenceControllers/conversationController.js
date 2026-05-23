@@ -13,12 +13,18 @@ exports.open_conversation = asyncHandler(async (req, res) => {
     const senderId = req.user.id; // القادم من الـ middleware (verifyToken)
     const receiverId = req.params.receiverId; // القادم من الرابط
 
+    const user=await User.findById(receiverId);
+    if(!user){
+        return res.status(400).json({
+            status:"error",
+            messages:'هذا الايدي ليس لشخص كي تفتح معه محادثة '
+        })
+    }
     // 1. البحث عن محادثة بين الطرفين
     let conversation = await Conversation.findOne({ 
         participants: { $all: [senderId, receiverId] } 
     });
     const userOtherParty=await User.findById(receiverId);
-    console.log(`the other party is ${userOtherParty}`)
     const role=userOtherParty.role;
     let otherPartyProfile
     if(role==='student'){

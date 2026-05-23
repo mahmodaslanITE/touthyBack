@@ -143,7 +143,6 @@ module.exports.loginUser = asyncHandler(async (req, res) => {
 
   const token = user.generateToken();
 
-  let profileData = null;
   if (profile) {
     const { _id, user: userRef, createdAt, updatedAt, __v, ...rest } = profile._doc;
     profileData = rest;
@@ -189,3 +188,40 @@ module.exports.loginUser = asyncHandler(async (req, res) => {
     token
   });
 });
+
+/**
+ * @description change password 
+ * @route api/auth/change_password
+ * @method put
+ * @access private
+ */
+module.exports.change_password=asyncHandler(async(req,res)=>{
+  const user_id=req.user.id;
+  const old_password=req.body.old_password;
+  const new_password=req.body.new_password;
+  const user=await User.findById(user_id);
+
+  if (!user) {
+    return res.status(400).json({
+      status: "error",
+      message: 'لم يتم العثور على حسابك'
+    });
+  }
+
+  const isPasswordValid = await bcrypt.compare(old_password, user.password);
+  if (!isPasswordValid) {
+    return res.status(400).json({
+      status: "error",
+      message: 'كلمة السر القديمة التي أدخلتها خاطئة      جرب طريقة اخرى '
+    });
+  }
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(new_password, salt);
+  user.password=hashedPassword;
+  await user.save();
+  res.status(200).json({
+    status:'success',
+    message:'تم تغيير كلمة السر بنجاح '
+  })
+
+})
