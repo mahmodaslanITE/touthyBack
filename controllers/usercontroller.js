@@ -77,8 +77,8 @@ let profile=await getUserProfile(req.params.id,user_role);
   if (!profile) {
     return res.status(404).json({ status: 'error', message: 'هذا الحساب غير موجود' });
   }
-  let finishds
-  let processes
+  let finishds=[]
+  let processes=[]
   if(user_role=='student'){
  finishds=await Finished.find({student:req.params.id});
 processes=await InProcess.find({student:req.params.id})
@@ -102,7 +102,7 @@ const formate={
   age:profile.age,
   is_verified:profile.is_verified,
   count_cases_finishds:finishds.length,
-  count_cases_in_process:processes.length
+  count_cases_in_process:processes.length,
   
 }
   // 5. إرسال الرد الناجح
