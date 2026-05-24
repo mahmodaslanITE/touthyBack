@@ -44,6 +44,16 @@ const storageConversation = multer.diskStorage({
     }
 });
 
+// posts photo
+const storagePosts = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, path.join(__dirname, '../images/posts'));
+    },
+    filename: (req, file, cb) => {
+        const uniqueName = Date.now() + '-' + file.originalname.replace(/\s/g, '');
+        cb(null, uniqueName);
+    }
+});
 // فلتر للتحقق من نوع الملف
 const fileFilter = (req, file, cb) => {
     const allowedExtensions=['.jpg','.jpeg','.png','.gif','webp','bmp','mp4'];
@@ -82,5 +92,11 @@ const uploadConversationPhoto = multer({
     fileFilter,
     limits: { fileSize: 1024 * 1024 * 5 } // حد 5 ميجا
 });
+// multer to upload post photos
+const uploadPostPhoto = multer({
+    storage:storagePosts,
+    fileFilter,
+    limits: { fileSize: 1024 * 1024 * 5 } // حد 5 ميجا
+});
 
-module.exports = {uploadProfilePhoto,uploadRequestPhoto,uploadVerifyRequestPhoto,uploadConversationPhoto};
+module.exports = {uploadProfilePhoto,uploadRequestPhoto,uploadVerifyRequestPhoto,uploadConversationPhoto,uploadPostPhoto};

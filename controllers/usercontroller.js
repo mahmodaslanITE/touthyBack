@@ -19,32 +19,52 @@ const InProcess = require('../models/InProcess');
  * @access Private
  ------------------------------------------------------*/
 module.exports.showUserProfile = asyncHandler(async (req, res) => {
-  const userId = req.user.id;
-  const userRole = req.user.role; 
-
-  let profile;
-
-  if (userRole === 'student') {
-    profile = await Student_profile.findOne({ user: userId });
-  } else if (userRole === 'patient') {
-    profile = await Patient_profile.findOne({ user: userId });
-  } 
-   else if (userRole === 'overseer') {
-    profile = await OverseerProfile.findOne({ user: userId });
-  } 
-  else {
-    return res.status(400).json({
-      status: "error",
-      message: 'نوع المستخدم غير صالح'
-    });
+  const user = req.user;
+  
+  if (!user) {
+    return res.status(401).json({ status: 'error', message: 'يجب تسجيل الدخول أولاً' });
   }
+const the_user=await User.findById(req.user.id)
+const user_role=the_user.role;
+let profile=await getUserProfile(req.user.id,user_role);
+  // 3. التأكد من وجود البروفايل في قاعدة البيانات
+  if (!profile) {
+    return res.status(404).json({ status: 'error', message: 'هذا الحساب غير موجود' });
+  }
+  let finishds=[]
+  let processes=[]
+  if(user_role=='student'){
+ finishds=await Finished.find({student:req.user.id});
+processes=await InProcess.find({student:req.user.id})
+  } 
+  else if(user_role=='overseer'){
+    finishds=await Finished.find({overseer:req.user.id})
+    processes=await InProcess.find({overseer:req.user.id})
 
-  res.status(200).json({
-    status: "success",
-    message: 'this is your profile',
-    data: profile
-  });
-});
+  }
+const formate={
+  user:profile.user,
+  first_name:profile.first_name,
+  father_name:profile.father_name,
+  last_name:profile.last_name,
+  bio:profile.bio,
+  profile_photo:profile.profile_photo,
+  gender:profile.gender,
+  role:user_role,
+  category:profile.category,
+  university_number:profile.university_number,
+  age:profile.age,
+  is_verified:profile.is_verified,
+  count_cases_finishds:finishds.length,
+  count_cases_in_process:processes.length,
+  
+}
+  // 5. إرسال الرد الناجح
+  res.status(200).json({ 
+    status: 'success', 
+    message: 'تم جلب البيانات بنجاح', 
+    data:formate// تأكد من كتابتها data وليس date
+  });});
 
 /**-----------------------------------------------------
  * @desc Get all profiles

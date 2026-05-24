@@ -6,7 +6,7 @@ const postSchema = new mongoose.Schema({
         ref: 'User',
         required: true
     },
-    publisher_role: {
+    publisherRole: {
         type: String,
         enum: ['patient', 'student', 'overseer', 'admin'],
         required: true
@@ -17,13 +17,12 @@ const postSchema = new mongoose.Schema({
         trim: true
     },
     images: [{
-        type: String,
-        default: []
+        url: String,
+        filename: String
     }],
     likes: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        default: []
+        ref: 'User'
     }],
     likesCount: {
         type: Number,
@@ -31,8 +30,7 @@ const postSchema = new mongoose.Schema({
     },
     dislikes: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        default: []
+        ref: 'User'
     }],
     dislikesCount: {
         type: Number,
@@ -41,11 +39,9 @@ const postSchema = new mongoose.Schema({
     commentsCount: {
         type: Number,
         default: 0
-    },
-    createdAt: {
-        type: Date,
-        default: Date.now
     }
+}, {
+    timestamps: true
 });
 
 module.exports = mongoose.model('Post', postSchema);

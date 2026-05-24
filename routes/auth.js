@@ -7,6 +7,6 @@ const router=express.Router();
 
 router.post('/register',createRegisterUser);
 router.post('/login',loginUser);
-router.post('/change_password',verifyToken,change_password);
+router.post('/change-password',verifyToken,change_password);
 router.post('/verify',verifyToken,uploadVerifyRequestPhoto.single('document'),addVerifyRequest);
 module.exports=router;
