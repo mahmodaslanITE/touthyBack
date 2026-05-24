@@ -16,10 +16,11 @@ const postSchema = new mongoose.Schema({
         required: true,
         trim: true
     },
-    images: [{
-        url: String,
-        filename: String
-    }],
+    // ✅ هذا هو التنسيق الصحيح - مصفوفة من النصوص
+    images: {
+        type: [String],
+        default: []
+    },
     likes: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'

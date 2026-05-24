@@ -4,20 +4,20 @@ const verifyToken = require('../Middlewares/verifyToken');
 const uploadPostImages = require('../Middlewares/uploadPost');
 const {
     createPost,
-    getAllPosts,
     getPostById,
     updatePost,
     deletePost,
     likePost,
-    dislikePost
+    dislikePost,
+    get_all_posts
 } = require('../controllers/CorrespondenceControllers/postController');
 
 // 🔓 جميع الروتات تحتاج مصادقة
 router.use(verifyToken);
 
 // 📝 CRUD Operations
-router.post('/', uploadPostImages.any(), createPost);
-router.get('/', getAllPosts);
+router.post('/', uploadPostImages.array('images'),verifyToken, createPost);
+router.get('/', get_all_posts);
 router.get('/:id', getPostById);
 router.put('/:id', uploadPostImages.array('images', 5), updatePost);
 router.delete('/:id', deletePost);

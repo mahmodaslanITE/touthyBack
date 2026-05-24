@@ -341,27 +341,27 @@
     access: "private (Admin only)"
 }
 
-// 44: get single report by ID (Admin only)
-{
-    link: "http://localhost:5000/api/reports/:id",
-    method: "get",
-    parameters: null,
-    access: "private (Admin only)"
-}
+
 
 // 45: update report status (Admin only)
 {
-    link: "http://localhost:5000/api/reports/:id/status",
+    link: "http://localhost:5000/api/reports/:id/",
     method: "put",
-    parameters: ["status", "adminNotes"],
+    parameters: [note"],
     access: "private (Admin only)",
-    statuses: ["pending", "reviewed", "resolved", "rejected"]
 }
 
-// 46: delete report (Admin only)
-{
-    link: "http://localhost:5000/api/reports/:id",
-    method: "delete",
-    parameters: null,
-    access: "private (Admin only)"
-}
+ 46: add post 
+ {
+     link: "http://localhost:5000/api/posts",
+    method: "post",
+    parameters: [content images"],
+    access: "private ",
+ }
+ 47: add post 
+ {
+     link: "http://localhost:5000/api/posts",
+    method: "get",
+    parameters: [content images"],
+    access: "private ",
+ }
