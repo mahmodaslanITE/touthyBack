@@ -1,6 +1,7 @@
 const asyncHandler = require('express-async-handler');
+const {User}=require('../../models/User')
 const Post = require('../../models/Correspondence/Post');
-
+const getUserProfile=require('../../functions/users')
 // إنشاء بوست جديد
 exports.createPost = asyncHandler(async (req, res) => {
     const { content } = req.body;
@@ -35,14 +36,37 @@ status:'error',            message: 'محتوى البوست مطلوب'
 
 // جلب جميع البوستات
 exports.get_all_posts = asyncHandler(async (req, res) => {
-    const posts = await Post.find()
-        .populate('publisher', 'email role')
-        .sort({ createdAt: -1 });
+    const posts = await Post.find().sort({ createdAt: -1 });
+    
+    // ✅ الحل: انتظار كل العمليات غير المتزامنة
+    const formated_post = await Promise.all(
+        posts.map(async (post) => {
+            const publisher = await User.findById(post.publisher);
+            const publisher_role = publisher.role;
+            const publisher_profile = await getUserProfile(post.publisher, publisher_role);
+            return {
+                content:post.content,
+                images:post.images,
+                count_likes:post.likesCount,
+                count_dislikes:post.dislikesCount,
+                count_comments:post.commentsCount,
+                created_at:post.createdAt,
+                publisher_role:post.publisherRole,
+                publisher:{
+                    full_name:`${publisher_profile.first_name} ${publisher_profile.father_name} ${publisher_profile.last_name}`,
+                    profile_photo:publisher_profile.profile_photo,
+                    gender:publisher_profile.gender,
+                    is_verified:publisher_profile.is_verified
+                }
+            };
+        })
+    );
 
     res.status(200).json({
-        success: true,
+        status: 'success',
+        message: 'هذه هي كل البوستات',
         count: posts.length,
-        data: posts
+        data: formated_post
     });
 });
 
