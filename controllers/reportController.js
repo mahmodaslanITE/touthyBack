@@ -103,7 +103,6 @@ module.exports.get_pending_reports = asyncHandler(async (req, res) => {
         })
     }
     
-    // ✅ تصحيح: استخدام Promise.all لانتظار كل الـ promises
     const formated_reports = await Promise.all(reports.map(async (report) => {
         const reporter = await User.findById(report.reporter);
         const reporter_role = reporter.role;
@@ -111,11 +110,9 @@ module.exports.get_pending_reports = asyncHandler(async (req, res) => {
         const reported = await User.findById(report.reported);
         const reported_role = reported.role;
         
-        // ✅ تصحيح: استخدام _id بدلاً من reporter
         const reporter_profile = await getUserProfile(reporter._id, reporter_role);
         const reported_profile = await getUserProfile(reported._id, reported_role);
 
-        console.log(`the repored profile is ${reported_profile}`)
         
         return {
             _id:report._id,

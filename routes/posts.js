@@ -7,9 +7,9 @@ const {
     getPostById,
     updatePost,
     deletePost,
-    likePost,
     dislikePost,
-    get_all_posts
+    get_all_posts,
+    like_post
 } = require('../controllers/CorrespondenceControllers/postController');
 
 // 🔓 جميع الروتات تحتاج مصادقة
@@ -23,7 +23,7 @@ router.put('/:id', uploadPostImages.array('images', 5), updatePost);
 router.delete('/:id', deletePost);
 
 // ❤️ تفاعلات
-router.post('/:id/like', likePost);
+router.post('/:id/like', like_post);
 router.post('/:id/dislike', dislikePost);
 
 module.exports = router;

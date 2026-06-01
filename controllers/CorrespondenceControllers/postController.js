@@ -45,6 +45,7 @@ exports.get_all_posts = asyncHandler(async (req, res) => {
             const publisher_role = publisher.role;
             const publisher_profile = await getUserProfile(post.publisher, publisher_role);
             return {
+                _id:post._id,
                 content:post.content,
                 images:post.images,
                 count_likes:post.likesCount,
@@ -77,14 +78,14 @@ exports.getPostById = asyncHandler(async (req, res) => {
 
     if (!post) {
         return res.status(404).json({
-            success: false,
+            status:'error',        
             message: 'البوست غير موجود'
         });
     }
 
     res.status(200).json({
-        success: true,
-        data: post
+       status:'success',
+       message:'هذا هو البوست'
     });
 });
 
@@ -98,14 +99,14 @@ exports.updatePost = asyncHandler(async (req, res) => {
 
     if (!post) {
         return res.status(404).json({
-            success: false,
+           status:'error',
             message: 'البوست غير موجود'
         });
     }
 
-    if (post.publisher.toString() !== userId && !isAdmin) {
+    if (post.publisher !== userId && !isAdmin) {
         return res.status(403).json({
-            success: false,
+            status:'error',
             message: 'غير مصرح لك بتعديل هذا البوست'
         });
     }
@@ -123,7 +124,7 @@ exports.updatePost = asyncHandler(async (req, res) => {
     await post.save();
 
     res.status(200).json({
-        success: true,
+        status:'success',
         message: 'تم تحديث البوست بنجاح',
         data: post
     });
@@ -138,14 +139,14 @@ exports.deletePost = asyncHandler(async (req, res) => {
 
     if (!post) {
         return res.status(404).json({
-            success: false,
+            status:'error',
             message: 'البوست غير موجود'
         });
     }
 
     if (post.publisher.toString() !== userId && !isAdmin) {
         return res.status(403).json({
-            success: false,
+            status:'error',
             message: 'غير مصرح لك بحذف هذا البوست'
         });
     }
@@ -153,19 +154,19 @@ exports.deletePost = asyncHandler(async (req, res) => {
     await post.deleteOne();
 
     res.status(200).json({
-        success: true,
+        status:'success',
         message: 'تم حذف البوست بنجاح'
     });
 });
 
 // إعجاب ببوست
-exports.likePost = asyncHandler(async (req, res) => {
+exports.like_post = asyncHandler(async (req, res) => {
     const userId = req.user.id;
     const post = await Post.findById(req.params.id);
 
     if (!post) {
         return res.status(404).json({
-            success: false,
+            status:'error',
             message: 'البوست غير موجود'
         });
     }
@@ -184,11 +185,11 @@ exports.likePost = asyncHandler(async (req, res) => {
     await post.save();
 
     res.status(200).json({
-        success: true,
+        status:'success',
         message: alreadyLiked ? 'تم إزالة الإعجاب' : 'تم الإعجاب بالبوست',
         data: {
-            likesCount: post.likesCount,
-            dislikesCount: post.dislikesCount
+            count_likes: post.likesCount,
+            count_dislikes: post.dislikesCount
         }
     });
 });
@@ -200,7 +201,7 @@ exports.dislikePost = asyncHandler(async (req, res) => {
 
     if (!post) {
         return res.status(404).json({
-            success: false,
+            status:'error',
             message: 'البوست غير موجود'
         });
     }
@@ -219,46 +220,12 @@ exports.dislikePost = asyncHandler(async (req, res) => {
     await post.save();
 
     res.status(200).json({
-        success: true,
+        status:'success',
         message: alreadyDisliked ? 'تم إزالة عدم الإعجاب' : 'تم عدم الإعجاب بالبوست',
         data: {
-            likesCount: post.likesCount,
-            dislikesCount: post.dislikesCount
+            count_likes: post.likesCount,
+            count_dislikes: post.dislikesCount
         }
     });
 });
 
-// حذف صورة معينة من البوست
-exports.deleteImage = asyncHandler(async (req, res) => {
-    const { postId, imageIndex } = req.params;
-    const userId = req.user.id;
-    const isAdmin = req.user.isAdmin;
-
-    const post = await Post.findById(postId);
-
-    if (!post) {
-        return res.status(404).json({
-            success: false,
-            message: 'البوست غير موجود'
-        });
-    }
-
-    if (post.publisher.toString() !== userId && !isAdmin) {
-        return res.status(403).json({
-            success: false,
-            message: 'غير مصرح لك'
-        });
-    }
-
-    const index = parseInt(imageIndex);
-    if (index >= 0 && index < post.images.length) {
-        post.images.splice(index, 1);
-        await post.save();
-    }
-
-    res.status(200).json({
-        success: true,
-        message: 'تم حذف الصورة بنجاح',
-        data: post
-    });
-});
