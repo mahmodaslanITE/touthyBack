@@ -54,6 +54,7 @@ exports.get_all_posts = asyncHandler(async (req, res) => {
                 created_at:post.createdAt,
                 publisher_role:post.publisherRole,
                 publisher:{
+                    _id:post.publisher,
                     full_name:`${publisher_profile.first_name} ${publisher_profile.father_name} ${publisher_profile.last_name}`,
                     profile_photo:publisher_profile.profile_photo,
                     gender:publisher_profile.gender,

@@ -6,8 +6,7 @@ const {
     createPost,
     getPostById,
     updatePost,
-    deletePost,
-    dislikePost,
+    deletePost,dislikePost,
     get_all_posts,
     like_post
 } = require('../controllers/CorrespondenceControllers/postController');

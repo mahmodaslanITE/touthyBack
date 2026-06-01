@@ -18,16 +18,16 @@ const storage = multer.diskStorage({
 });
 
 const fileFilter = (req, file, cb) => {
-    const allowedTypes = /jpeg|jpg|png|gif|webp|bmp/;
-    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-    const mimetype = allowedTypes.test(file.mimetype);
-    
-    if (mimetype && extname) {
-        return cb(null, true);
-    } else {
-        cb(new Error('只支持图片格式: jpg, jpeg, png, gif, webp, bmp'), false);
-    }
-};
+        // قائمة الامتدادات المسموحة
+        const allowedExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp'];
+        const ext = path.extname(file.originalname).toLowerCase();
+       
+        if (allowedExtensions.includes(ext)) {
+            cb(null, true);
+        } else {
+            cb(new Error('只支持图片格式: jpg, jpeg, png, gif, webp, bmp'), false);
+        }
+    };
 
 // ✅ زيادة عدد الصور المسموحة إلى 10
 const uploadPostImages = multer({
