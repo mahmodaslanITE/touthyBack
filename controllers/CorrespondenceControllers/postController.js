@@ -1,7 +1,8 @@
 const asyncHandler = require('express-async-handler');
 const {User}=require('../../models/User')
 const Post = require('../../models/Correspondence/Post');
-const getUserProfile=require('../../functions/users')
+const getUserProfile=require('../../functions/users');
+const Comment = require('../../models/Correspondence/Comment');
 // إنشاء بوست جديد
 exports.createPost = asyncHandler(async (req, res) => {
     const { content } = req.body;
@@ -72,21 +73,79 @@ exports.get_all_posts = asyncHandler(async (req, res) => {
     });
 });
 
-// جلب بوست محدد
+// جلب بوست محدد مع التعليقات
 exports.getPostById = asyncHandler(async (req, res) => {
-    const post = await Post.findById(req.params.id)
-        .populate('publisher', 'email role');
-
+    const postId  = req.params.id;
+    // 1. جلب البوست
+    const post = await Post.findById(postId);
     if (!post) {
         return res.status(404).json({
-            status:'error',        
+            status: 'error',
             message: 'البوست غير موجود'
         });
     }
-
+    
+    // 2. جلب بيانات الناشر
+    const publisher = await User.findById(post.publisher);
+    const publisher_role = publisher.role;
+    const publisher_profile = await getUserProfile(post.publisher, publisher_role);
+    
+    // 3. تنسيق بيانات البوست (نفس طريقة get_all_posts)
+    const formattedPost = {
+        _id: post._id,
+        content: post.content,
+        images: post.images,
+        count_likes: post.likesCount,
+        count_dislikes: post.dislikesCount,
+        count_comments: post.commentsCount,
+        created_at: post.createdAt,
+        updated_at: post.updatedAt,
+        publisher_role: post.publisherRole,
+        publisher: {
+            _id: post.publisher,
+            full_name: `${publisher_profile.first_name} ${publisher_profile.father_name} ${publisher_profile.last_name}`,
+            profile_photo: publisher_profile.profile_photo,
+            gender: publisher_profile.gender,
+            is_verified: publisher_profile.is_verified
+        }
+    };
+    
+    // 4. جلب التعليقات الخاصة بهذا البوست
+    const comments = await Comment.find({ post: postId })
+        .sort({ createdAt: -1 });
+    
+    // 5. تنسيق التعليقات مع بيانات أصحابها
+    const formattedComments = await Promise.all(
+        comments.map(async (comment) => {
+            const commentUser = await User.findById(comment.user);
+            const commentUserRole = commentUser.role;
+            const commentUserProfile = await getUserProfile(comment.user, commentUserRole);
+            
+            return {
+                _id: comment._id,
+                content: comment.content,
+                likes_count: comment.likesCount,
+                created_at: comment.createdAt,
+                user: {
+                    _id: comment.user,
+                    full_name: `${commentUserProfile.first_name} ${commentUserProfile.father_name} ${commentUserProfile.last_name}`,
+                    profile_photo: commentUserProfile.profile_photo,
+                    gender: commentUserProfile.gender,
+                    is_verified: commentUserProfile.is_verified
+                }
+            };
+        })
+    );
+    
+    // 6. إرسال الرد
     res.status(200).json({
-       status:'success',
-       message:'هذا هو البوست'
+        status: 'success',
+        message: 'هذا هو البوست مع تعليقاته',
+        data: {
+            post: formattedPost,
+            comments: formattedComments,
+            comments_count: formattedComments.length
+        }
     });
 });
 

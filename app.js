@@ -26,6 +26,7 @@ app.use('/api/overseer',require('./routes/overseer'))
 app.use('/api/conversations',require('./routes/conversations'))
 app.use('/api/reports',require('./routes/reports'));
 app.use('/api/posts',require('./routes/posts'))
+app.use('/api/posts/comments',require('./routes/comments'))
 
 // خطأ 404 لأي راوتر آخر
 app.use((req, res) => {

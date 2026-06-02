@@ -358,10 +358,50 @@
     parameters: [content images"],
     access: "private ",
  }
- 47: add post 
- {
+
+ 47: get all posts 
+  {
      link: "http://localhost:5000/api/posts",
     method: "get",
+    access: "private ",
+ }
+ 48: get any post by id 
+ {
+     link: "http://localhost:5000/api/posts/:id",
+    method: "get",
+    access: "private ",
+ }
+ 49: add like
+ {
+     link: "http://localhost:5000/api/posts/:id/like",
+    method: "post",
+    access: "private ",
+ }
+ 50: add dislike
+ {
+     link: "http://localhost:5000/api/posts/:id/dislike",
+    method: "post",
+    access: "private ",
+ }
+ 51:
+ {
+     link: "http://localhost:5000/api/posts/:id",
+    method: "put",
+    access: "private ",
+ }
+ 52: delete post 
+  {
+     link: "http://localhost:5000/api/posts/:id",
+    method: "delete",
+    access: "private ",
+ }
+ 53:add comment
+ 
+ {
+     link: "http://localhost:5000/api/posts/cooments",
+    method: "post",
     parameters: [content images"],
     access: "private ",
  }
+ 
+
