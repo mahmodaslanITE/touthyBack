@@ -144,7 +144,6 @@ exports.getPostById = asyncHandler(async (req, res) => {
         data: {
             post: formattedPost,
             comments: formattedComments,
-            comments_count: formattedComments.length
         }
     });
 });
@@ -164,7 +163,7 @@ exports.updatePost = asyncHandler(async (req, res) => {
         });
     }
 
-    if (post.publisher !== userId && !isAdmin) {
+    if (post.publisher.toString() !== userId && !isAdmin) {
         return res.status(403).json({
             status:'error',
             message: 'غير مصرح لك بتعديل هذا البوست'

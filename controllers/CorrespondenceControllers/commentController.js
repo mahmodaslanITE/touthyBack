@@ -8,15 +8,15 @@ const Post = require('../../models/Correspondence/Post');
  * @access Private (any authenticated user)
  */
 exports.addComment = asyncHandler(async (req, res) => {
-    const  postId  = req.params.id;
-    const content  = req.body.content;
+    const postId = req.params.id;
+    const content = req.body.content;
     const userId = req.user.id;
     const userRole = req.user.role;
 
     // 1. التحقق من وجود المحتوى
     if (!content || content.trim().length === 0) {
         return res.status(400).json({
-status:'error',            message: 'محتوى التعليق مطلوب'
+            status: 'error', message: 'محتوى التعليق مطلوب'
         });
     }
 
@@ -24,7 +24,7 @@ status:'error',            message: 'محتوى التعليق مطلوب'
     const post = await Post.findById(postId);
     if (!post) {
         return res.status(404).json({
-            status:'error', 
+            status: 'error',
             message: 'البوست غير موجود'
         });
     }
@@ -34,7 +34,7 @@ status:'error',            message: 'محتوى التعليق مطلوب'
         post: postId,
         user: userId,
         userRole: userRole,
-        content: content.trim()
+        content: content
     });
 
     // 4. زيادة عدد التعليقات في البوست
@@ -46,7 +46,7 @@ status:'error',            message: 'محتوى التعليق مطلوب'
         .populate('user', 'email role');
 
     res.status(201).json({
-        status:'success', 
+        status: 'success',
         message: 'تم إضافة التعليق بنجاح',
         data: populatedComment
     });
@@ -95,7 +95,7 @@ exports.getPostComments = asyncHandler(async (req, res) => {
  * @access Private (comment owner or admin)
  */
 exports.updateComment = asyncHandler(async (req, res) => {
-    const { commentId } = req.params;
+    const commentId = req.params.id;
     const { content } = req.body;
     const userId = req.user.id;
     const isAdmin = req.user.isAdmin;
@@ -142,7 +142,7 @@ exports.updateComment = asyncHandler(async (req, res) => {
  * @access Private (comment owner or admin)
  */
 exports.deleteComment = asyncHandler(async (req, res) => {
-    const { commentId } = req.params;
+    const commentId = req.params.id;
     const userId = req.user.id;
     const isAdmin = req.user.isAdmin;
 
@@ -195,13 +195,13 @@ exports.likeComment = asyncHandler(async (req, res) => {
     }
 
     const alreadyLiked = comment.likes.includes(userId);
-    
+
     if (alreadyLiked) {
         comment.likes = comment.likes.filter(id => id.toString() !== userId);
     } else {
         comment.likes.push(userId);
     }
-    
+
     comment.likesCount = comment.likes.length;
     await comment.save();
 
