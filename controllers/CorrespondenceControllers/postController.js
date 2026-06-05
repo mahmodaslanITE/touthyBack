@@ -38,16 +38,19 @@ status:'error',            message: 'محتوى البوست مطلوب'
 // جلب جميع البوستات
 exports.get_all_posts = asyncHandler(async (req, res) => {
     const posts = await Post.find().sort({ createdAt: -1 });
-    
+    let is_for_me;
     // ✅ الحل: انتظار كل العمليات غير المتزامنة
     const formated_post = await Promise.all(
         posts.map(async (post) => {
             const publisher = await User.findById(post.publisher);
             const publisher_role = publisher.role;
             const publisher_profile = await getUserProfile(post.publisher, publisher_role);
+             is_for_me=false;
+            if(post.publisher==req.user.id){is_for_me=true}
             return {
                 _id:post._id,
                 content:post.content,
+                is_for_me,
                 images:post.images,
                 count_likes:post.likesCount,
                 count_dislikes:post.dislikesCount,
@@ -113,17 +116,19 @@ exports.getPostById = asyncHandler(async (req, res) => {
     // 4. جلب التعليقات الخاصة بهذا البوست
     const comments = await Comment.find({ post: postId })
         .sort({ createdAt: -1 });
-    
+    let is_for_me;
     // 5. تنسيق التعليقات مع بيانات أصحابها
     const formattedComments = await Promise.all(
         comments.map(async (comment) => {
+            is_for_me=false;
             const commentUser = await User.findById(comment.user);
             const commentUserRole = commentUser.role;
             const commentUserProfile = await getUserProfile(comment.user, commentUserRole);
-            
+            if(comment.user==req.user.id){is_for_me=true}
             return {
                 _id: comment._id,
                 content: comment.content,
+                is_for_me,
                 likes_count: comment.likesCount,
                 created_at: comment.createdAt,
                 user: {

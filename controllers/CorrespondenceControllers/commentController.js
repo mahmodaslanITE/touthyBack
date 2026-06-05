@@ -34,7 +34,7 @@ exports.addComment = asyncHandler(async (req, res) => {
         post: postId,
         user: userId,
         userRole: userRole,
-        content: content
+        content: content.trim()
     });
 
     // 4. زيادة عدد التعليقات في البوست
