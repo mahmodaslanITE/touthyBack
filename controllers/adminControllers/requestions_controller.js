@@ -1,18 +1,26 @@
 const asyncHandler = require('express-async-handler');
-const InProcess = require('../../models/InProcess');
+const InProcess = require('../../models/InProcess_request');
 
+// ============================================================
+// 🔧 ADMIN UPDATE IN-PROCESS REQUEST
+// ============================================================
+
+/**
+ * @description Admin update in-process request
+ * @route PUT /api/admin/in_process/:id
+ * @access Private (Admin only)
+ */
 module.exports.adminUpdateInProcess = asyncHandler(async (req, res) => {
     // 1. التحقق من صلاحية المشرف
-    if (!req.user.isAdmin) {
+    if (!req.user?.isAdmin) {
         return res.status(403).json({
             status: 'error',
-            message: 'غير مصرح لك - هذا الروت للمشرفين فقط'
+            message: 'غير مصرح بالوصول، هذا الروت للمشرفين فقط'
         });
     }
 
     // 2. البحث عن الحالة
     const request = await InProcess.findById(req.params.id);
-    
     if (!request) {
         return res.status(404).json({
             status: 'error',
@@ -21,52 +29,24 @@ module.exports.adminUpdateInProcess = asyncHandler(async (req, res) => {
     }
 
     // 3. منع تعديل الحقول الممنوعة
-    if (req.body.patient) {
-        return res.status(400).json({
-            status: 'error',
-            message: 'لا يمكن تعديل حقل patient'
-        });
-    }
-    
-    if (req.body.student) {
-        return res.status(400).json({
-            status: 'error',
-            message: 'لا يمكن تعديل حقل student'
-        });
-    }
-    
-    if (req.body.date_of_accepting) {
-        return res.status(400).json({
-            status: 'error',
-            message: 'لا يمكن تعديل حقل date_of_accepting'
-        });
+    const forbiddenFields = ['patient', 'student', 'date_of_accepting', 'case_type', 'overseer'];
+    for (const field of forbiddenFields) {
+        if (req.body[field] !== undefined) {
+            return res.status(400).json({
+                status: 'error',
+                message: `لا يمكن تعديل حقل ${field} من خلال هذا الروت`
+            });
+        }
     }
 
-    // ✅ 4. تحديث الحقول داخل كائن Requestion
-    if (req.body.pain_severity !== undefined) {
-        request.Requestion.pain_severity = req.body.pain_severity;
+    // 4. تحديث الحقول داخل كائن Requestion
+    const requestionFields = ['pain_severity', 'pain_time', 'tooth_location', 'gender', 'age', 'notes'];
+    for (const field of requestionFields) {
+        if (req.body[field] !== undefined) {
+            request.Requestion[field] = req.body[field];
+        }
     }
-    
-    if (req.body.pain_time !== undefined) {
-        request.Requestion.pain_time = req.body.pain_time;
-    }
-    
-    if (req.body.tooth_location !== undefined) {
-        request.Requestion.tooth_location = req.body.tooth_location;
-    }
-    
-    if (req.body.gender !== undefined) {
-        request.Requestion.gender = req.body.gender;
-    }
-    
-    if (req.body.age !== undefined) {
-        request.Requestion.age = req.body.age;
-    }
-    
-    if (req.body.notes !== undefined) {
-        request.Requestion.notes = req.body.notes;
-    }
-    
+
     // 5. معالجة more_details داخل Requestion
     if (req.body.more_details !== undefined) {
         if (typeof req.body.more_details === 'string') {
@@ -75,34 +55,21 @@ module.exports.adminUpdateInProcess = asyncHandler(async (req, res) => {
             } catch (err) {
                 return res.status(400).json({
                     status: 'error',
-                    message: 'more_details يجب أن يكون JSON صحيح'
+                    message: 'حقل more_details يجب أن يكون بتنسيق JSON صحيح'
                 });
             }
         } else {
             request.Requestion.more_details = req.body.more_details;
         }
     }
-    
-    // 6. تحديث الحقول الخارجية
-    if (req.body.case_type !== undefined) {
-        return res.status(403).json({
-            status:'erroe',
-            message:'لا يمكنك تعديل نوع المعالجة من هنا في كود جاهز لتعدل المعالجة لحالها '
-        })
-    }
-    
-    if (req.body.overseer !== undefined) {
-        return res.status(403).json({
-            status:'erroe',
-message:'لا يمكن تعديل المشرف باستخدام هذا الروت يوجد روت خاص لتعديل المشرف '        })    }
 
-    // 7. حفظ التعديلات
+    // 6. حفظ التعديلات
     await request.save();
 
-    // 8. إرجاع النتيجة
+    // 7. إرجاع النتيجة
     res.status(200).json({
         status: 'success',
-        message: 'تم التعديل بنجاح',
+        message: 'تم تعديل الحالة بنجاح',
         data: {
             _id: request._id,
             patient: request.patient,

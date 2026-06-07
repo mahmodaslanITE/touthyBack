@@ -6,7 +6,7 @@ const postSchema = new mongoose.Schema({
         ref: 'User',
         required: true
     },
-    publisherRole: {
+    publisher_role: { // تعديل إلى snake_case
         type: String,
         enum: ['patient', 'student', 'overseer', 'admin'],
         required: true
@@ -16,7 +16,6 @@ const postSchema = new mongoose.Schema({
         required: true,
         trim: true
     },
-    // ✅ هذا هو التنسيق الصحيح - مصفوفة من النصوص
     images: {
         type: [String],
         default: []
@@ -25,7 +24,7 @@ const postSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
     }],
-    likesCount: {
+    count_likes: { // تعديل إلى snake_case
         type: Number,
         default: 0
     },
@@ -33,11 +32,11 @@ const postSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
     }],
-    dislikesCount: {
+    count_dislikes: { // تعديل إلى snake_case
         type: Number,
         default: 0
     },
-    commentsCount: {
+    count_comments: { // تعديل إلى snake_case
         type: Number,
         default: 0
     }

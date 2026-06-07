@@ -19,6 +19,6 @@ router.get('/:id', getPostComments);
 // 🔧 عمليات على التعليق نفسه
 router.put('/:id', updateComment);
 router.delete('/:id', deleteComment);
-router.post('/comments/:commentId/like', likeComment);
+router.post('/:commentId/like', likeComment);
 
 module.exports = router;

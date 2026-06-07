@@ -1,9 +1,6 @@
-// utils/requestHelper.js
-
-/**
- * Helper function to get requests by status and role
- * This file contains all shared logic for request queries
- */
+// ============================================================
+// 📦 UTILS / REQUEST HELPER (التابع المساعد الموحد) - المُحسّن
+// ============================================================
 
 /**
  * Format requests to separate case_type from course
@@ -21,6 +18,9 @@ function formatRequests(requests, role) {
         }
         if (role === 'student') {
             delete item.student;
+        }
+        if (role === 'overseer') {
+            delete item.overseer;
         }
         delete item.__v;
         
@@ -46,32 +46,35 @@ function formatRequests(requests, role) {
  */
 function getStatusMessage(status) {
     const messages = {
-        processing: 'this is your processing requests',
-        finished: 'this is your finished requests',
-        rejected: 'this is your rejected requests'
+        processing: 'هذه هي طلباتك قيد المعالجة',
+        finished: 'هذه هي طلباتك المنتهية',
+        rejected: 'هذه هي طلباتك المرفوضة'
     };
-    return messages[status] || 'this is your requests';
+    return messages[status] || 'هذه هي طلباتك';
 }
 
 /**
  * Generic function to get requests by status and role
  * @param {Object} params - Parameters object
- * @param {Object} params.Model - Mongoose model (InProcess, Finished, Rejected)
+ * @param {Object} params.Model - Mongoose model (InProcess, Finished, Rejected, Pending_request)
  * @param {Object} params.user - User object from req.user
+ * @param {Object} params.additionalQuery - Additional query conditions
  * @returns {Promise<Array>} - Formatted requests
  */
-async function getRequestsByStatus({ Model, user }) {
+async function getRequestsByStatus({ Model, user, additionalQuery = {} }) {
     const role = user.role;
     const isAdmin = user.isAdmin;
-    let query = {};
+    let query = { ...additionalQuery };
     
     // Build query based on role
     if (isAdmin) {
-        query = {};
+        query = { ...additionalQuery };
     } else if (role === 'student') {
         query.student = user.id;
     } else if (role === 'patient') {
         query.patient = user.id;
+    } else if (role === 'overseer') {
+        query.overseer = user.id;
     } else {
         return [];
     }
@@ -79,17 +82,19 @@ async function getRequestsByStatus({ Model, user }) {
     // Define populate fields based on role
     let populateFields = [];
     
-    if (isAdmin || role === 'student') {
+    // ✅ Patient population (لجميع الأدوار ما عدا patient نفسه)
+    if (role !== 'patient') {
         populateFields.push({
             path: 'patient',
-            model: 'Patient_profil',
+            model: 'Patient_profile',
             foreignField: 'user',
             localField: 'patient',
             select: '-_id first_name father_name last_name'
         });
     }
     
-    if (isAdmin || role === 'patient') {
+    // ✅ Student population (لجميع الأدوار ما عدا student نفسه)
+    if (role !== 'student') {
         populateFields.push({
             path: 'student',
             model: 'Student_profile',
@@ -99,16 +104,18 @@ async function getRequestsByStatus({ Model, user }) {
         });
     }
     
-    // Overseer always populated
-    populateFields.push({
-        path: 'overseer',
-        model: 'OverseerProfile',
-        foreignField: 'user',
-        localField: 'overseer',
-        select: '-_id first_name father_name last_name'
-    });
+    // ✅ Overseer population (لجميع الأدوار ما عدا overseer نفسه)
+    if (role !== 'overseer') {
+        populateFields.push({
+            path: 'overseer',
+            model: 'Overseer_profile',
+            foreignField: 'user',
+            localField: 'overseer',
+            select: '-_id first_name father_name last_name'
+        });
+    }
     
-    // Case type with course population
+    // ✅ Case type with course population (دائماً مطلوب)
     populateFields.push({
         path: 'case_type',
         model: 'Treatment',
@@ -131,7 +138,6 @@ async function getRequestsByStatus({ Model, user }) {
     return formattedRequests;
 }
 
-// Export all functions
 module.exports = {
     getRequestsByStatus,
     formatRequests,

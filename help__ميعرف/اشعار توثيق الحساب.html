@@ -20,7 +20,7 @@
     socket.on("connect", () => {
       console.log("متصل بالسيرفر عبر socket.io, id:", socket.id);
 
-      const patientId = '69a697a28b36cdbf5ebc8390'; 
+      const patientId = '6a240e86332a6ffd45ac32ab'; 
       socket.emit("registerPatient", patientId);
     });
 

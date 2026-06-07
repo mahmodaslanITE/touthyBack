@@ -7,16 +7,6 @@ const course_schema = new mongoose.Schema({
     required: true, 
     trim: true 
   },
-  // المشرفين (خريطة تحتوي على الفئة ومصفوفة من المعرفات)
-  overseers: {
-    type: Map,
-    of: [{ 
-      type: mongoose.Schema.Types.ObjectId, 
-      ref: 'OverseerProfile' // المرجع لجدول المشرفين
-    }],
-    required: true,
-    default: {}
-  }
 }, { 
   timestamps: { 
     createdAt: 'created_at', 

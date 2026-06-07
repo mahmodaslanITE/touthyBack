@@ -34,5 +34,5 @@ const profileSchema=mongoose.Schema({
         type:String
       }
 })
-const Patient_profil=mongoose.model('Patient_profil',profileSchema)
-module.exports=Patient_profil
+const Patient_profile=mongoose.model('Patient_profile',profileSchema)
+module.exports=Patient_profile

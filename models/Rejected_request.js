@@ -30,7 +30,7 @@ const FinishedSchema = new mongoose.Schema({
     // حقول التقييم والإغلاق الجديدة
     note: {
         type: String,
-        required: [true, 'الرجاء إضافة تقييم'],
+        required: [true, 'الرجاء إضافة ملاحظة توضيحية لسبب الرفض'],
       
     },
     rejected_At: {
@@ -44,6 +44,6 @@ const FinishedSchema = new mongoose.Schema({
     timestamps: true // لإنشاء createdAt و updatedAt تلقائياً
 });
 
-const Rejected = mongoose.model('Rejected', FinishedSchema);
+const Rejected_request = mongoose.model('Rejected_request', FinishedSchema);
 
-module.exports = Rejected;
+module.exports = Rejected_request;

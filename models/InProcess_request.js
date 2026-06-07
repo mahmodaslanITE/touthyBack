@@ -32,5 +32,5 @@ const inProcessSchema=mongoose.Schema({
     ]
     
 })
-const InProcess=mongoose.model('InProcess',inProcessSchema);
-module.exports=InProcess;
+const InProcess_request=mongoose.model('InProcess_request',inProcessSchema);
+module.exports=InProcess_request;

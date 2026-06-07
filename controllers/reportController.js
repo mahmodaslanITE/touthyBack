@@ -2,7 +2,7 @@
 const asyncHandler = require('express-async-handler');
 const Report = require('../models/Report');
 const{User} = require('../models/User');
-const getUserProfile = require('../functions/users');
+const getUserProfile = require('../utils/users');
 const socket = require('../socket/init');
 
 

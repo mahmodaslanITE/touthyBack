@@ -1,26 +1,28 @@
 const express=require('express');
-const { createOverseer, get_all_patients, get_all_students, get_all_overseers, verify_account_accept, verify_account_reject, createCourse, get_courses, addTreatment, getAllTreatments, deleteTreatment, add_category, add_practical_lesson, get_categorirs, assign_overseer } = require('../controllers/adminController');
 const verifyToken = require('../Middlewares/verifyToken');
-const { getAllVerifyRequests } = require('../controllers/studentController');
-const { get_all_lessons } = require('../controllers/adminControllers/courses_and_treatments');
+const { createOverseer, getAllOverseers, assignOverseerToLesson } = require('../controllers/adminControllers/overseersController');
+const { verifyAccountAccept, verifyAccountReject, getAllStudents, addCategory, getCategories, getAllVerifyRequests } = require('../controllers/adminControllers/studentsController');
+const { getAllPatients } = require('../controllers/adminControllers/patientsController');
+const { createCourse, getCourses, addTreatment, getAllTreatments, deleteTreatment, addPracticalLesson, getAllLessons } = require('../controllers/adminControllers/courses_and_treatments');
 const { adminUpdateInProcess } = require('../controllers/adminControllers/requestions_controller');
+
 const router=express.Router();
 // add over seer 
 router.post('/overseer',verifyToken,createOverseer);
-router.put('/overseer/assign',verifyToken,assign_overseer)
+router.put('/overseer/assign',verifyToken,assignOverseerToLesson)
 //get verify requests
 router.get('/verify',verifyToken,getAllVerifyRequests);
 //verify account
-router.post('/verification/accept/:id',verifyToken,verify_account_accept);
-router.post('/verification/reject/:id',verifyToken,verify_account_reject);
+router.post('/verify/accept/:id',verifyToken,verifyAccountAccept);
+router.post('/verify/reject/:id',verifyToken,verifyAccountReject);
 // get the users
-router.get('/patients',verifyToken,get_all_patients);
-router.get('/overseers',verifyToken,get_all_overseers);
-router.get('/students',verifyToken,get_all_students);
+router.get('/patients',verifyToken,getAllPatients);
+router.get('/overseers',verifyToken,getAllOverseers);
+router.get('/students',verifyToken,getAllStudents);
 
 //add coures 
 router.post('/course',verifyToken,createCourse);
-router.get('/course',verifyToken,get_courses)
+router.get('/course',verifyToken,getCourses)
 
 //treatment
 router.post('/treatment',verifyToken,addTreatment)
@@ -28,14 +30,14 @@ router.get('/treatment',verifyToken,getAllTreatments)
 router.delete('/treatment/:id',verifyToken,deleteTreatment)
 
 //categories
-router.post('/category',verifyToken,add_category)
-router.get('/category',verifyToken,get_categorirs)
+router.post('/category',verifyToken,addCategory)
+router.get('/category',verifyToken,getCategories)
 
 //practical-lessons
-router.post('/practical-lessons',verifyToken,add_practical_lesson)
-router.get('/practical-lessons',verifyToken,get_all_lessons)
+router.post('/practical-lessons',verifyToken,addPracticalLesson)
+router.get('/practical-lessons',verifyToken,getAllLessons)
 
 // inprocess 
-router.put('/in_proccess/:id',verifyToken,adminUpdateInProcess)
+router.put('/in-proccess/:id',verifyToken,adminUpdateInProcess)
 
 module.exports=router

@@ -1,17 +1,17 @@
 const mongoose = require('mongoose');
 
 const commentSchema = new mongoose.Schema({
-    post: {
+    post: { 
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Post',
         required: true
     },
-    user: {
+    user: { // تعديل إلى snake_case
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true
     },
-    userRole: {
+    user_role: { // تعديل إلى snake_case
         type: String,
         enum: ['patient', 'student', 'overseer', 'admin'],
         required: true
@@ -26,11 +26,11 @@ const commentSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
     }],
-    likesCount: {
+    count_likes: { // تعديل إلى snake_case
         type: Number,
         default: 0
     },
-    createdAt: {
+    created_at: { // تعديل إلى snake_case
         type: Date,
         default: Date.now
     }
@@ -39,6 +39,6 @@ const commentSchema = new mongoose.Schema({
 });
 
 // إضافة فهرس لتحسين الأداء
-commentSchema.index({ post: 1, createdAt: -1 });
+commentSchema.index({ post_id: 1, created_at: -1 }); // تعديل الفهرس إلى snake_case
 
 module.exports = mongoose.model('Comment', commentSchema);

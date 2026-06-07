@@ -1,246 +1,234 @@
 const asyncHandler = require('express-async-handler');
 const path = require('path');
-const fs = require("fs");
-const {User}=require("../models/User")
-const Student_profile = require('../models/Student_profile');
-const Patient_profile = require('../models/Patient_profile');
-const { OverseerProfile } = require('../models/Overseer_profile');
-const getUserProfile = require('../functions/users');
-const Finished = require('../models/Finished');
-const InProcess = require('../models/InProcess');
+const fs = require('fs');
+const { User } = require('../models/User');
+const getUserProfile = require('../utils/users');
+const Finished = require('../models/Finished_request');
+const InProcess = require('../models/InProcess_request');
 
-/**-----------------------------------------------------
- * @desc Get user profile (student or patient)
- * @route  /api/profile
+// ============================================================
+// 📦 HELPER FUNCTIONS (دوال مساعدة)
+// ============================================================
+
+/**
+ * Format profile response
+ * @param {Object} profile - User profile
+ * @param {string} role - User role
+ * @param {Object} counts - Counts object
+ * @returns {Object} Formatted profile
+ */
+const formatProfileResponse = (profile, role, counts = { finished: 0, inProcess: 0 }) => ({
+    user: profile.user,
+    first_name: profile.first_name,
+    father_name: profile.father_name,
+    last_name: profile.last_name,
+    bio: profile.bio,
+    profile_photo: profile.profile_photo,
+    gender: profile.gender,
+    role,
+    category: profile.category,
+    university_number: profile.university_number,
+    age: profile.age,
+    is_verified: profile.is_verified,
+    count_cases_finished: counts.finished,
+    count_cases_in_process: counts.inProcess
+});
+
+/**
+ * Get case counts for user
+ * @param {string} userId - User ID
+ * @param {string} role - User role
+ * @returns {Promise<Object>} Counts object
+ */
+const getCaseCounts = async (userId, role) => {
+    if (role === 'student') {
+        return {
+            finished: await Finished.countDocuments({ student: userId }),
+            inProcess: await InProcess.countDocuments({ student: userId })
+        };
+    }
+    if (role === 'overseer') {
+        return {
+            finished: await Finished.countDocuments({ overseer: userId }),
+            inProcess: await InProcess.countDocuments({ overseer: userId })
+        };
+    }
+    return { finished: 0, inProcess: 0 };
+};
+
+// ============================================================
+// 👤 USER PROFILE MANAGEMENT
+// ============================================================
+
+/**
+ * @description Get current user profile
+ * @route GET /api/users
  * @access Private
- ------------------------------------------------------*/
+ */
 module.exports.showUserProfile = asyncHandler(async (req, res) => {
-  const user = req.user;
-  
-  if (!user) {
-    return res.status(401).json({ status: 'error', message: 'يجب تسجيل الدخول أولاً' });
-  }
-const the_user=await User.findById(req.user.id)
-const user_role=the_user.role;
-let profile=await getUserProfile(req.user.id,user_role);
-  // 3. التأكد من وجود البروفايل في قاعدة البيانات
-  if (!profile) {
-    return res.status(404).json({ status: 'error', message: 'هذا الحساب غير موجود' });
-  }
-  let finishds=[]
-  let processes=[]
-  if(user_role=='student'){
- finishds=await Finished.find({student:req.user.id});
-processes=await InProcess.find({student:req.user.id})
-  } 
-  else if(user_role=='overseer'){
-    finishds=await Finished.find({overseer:req.user.id})
-    processes=await InProcess.find({overseer:req.user.id})
+    if (!req.user?.id) {
+        return res.status(401).json({
+            status: 'error',
+            message: 'يجب تسجيل الدخول أولاً'
+        });
+    }
 
-  }
-const formate={
-  user:profile.user,
-  first_name:profile.first_name,
-  father_name:profile.father_name,
-  last_name:profile.last_name,
-  bio:profile.bio,
-  profile_photo:profile.profile_photo,
-  gender:profile.gender,
-  role:user_role,
-  category:profile.category,
-  university_number:profile.university_number,
-  age:profile.age,
-  is_verified:profile.is_verified,
-  count_cases_finishds:finishds.length,
-  count_cases_in_process:processes.length,
-  
-}
-  // 5. إرسال الرد الناجح
-  res.status(200).json({ 
-    status: 'success', 
-    message: 'تم جلب البيانات بنجاح', 
-    data:formate// تأكد من كتابتها data وليس date
-  });});
+    const userId = req.user.id;
+    const userRole = req.user.role;
 
-/**-----------------------------------------------------
- * @desc Get all profiles
- * @route  /api/profile/all
- * @access Private
- ------------------------------------------------------*/
-module.exports.getAllProfile = asyncHandler(async (req, res) => {
-  return res.status(200).json({
-    status: "success",
-    message: "Not implemented yet"
-  });
+    // ✅ استخدام getUserProfile الموجود
+    const profile = await getUserProfile(userId, userRole);
+    if (!profile) {
+        return res.status(404).json({
+            status: 'error',
+            message: 'الملف الشخصي غير موجود'
+        });
+    }
+
+    const counts = await getCaseCounts(userId, userRole);
+    const formattedProfile = formatProfileResponse(profile, userRole, counts);
+
+    res.status(200).json({
+        status: 'success',
+        message: 'تم جلب البيانات بنجاح',
+        data: formattedProfile
+    });
 });
 
-/**-----------------------------------------------------
- * @desc Get any profiles
- * @route  /api/profile/:id
+/**
+ * @description Get user profile by ID
+ * @route GET /api/users/:id
  * @access Private
- ------------------------------------------------------*/
+ */
 module.exports.getProfile = asyncHandler(async (req, res) => {
-  // 1. التأكد من أن المستخدم مسجل دخول (يأتي من middleware التحقق)
-  const user = req.user;
-  
-  if (!user) {
-    return res.status(401).json({ status: 'error', message: 'يجب تسجيل الدخول أولاً' });
-  }
-const the_user=await User.findById(req.params.id)
-const user_role=the_user.role;
-let profile=await getUserProfile(req.params.id,user_role);
-  // 3. التأكد من وجود البروفايل في قاعدة البيانات
-  if (!profile) {
-    return res.status(404).json({ status: 'error', message: 'هذا الحساب غير موجود' });
-  }
-  let finishds=[]
-  let processes=[]
-  if(user_role=='student'){
- finishds=await Finished.find({student:req.params.id});
-processes=await InProcess.find({student:req.params.id})
-  } 
-  else if(user_role=='overseer'){
-    finishds=await Finished.find({overseer:req.params.id})
-    processes=await InProcess.find({overseer:req.params.id})
+    if (!req.user?.id) {
+        return res.status(401).json({
+            status: 'error',
+            message: 'يجب تسجيل الدخول أولاً'
+        });
+    }
 
-  }
-const formate={
-  user:profile.user,
-  first_name:profile.first_name,
-  father_name:profile.father_name,
-  last_name:profile.last_name,
-  bio:profile.bio,
-  profile_photo:profile.profile_photo,
-  gender:profile.gender,
-  role:user_role,
-  category:profile.category,
-  university_number:profile.university_number,
-  age:profile.age,
-  is_verified:profile.is_verified,
-  count_cases_finishds:finishds.length,
-  count_cases_in_process:processes.length,
-  
-}
-  // 5. إرسال الرد الناجح
-  res.status(200).json({ 
-    status: 'success', 
-    message: 'تم جلب البيانات بنجاح', 
-    data:formate// تأكد من كتابتها data وليس date
-  });
+    const { id } = req.params;
+
+    const targetUser = await User.findById(id);
+    if (!targetUser) {
+        return res.status(404).json({
+            status: 'error',
+            message: 'المستخدم غير موجود'
+        });
+    }
+
+    const userRole = targetUser.role;
+
+    // ✅ استخدام getUserProfile الموجود
+    const profile = await getUserProfile(id, userRole);
+    if (!profile) {
+        return res.status(404).json({
+            status: 'error',
+            message: 'الملف الشخصي غير موجود'
+        });
+    }
+
+    const counts = await getCaseCounts(id, userRole);
+    const formattedProfile = formatProfileResponse(profile, userRole, counts);
+
+    res.status(200).json({
+        status: 'success',
+        message: 'تم جلب البيانات بنجاح',
+        data: formattedProfile
+    });
 });
 
-
-/**-----------------------------------------------------
- * @desc Update user profile (student or patient)
- * @route PUT /api/profile
+/**
+ * @description Get all profiles (Not implemented yet)
+ * @route GET /api/users/all
  * @access Private
- ------------------------------------------------------*/
+ */
+module.exports.getAllProfiles = asyncHandler(async (req, res) => {
+    res.status(200).json({
+        status: 'success',
+        message: 'هذه الخدمة قيد التطوير'
+    });
+});
+
+/**
+ * @description Update user profile
+ * @route PUT /api/users
+ * @access Private
+ */
 module.exports.updateUserProfile = asyncHandler(async (req, res) => {
-  const userId = req.user.id;
-  const userRole = req.user.role;
+    const userId = req.user.id;
+    const userRole = req.user.role;
+    const { first_name, last_name, father_name, university_number, bio, category } = req.body;
 
-  const { first_name, last_name,father_name, university_number, bio ,category} = req.body;
+    const profile = await getUserProfile(userId, userRole);
+    if (!profile) {
+        return res.status(404).json({
+            status: 'error',
+            message: 'الملف الشخصي غير موجود'
+        });
+    }
 
-  let profile;
+    // تحديث الحقول
+    if (first_name) profile.first_name = first_name;
+    if (father_name) profile.father_name = father_name;
+    if (last_name) profile.last_name = last_name;
+    if (university_number) profile.university_number = university_number;
+    if (bio) profile.bio = bio;
+    if (category) profile.category = category;
 
-  if (userRole === 'student') {
-    profile = await Student_profile.findOne({ user: userId });
-  } else if (userRole === 'patient') {
-    profile = await Patient_profile.findOne({ user: userId });
-  } 
-  else if(userRole==='overseer'){
-    profile=await OverseerProfile.findOne({user:userId})
-  }
-  else {
-    return res.status(400).json({
-      status: "error",
-      message: 'نوع المستخدم غير صالح'
+    await profile.save();
+
+    // إزالة الحقول الزائدة من الاستجابة
+    const { _id, user, createdAt, updatedAt, __v, ...profileData } = profile._doc;
+
+    res.status(200).json({
+        status: 'success',
+        message: 'تم تحديث الملف الشخصي بنجاح',
+        data: profileData
     });
-  }
-
-  if (!profile) {
-    return res.status(404).json({
-      status: "error",
-      message: 'الملف الشخصي غير موجود'
-    });
-  }
-
-  if (first_name) profile.first_name = first_name;
-  if (father_name) profile.father_name = father_name;
-  if (last_name) profile.last_name = last_name;
-  if (university_number) profile.university_number = university_number;
-  if (bio) profile.bio = bio;
-  if(category) profile.category=category
-
-  await profile.save();
-
-  const { _id, user, createdAt, updatedAt, __v, ...profileData } = profile._doc;
-
-  res.status(200).json({
-    status: "success",
-    message: 'تم تحديث الملف الشخصي بنجاح',
-    data: profileData,
-  });
 });
 
-/**-----------------------------------------------------
- * @desc Update profile photo (student or patient)
- * @route PUT /api/profile/photo
+/**
+ * @description Update profile photo
+ * @route PUT /api/users/photo
  * @access Private
- ------------------------------------------------------*/
+ */
 module.exports.updateProfilePhoto = asyncHandler(async (req, res) => {
-  if (!req.file) {
-    return res.status(400).json({
-      status: "error",
-      message: "No file uploaded"
-    });
-  }
-
-  let profile;
-
-  if (req.user.role === "patient") {
-    profile = await Patient_profile.findOne({ user: req.user.id });
-  } else if (req.user.role === "student") {
-    profile = await Student_profile.findOne({ user: req.user.id });
-  } 
-  else if(req.user.role==='overseer'){
-    profile=await OverseerProfile.findOne({user:req.user.id})
-  }
-  else {
-    return res.status(400).json({
-      status: "error",
-      message: 'نوع المستخدم غير صالح'
-    });
-  }
-
-  if (!profile) {
-    return res.status(404).json({
-      status: "error",
-      message: 'الملف الشخصي غير موجود'
-    });
-  }
-
-  if (profile.profile_photo?.url) {
-    const oldImagePath = path.join(
-      __dirname,
-      `../images/profile/${path.basename(profile.profile_photo.url)}`
-    );
-    if (fs.existsSync(oldImagePath)) {
-      fs.unlinkSync(oldImagePath);
+    if (!req.file) {
+        return res.status(400).json({
+            status: 'error',
+            message: 'الرجاء رفع صورة'
+        });
     }
-  }
 
-  profile.profile_photo = {
-    url: `images/profile/${req.file.filename}`
-  };
+    const userId = req.user.id;
+    const userRole = req.user.role;
 
-  await profile.save();
-
-  res.status(200).json({
-    status: "success",
-    message: "File uploaded successfully",
-    profile_photo: {
-      url: `/images/profile/${req.file.filename}`
+    // ✅ استخدام getUserProfile لجلب الملف الشخصي الحالي
+    const profile = await getUserProfile(userId, userRole);
+    if (!profile) {
+        return res.status(404).json({
+            status: 'error',
+            message: 'الملف الشخصي غير موجود'
+        });
     }
-  });
+
+    // حذف الصورة القديمة
+    if (profile.profile_photo?.url) {
+        const oldImagePath = path.join(__dirname, '../images/profile', path.basename(profile.profile_photo.url));
+        if (fs.existsSync(oldImagePath)) {
+            fs.unlinkSync(oldImagePath);
+        }
+    }
+
+    // حفظ الصورة الجديدة
+    profile.profile_photo = { url: `images/profile/${req.file.filename}` };
+    await profile.save();
+
+    res.status(200).json({
+        status: 'success',
+        message: 'تم تحديث الصورة الشخصية بنجاح',
+        profile_photo: { url: `images/profile/${req.file.filename}` }
+    });
 });

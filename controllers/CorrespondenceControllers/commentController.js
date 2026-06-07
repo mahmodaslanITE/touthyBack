@@ -28,17 +28,17 @@ exports.addComment = asyncHandler(async (req, res) => {
             message: 'البوست غير موجود'
         });
     }
-
+console.log(`user_id is ${userId} and user role is ${userRole}`)
     // 3. إنشاء التعليق
     const comment = await Comment.create({
         post: postId,
         user: userId,
-        userRole: userRole,
+        user_role: userRole,
         content: content.trim()
     });
 
     // 4. زيادة عدد التعليقات في البوست
-    post.commentsCount += 1;
+    post.count_comments += 1;
     await post.save();
 
     // 5. جلب التعليق مع بيانات المستخدم
@@ -168,7 +168,7 @@ exports.deleteComment = asyncHandler(async (req, res) => {
 
     // 4. تقليل عدد التعليقات في البوست
     await Post.findByIdAndUpdate(comment.post, {
-        $inc: { commentsCount: -1 }
+        $inc: { count_comments: -1 }
     });
 
     res.status(200).json({
@@ -202,14 +202,14 @@ exports.likeComment = asyncHandler(async (req, res) => {
         comment.likes.push(userId);
     }
 
-    comment.likesCount = comment.likes.length;
+    comment.count_likes = comment.likes.length;
     await comment.save();
 
     res.status(200).json({
         success: true,
         message: alreadyLiked ? 'تم إزالة الإعجاب' : 'تم الإعجاب بالتعليق',
         data: {
-            likesCount: comment.likesCount
+            likesCount: comment.count_likes
         }
     });
 });

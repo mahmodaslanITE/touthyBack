@@ -50,6 +50,6 @@ const FinishedSchema = new mongoose.Schema({
     timestamps: true // لإنشاء createdAt و updatedAt تلقائياً
 });
 
-const Finished = mongoose.model('Finished', FinishedSchema);
+const Finished_request = mongoose.model('Finished_request', FinishedSchema);
 
-module.exports = Finished;
+module.exports = Finished_request;

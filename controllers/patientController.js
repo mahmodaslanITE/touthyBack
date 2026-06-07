@@ -1,250 +1,217 @@
-const { Pending_request,  validateUpdateRequest, validateTreatmentRequest } = require('../models/Pending');
 const asyncHandler = require('express-async-handler');
-// الموديل بالاسم الجديد
+const { Pending_request, validateTreatmentRequest } = require('../models/Pending_request');
 const Treatment = require('../models/Treatment');
 
-/**-----------------------------------------------------
- * @desc Create treatment request
- * @route POST /api/requestion
- * @access Private
- ------------------------------------------------------*/
- exports.createTreatmentRequest = asyncHandler(async (req, res) => {
-  const user = req.user;
+// ============================================================
+// 📝 PATIENT REQUESTS MANAGEMENT
+// ============================================================
 
-  // 1. التحقق من وجود المستخدم وصلاحياته أولاً
-  if (!user) {
-    return res.status(401).json({ status: 'error', message: 'غير مصرح لك' });
-  }
-  if (user.role !== 'patient') {
-    return res.status(403).json({ status: 'error', message: 'يسمح فقط للمرضى بإنشاء طلب' });
-  }
-
-  // 2. تنفيذ التحقق
-  const { error } = validateTreatmentRequest(req.body);
-  if (error) {
-    // إرجاع مصفوفة الأخطاء كاملة للتأكد من رؤيتها
-    return res.status(400).json({
-      status: 'error',
-      errors: error.details.map(d => d.message) 
-    });
-  }
-
-  // 3. تحويل moreDetails من String إلى JSON Object
-  let more_detailsData = req.body.more_details;
-  if (typeof req.body.more_details === 'string') {
-    try {
-      more_detailsData = JSON.parse(req.body.more_details);
-    } catch (e) {
-      return res.status(400).json({ status: 'error', message: 'حقل moreDetails ليس بتنسيق JSON صحيح' });
-    }
-  }
-
-  // 4. معالجة الصورة
-  let photoData = req.file ? {
-    publicId: null,
-    url: `images/requests/${req.file.filename}`
-  } : null;
-const case_type=req.body.case_type
-const treatment=await Treatment.findById(case_type)
-if(!treatment){
-  return res.status(400).json({
-    status:'error',
-    message:'المعالجة التي طلبتها غير متاحة حاليا '
-  })
-}
-
-// التأكد من ان البيانات منطقية 
-if(req.body.gender==='male'&&req.body.is_pregnant==='true'){ return res.status(707).json({
-  status:'error',
-  message :'ذكر وحامل يا خرا       ما تستحي على وجهك'
-})}
-  // 5. الحفظ في قاعدة البيانات
-  const request = new Pending_request({
-    ...req.body,
-    more_details: more_detailsData,
-    user: user.id,
-    photo: photoData
-  });
-
-  await request.save();
-  res.status(201).json({ status: 'success', data: request });
-});
-
-
-
-/**-----------------------------------------------------
- * @desc Show my requests
- * @route GET /api/requestion/my
- * @access Private
- ------------------------------------------------------*/
-exports.getUserTreatmentRequests = asyncHandler(async (req, res) => {
-  const user = req.user;
-
-  const requests = await Pending_request.find({ user: user.id }).populate({
-    path: 'case_type',
-    select: '_id case_type',
-  });
-const formated=requests.map((requestion)=>{
-  return{
-    _id:requestion._id,
-    Requestion:{
-      pain_severity:requestion.pain_severity,
-      pain_time:requestion.pain_time,
-      tooth_location:requestion.tooth_location,
-      gender:requestion.gender,
-      age:requestion.age,
-      photo:requestion.photo,
-      more_details:requestion.more_details
-    },
-    case_type:requestion.case_type
-  }
-})
-  res.status(200).json({
-    status: 'success',
-    message: 'this is your requests',
-    data: formated  });
-});
-
-/**________________________________________________________________________________
- * @desc update the requestion until it is pending
- * @route Put /api/requestion/:id
- * @access private
- *_____________________________________________________________________
+/**
+ * @description Create treatment request
+ * @route POST /api/request
+ * @access Private (Patient only)
  */
- module.exports.updateRequest = asyncHandler(async (req, res) => {
-  const userId = req.user.id;
-  const role = req.user.role;
-  const isAdmin=req.user.isAdmin
+exports.createTreatmentRequest = asyncHandler(async (req, res) => {
+    if (!req.user) {
+        return res.status(401).json({
+            status: 'error',
+            message: 'غير مصرح، يرجى تسجيل الدخول'
+        });
+    }
 
-  // check role
-  if (role !== 'patient' &&!isAdmin) {
-    return res.status(403).json({
-      status: 'error',
-      message: 'انت مش مريض علشان تعدل الحالة'
+    if (req.user.role !== 'patient') {
+        return res.status(403).json({
+            status: 'error',
+            message: 'يسمح فقط للمرضى بإنشاء طلب'
+        });
+    }
+
+    const { error } = validateTreatmentRequest(req.body);
+    if (error) {
+        return res.status(400).json({
+            status: 'error',
+            message: error.details.map(d => d.message).join(', ')
+        });
+    }
+
+    let moreDetailsData = req.body.more_details;
+    if (typeof moreDetailsData === 'string') {
+        try {
+            moreDetailsData = JSON.parse(moreDetailsData);
+        } catch (e) {
+            return res.status(400).json({
+                status: 'error',
+                message: 'حقل more_details يجب أن يكون بتنسيق JSON صحيح'
+            });
+        }
+    }
+
+    const treatment = await Treatment.findById(req.body.case_type);
+    if (!treatment) {
+        return res.status(400).json({
+            status: 'error',
+            message: 'المعالجة التي طلبتها غير متاحة حالياً'
+        });
+    }
+
+    if (req.body.gender === 'male' && req.body.is_pregnant === 'true') {
+        return res.status(400).json({
+            status: 'error',
+            message: 'البيانات غير منطقية'
+        });
+    }
+
+    const photoData = req.file ? {
+        publicId: null,
+        url: `images/requests/${req.file.filename}`
+    } : null;
+
+    const request = await Pending_request.create({
+        ...req.body,
+        more_details: moreDetailsData,
+        user: req.user.id,
+        photo: photoData
     });
-  }
 
-  // find request
-  const request = await Pending_request.findById(req.params.id);
-
-  // check if request exists
-  if (!request) {
-    return res.status(404).json({
-      status: 'error',
-      message: 'الحالة غير موجودة'
+    res.status(201).json({
+        status: 'success',
+        message: 'تم إنشاء الطلب بنجاح',
+        data: request
     });
-  }
-
-  // check ownership
-  if (request.user!= userId && !isAdmin) {
-    return res.status(403).json({
-      status: 'error',
-      message: 'هذه الحالة ليست لك'
-    });
-  }
-
-  
-
-  // validate body
-  // const { error } = validateUpdateRequest(req.body);
-  // if (error) {
-  //   return res.status(400).json({
-  //     status: 'error',
-  //     message: error.details[0].message
-  //   });
-  // }
-
-  // update fields
-  const {
-    pain_severity,
-    pain_time,
-    tooth_location,
-    gender,
-    is_pregnant,
-    case_type,
-    notes,
-    age,
-    more_details
-  } = req.body
- // 3. تحويل moreDetails من String إلى JSON Object
-
-  if (pain_severity !== undefined) request.pain_severity = pain_severity;
-  if (pain_time !== undefined) request.pain_time = pain_time;
-  if (tooth_location !== undefined) request.tooth_location = tooth_location;
-  if (gender !== undefined) request.gender = gender;
-  if (is_pregnant !== undefined) request.is_pregnant = is_pregnant;
-  if (case_type !== undefined) request.case_type = case_type;
-  if (notes !== undefined) request.notes = notes;
-  if (age !== undefined) request.age = age;
-  if(more_details !== undefined ){ let more_detailsData = req.body.more_details;
-    if (typeof req.body.more_details === 'string') {
-      try {
-        more_detailsData = JSON.parse(req.body.more_details);
-      } catch (e) {
-        return res.status(400).json({ status: 'error', message: 'حقل moreDetails ليس بتنسيق JSON صحيح' });
-      }
-    }request.more_details= more_detailsData;}
-
-  // update photo if exists
-  if (req.file) {
-    request.photo = {
-      url: `images/requests/${req.file.filename}`
-    };
-  }
-
-  await request.save();
-
-  res.status(200).json({
-    status: 'success',
-    message: 'تم التعديل بنجاح',
-    data: request
-  });
 });
 
-/**-----------------------------------------------------
- * @desc delete requests
- * @route DELETE /api/requestion
- * @access Private
-/**-----------------------------------------------------*/
- module.exports.deleteRequest = asyncHandler(async (req, res) => {
-  const userId = req.user.id;
-  const role = req.user.role;
-  const isAdmin=req.user.isAdmin
+/**
+ * @description Get current user requests
+ * @route GET /api/request/my
+ * @access Private (Patient only)
+ */
+exports.getUserTreatmentRequests = asyncHandler(async (req, res) => {
+    const requests = await Pending_request.find({ user: req.user.id })
+        .populate('case_type', '_id case_type');
 
-  // check role
-  if (role !== 'patient' && !isAdmin) {
-    return res.status(403).json({
-      status: 'error',
-      message: 'انت مش مريض علشان تحذف الحالة'
+    const formattedRequests = requests.map(request => ({
+        _id: request._id,
+        Requestion: {
+            pain_severity: request.pain_severity,
+            pain_time: request.pain_time,
+            tooth_location: request.tooth_location,
+            gender: request.gender,
+            age: request.age,
+            photo: request.photo,
+            more_details: request.more_details
+        },
+        case_type: request.case_type
+    }));
+
+    res.status(200).json({
+        status: 'success',
+        message: 'هذه هي طلباتك',
+        count: formattedRequests.length,
+        data: formattedRequests
     });
-  }
-
-  // find request
-  const request = await Pending_request.findById(req.params.id);
-
-  // check if request exists
-  if (!request) {
-    return res.status(404).json({
-      status: 'error',
-      message: 'الحالة غير موجودة'
-    });
-  }
-
-// check ownership
-if (request.user!= userId && !isAdmin) {
-  return res.status(403).json({
-    status: 'error',
-    message: 'هذه الحالة ليست لك'
-  });
-}
-
-  // delete request
-  await request.deleteOne();
-
-  res.status(200).json({
-    status: 'success',
-    message: 'تم حذف الحالة بنجاح'
-  });
 });
 
- 
+/**
+ * @description Update pending request
+ * @route PUT /api/request/:id
+ * @access Private (Patient or Admin)
+ */
+module.exports.updateRequest = asyncHandler(async (req, res) => {
+    const isPatient = req.user.role === 'patient';
+    const isAdmin = req.user.isAdmin;
+
+    if (!isPatient && !isAdmin) {
+        return res.status(403).json({
+            status: 'error',
+            message: 'غير مصرح، فقط المرضى أو المشرفين يمكنهم تعديل الحالة'
+        });
+    }
+
+    const request = await Pending_request.findById(req.params.id);
+    if (!request) {
+        return res.status(404).json({
+            status: 'error',
+            message: 'الحالة غير موجودة'
+        });
+    }
+
+    if (request.user.toString() !== req.user.id && !isAdmin) {
+        return res.status(403).json({
+            status: 'error',
+            message: 'هذه الحالة ليست لك'
+        });
+    }
+
+    const updatableFields = ['pain_severity', 'pain_time', 'tooth_location', 'gender', 'is_pregnant', 'case_type', 'notes', 'age'];
+    for (const field of updatableFields) {
+        if (req.body[field] !== undefined) {
+            request[field] = req.body[field];
+        }
+    }
+
+    if (req.body.more_details !== undefined) {
+        let moreDetailsData = req.body.more_details;
+        if (typeof moreDetailsData === 'string') {
+            try {
+                moreDetailsData = JSON.parse(moreDetailsData);
+            } catch (e) {
+                return res.status(400).json({
+                    status: 'error',
+                    message: 'حقل more_details يجب أن يكون بتنسيق JSON صحيح'
+                });
+            }
+        }
+        request.more_details = moreDetailsData;
+    }
+
+    if (req.file) {
+        request.photo = { url: `images/requests/${req.file.filename}` };
+    }
+
+    await request.save();
+
+    res.status(200).json({
+        status: 'success',
+        message: 'تم تعديل الحالة بنجاح',
+        data: request
+    });
+});
+
+/**
+ * @description Delete pending request
+ * @route DELETE /api/request/:id
+ * @access Private (Patient or Admin)
+ */
+module.exports.deleteRequest = asyncHandler(async (req, res) => {
+    const isPatient = req.user.role === 'patient';
+    const isAdmin = req.user.isAdmin;
+
+    if (!isPatient && !isAdmin) {
+        return res.status(403).json({
+            status: 'error',
+            message: 'غير مصرح، فقط المرضى أو المشرفين يمكنهم حذف الحالة'
+        });
+    }
+
+    const request = await Pending_request.findById(req.params.id);
+    if (!request) {
+        return res.status(404).json({
+            status: 'error',
+            message: 'الحالة غير موجودة'
+        });
+    }
+
+    if (request.user.toString() !== req.user.id && !isAdmin) {
+        return res.status(403).json({
+            status: 'error',
+            message: 'هذه الحالة ليست لك'
+        });
+    }
+
+    await request.deleteOne();
+
+    res.status(200).json({
+        status: 'success',
+        message: 'تم حذف الحالة بنجاح'
+    });
+});

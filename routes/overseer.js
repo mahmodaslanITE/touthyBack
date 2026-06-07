@@ -1,23 +1,22 @@
 const express=require('express')
 const router=express.Router();
 const verifyToken=require('../Middlewares/verifyToken');
-const { complete_request, reject_request, show_overseer_requests_in_process, reject_request_with_option, add_stage_evaluation } = require('../controllers/overseerController');
-const { reject_request_with_option_testone } = require('../controllers/testController');
+const { showOverseerRequests, rejectRequestWithOption, rejectRequest, completeRequest, addStageEvaluation } = require('../controllers/overseerController');
 
 // finish treatment 
-router.put('/treatment/complete/:id',verifyToken,complete_request)
+router.put('/treatment/complete/:id',verifyToken,completeRequest)
 
 //reject request
-router.put('/treatment/reject/:id',verifyToken,reject_request)
+router.put('/treatment/reject/:id',verifyToken,rejectRequest)
 
 //reject with option
-router.put('/treatment/reject/:id/:option',verifyToken,reject_request_with_option)
+router.put('/treatment/reject/:id/:option',verifyToken,rejectRequestWithOption)
 
 //show overseer requests in processer 
-router.get('/treatment',verifyToken,show_overseer_requests_in_process)
+router.get('/treatment',verifyToken,showOverseerRequests)
 
 
-router.put('/add-evaluation/:id',verifyToken,add_stage_evaluation)
+router.put('/add-evaluation/:id',verifyToken,addStageEvaluation)
 
 
 

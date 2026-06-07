@@ -39,5 +39,5 @@ const profileSchema=mongoose.Schema({
         type:String
       }
 })
-const OverseerProfile=mongoose.model('OverseerProfile',profileSchema)
-module.exports={OverseerProfile}
+const Overseer_profile=mongoose.model('Overseer_profile',profileSchema)
+module.exports={Overseer_profile}
