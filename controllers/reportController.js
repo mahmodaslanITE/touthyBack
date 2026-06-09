@@ -175,3 +175,52 @@ module.exports.review_report=asyncHandler(async(req,res)=>{
         message:'تمت مراجعة الابلاغ بنجاح '
     })
 })
+
+
+/**
+ * @description Get all admins with their profiles (accessible by all authenticated users)
+ * @route GET /api/admins
+ * @access Private (any authenticated user)
+ */
+module.exports.getAllAdmins = asyncHandler(async (req, res) => {
+    // 1. فقط التأكد من أن المستخدم مسجل دخول (وليس بالضرورة أدمن)
+    if (!req.user) {
+        return res.status(401).json({
+            status: 'error',
+            message: 'يجب تسجيل الدخول أولاً'
+        });
+    }
+
+    // 2. جلب جميع المستخدمين الذين دورهم admin ✅ تصحيح اسم الحقل
+    const admins = await User.find({ isAdmin: true }).select('-password -__v');
+
+    // 3. جلب الملفات الشخصية لكل أدمن
+    const adminsWithProfiles = await Promise.all(
+        admins.map(async (admin) => {
+            const profile = await getUserProfile(admin._id, admin.role);
+            
+            return {
+                _id: admin._id,
+                profile: {
+                    first_name: profile?.first_name || '',
+                    father_name: profile?.father_name || '',
+                    last_name: profile?.last_name || '',
+                    full_name: profile ? 
+                        `${profile.first_name || ''} ${profile.father_name || ''} ${profile.last_name || ''}`.trim() : 
+                        admin.email,
+                    profile_photo: profile?.profile_photo || null,
+                    bio: profile?.bio || '',
+                    gender: profile.gender || 'gay',
+                },
+            };
+        })
+    );
+
+    // 4. إرسال الرد
+    res.status(200).json({
+        status: 'success',
+        message: 'هذه قائمة جميع المشرفين',
+        count: adminsWithProfiles.length,
+        data: adminsWithProfiles
+    });
+});

@@ -78,6 +78,10 @@ module.exports.showUserProfile = asyncHandler(async (req, res) => {
 
     // ✅ استخدام getUserProfile الموجود
     const profile = await getUserProfile(userId, userRole);
+    const user=await User.findById(userId);
+    const email=user.email;
+    // دمج الإيميل داخل كائن البروفايل
+
     if (!profile) {
         return res.status(404).json({
             status: 'error',
@@ -87,11 +91,15 @@ module.exports.showUserProfile = asyncHandler(async (req, res) => {
 
     const counts = await getCaseCounts(userId, userRole);
     const formattedProfile = formatProfileResponse(profile, userRole, counts);
+    const profileWithEmail = {
+        ...formattedProfile.toObject ? formattedProfile.toObject() : formattedProfile, // تحويل إلى كائن عادي
+        email: email
+    };
 
     res.status(200).json({
         status: 'success',
         message: 'تم جلب البيانات بنجاح',
-        data: formattedProfile
+        data: profileWithEmail
     });
 });
 

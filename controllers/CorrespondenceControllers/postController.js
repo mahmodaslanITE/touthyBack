@@ -238,22 +238,103 @@ exports.createPost = asyncHandler(async (req, res) => {
     });
 });
 
-/**
- * @description Get all posts
- * @route GET /api/posts
- * @access Private (any authenticated user)
- */
-exports.getAllPosts = asyncHandler(async (req, res) => {
-    const posts = await Post.find().sort({ createdAt: -1 });
-    const formattedPosts = await Promise.all(posts.map(post => formatPost(post, req.user.id)));
 
+
+
+
+
+
+
+
+
+
+
+
+exports.getAllPosts = asyncHandler(async (req, res) => {
+    // ============================================================
+    // 📄 PAGINATION SETUP
+    // ============================================================
+    
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(50, Math.max(1, parseInt(req.query.limit) || 3));
+    const skip = (page - 1) * limit;
+    
+    const sortField = req.query.sort || 'createdAt';
+    const sortOrder = req.query.order === 'asc' ? 1 : -1;
+    const sortOptions = { [sortField]: sortOrder };
+    
+    // ============================================================
+    // 🎯 BUILD FILTER (ONLY IF REQUESTED)
+    // ============================================================
+    
+    let filter = {};
+    
+    // ✅ التصفية حسب نوع المستخدم (إذا طلبها المستخدم)
+    if (req.query.filter) {
+        const validRoles = ['patient', 'student', 'overseer', 'admin'];
+        if (validRoles.includes(req.query.filter)) {
+            filter.publisher_role = req.query.filter;
+        }
+    }
+    
+    // ============================================================
+    // 📊 EXECUTE QUERY
+    // ============================================================
+    
+    // أولاً: جلب العدد الإجمالي للبوستات التي تطابق الفلتر
+    const totalPosts = await Post.countDocuments(filter);
+    const totalPages = Math.ceil(totalPosts / limit);
+    
+    // ثانياً: جلب البوستات المفلترة مع Pagination
+    const posts = await Post.find(filter)  // ← التصفية تحدث هنا أولاً
+        .sort(sortOptions)
+        .skip(skip)
+        .limit(limit);
+    
+    // ثالثاً: تنسيق البوستات
+    const formattedPosts = await Promise.all(
+        posts.map(post => formatPost(post, req.user.id))
+    );
+    
+    // ============================================================
+    // 📤 RESPONSE
+    // ============================================================
+    
+    const startItem = totalPosts === 0 ? 0 : skip + 1;
+    const endItem = Math.min(skip + limit, totalPosts);
+    
     res.status(200).json({
         status: 'success',
         message: 'هذه هي كل البوستات',
+        ...(req.query.filter && { applied_filter: req.query.filter }),
+        pagination: {
+            current_page: page,
+            total_pages: totalPages,
+            total_items: totalPosts,
+            items_per_page: limit,
+            range: totalPosts === 0 ? '0 of 0' : `${startItem}-${endItem} of ${totalPosts}`,
+            has_next: page < totalPages,
+            has_prev: page > 1,
+            next_page: page < totalPages ? page + 1 : null,
+            prev_page: page > 1 ? page - 1 : null
+        },
+        sorting: {
+            field: sortField,
+            order: sortOrder === 1 ? 'asc' : 'desc'
+        },
         count: posts.length,
         data: formattedPosts
     });
 });
+
+
+
+
+
+
+
+
+
 
 /**
  * @description Get a specific post with comments
