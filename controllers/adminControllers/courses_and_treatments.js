@@ -118,7 +118,6 @@ module.exports.addTreatment = asyncHandler(async (req, res) => {
  */
 module.exports.getAllTreatments = asyncHandler(async (req, res) => {
     const isPatient = req.user?.role === 'patient';
-    const isAdmin = req.user?.isAdmin;
 
     if (isPatient) {
         const treatments = await Treatment.find().select('-course');
@@ -134,7 +133,6 @@ module.exports.getAllTreatments = asyncHandler(async (req, res) => {
         });
     }
 
-    if (isAdmin) {
         const treatments = await Treatment.find().populate('course', 'course_name');
         const formatted = treatments.map(item => ({
             case_type: { _id: item._id, case_type: item.case_type },
@@ -149,12 +147,9 @@ module.exports.getAllTreatments = asyncHandler(async (req, res) => {
             count: formatted.length,
             data: formatted
         });
-    }
+ 
 
-    return res.status(403).json({
-        status: 'error',
-        message: 'غير مصرح بالوصول'
-    });
+   
 });
 
 /**

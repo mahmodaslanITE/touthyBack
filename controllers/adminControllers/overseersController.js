@@ -23,15 +23,24 @@ module.exports.getAllOverseers = asyncHandler(async (req, res) => {
         });
     }
 
-    const overseers = await Overseer_profile.find();
+    const overseers = await Overseer_profile.find().populate('user', 'email').lean();
+
+    // ✅ تنسيق البيانات: إخراج user._id و user.email إلى المستوى العلوي
+    const formattedOverseers = overseers.map(overseer => {
+        const { user, ...rest } = overseer;
+        return {
+            ...rest,
+            user: user?._id || null,
+            email: user?.email || null
+        };
+    });
 
     res.status(200).json({
         status: 'success',
-        count: overseers.length,
-        data: overseers
+        count: formattedOverseers.length,
+        data: formattedOverseers
     });
 });
-
 /**
  * @description Create new overseer account
  * @route POST /api/admin/overseer

@@ -23,7 +23,7 @@ const formatProfileResponse = (profile, role, counts = { finished: 0, inProcess:
     father_name: profile.father_name,
     last_name: profile.last_name,
     bio: profile.bio,
-    profile_photo: profile.profile_photo,
+    profile_photo: profile.profile_photo || {url:null},
     gender: profile.gender,
     role,
     category: profile.category,
@@ -237,6 +237,7 @@ module.exports.updateProfilePhoto = asyncHandler(async (req, res) => {
     res.status(200).json({
         status: 'success',
         message: 'تم تحديث الصورة الشخصية بنجاح',
-        profile_photo: { url: `images/profile/${req.file.filename}` }
+        data:{
+        profile_photo: { url: `images/profile/${req.file.filename}` }}
     });
 });
