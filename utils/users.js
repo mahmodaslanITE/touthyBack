@@ -12,22 +12,29 @@ const Student_profile = require("../models/Student_profile");
  * @returns {Promise<Object>} - User profile
  */
 async function getUserProfile(userId, role) {
+    console.log(`getUserProfile called with userId: ${userId}, role: ${role}`);
+    let  profile=null
     try {
+        console.log(`Fetching profile for userId: ${userId}, role: ${role}`);
         switch (role) {
             case 'student':
-                return await Student_profile.findOne({ user: userId })
+                profile= await Student_profile.findOne({ user: userId })
                     .populate('category', 'category');
             case 'patient':
-                return await Patient_profile.findOne({ user: userId });
+                profile= await Patient_profile.findOne({ user: userId });
             case 'overseer':
-                return await Overseer_profile.findOne({ user: userId });
+                profile= await Overseer_profile.findOne({ user: userId });
+                console.log(`Profile found: ${profile}`);
             default:
-                return null;
+                console.log(`Invalid role: ${role}`);
+                
         }
+        
     } catch (error) {
         console.error('Error in getUserProfile:', error.message);
         return null;
     }
+    return profile
 }
 
 module.exports = getUserProfile;

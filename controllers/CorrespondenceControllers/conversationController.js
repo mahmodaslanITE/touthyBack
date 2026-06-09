@@ -5,6 +5,7 @@ const Student_profile = require('../../models/Student_profile');
 const { User } = require('../../models/User');
 const Patient_profil = require('../../models/Patient_profile');
 const { OverseerProfile } = require('../../models/Overseer_profile');
+const getUserProfile = require('../../utils/users');
 
 /**
  * دالة مساعدة لجلب ملف المستخدم الشخصي بناءً على دوره
@@ -12,19 +13,6 @@ const { OverseerProfile } = require('../../models/Overseer_profile');
  * @param {string} role - دور المستخدم (student, patient, overseer)
  * @returns {Promise<Object|null>} - ملف المستخدم الشخصي
  */
-const getUserProfile = async (userId, role) => {
-    const profileModels = {
-        student: Student_profile,
-        patient: Patient_profil,
-        overseer: OverseerProfile
-    };
-
-    const Model = profileModels[role];
-    if (!Model) return null;
-
-    return await Model.findOne({ user: userId })
-        .select('user first_name father_name last_name profile_photo');
-};
 
 /**
  * دالة مساعدة لتنسيق بيانات الطرف الآخر
@@ -78,7 +66,6 @@ exports.open_conversation = asyncHandler(async (req, res) => {
             message: 'المستخدم غير موجود'
         });
     }
-
     // جلب ملف المستخدم الشخصي للطرف الآخر
     const receiverProfile = await getUserProfile(receiverId, receiver.role);
     if (!receiverProfile) {
