@@ -24,7 +24,8 @@ const formatOtherPartyProfile = (profile, userId, role) => {
         userId: userId,
         full_name: `${profile.first_name} ${profile.father_name} ${profile.last_name}`.trim(),
         profile_photo: profile.profile_photo,
-        role: role
+        role: role,
+        
     };
 };
 

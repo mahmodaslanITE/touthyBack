@@ -17,14 +17,18 @@ async function getUserProfile(userId, role) {
     try {
         console.log(`Fetching profile for userId: ${userId}, role: ${role}`);
         switch (role) {
-            case 'student':
+            case 'student':{
+                console.log('Fetching student profile...');
                 profile= await Student_profile.findOne({ user: userId })
                     .populate('category', 'category');
-            case 'patient':
+                    break}
+            case 'patient':{
                 profile= await Patient_profile.findOne({ user: userId });
-            case 'overseer':
+                break}
+            case 'overseer':{
                 profile= await Overseer_profile.findOne({ user: userId });
                 console.log(`Profile found: ${profile}`);
+            break}
             default:
                 console.log(`Invalid role: ${role}`);
                 
