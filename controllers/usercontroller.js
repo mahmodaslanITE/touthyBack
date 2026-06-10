@@ -15,24 +15,33 @@ const getUserProfile = require('../utils/users');
  * @param {Object} profile - User profile
  * @param {string} role - User role
  * @param {Object} counts - Counts object
+ * @param {boolean} includeEmail - Whether to include email
  * @returns {Object} Formatted profile
  */
-const formatProfileResponse = (profile, role, counts = { finished: 0, inProcess: 0 }) => ({
-    user: profile.user,
-    first_name: profile.first_name,
-    father_name: profile.father_name,
-    last_name: profile.last_name,
-    bio: profile.bio,
-    profile_photo: profile.profile_photo || {url:null},
-    gender: profile.gender,
-    role,
-    category: profile.category,
-    university_number: profile.university_number,
-    age: profile.age,
-    is_verified: profile.is_verified,
-    count_cases_finished: counts.finished,
-    count_cases_in_process: counts.inProcess
-});
+const formatProfileResponse = (profile, role, counts = { finished: 0, inProcess: 0 }, includeEmail = false, email = null) => {
+    const result = {
+        user: profile.user,
+        first_name: profile.first_name,
+        father_name: profile.father_name,
+        last_name: profile.last_name,
+        bio: profile.bio,
+        profile_photo: profile.profile_photo || { url: null },
+        gender: profile.gender,
+        role,
+        category: profile.category,
+        university_number: profile.university_number,
+        age: profile.age,
+        is_verified: profile.is_verified,
+        count_cases_finished: counts.finished,
+        count_cases_in_process: counts.inProcess
+    };
+    
+    if (includeEmail && email) {
+        result.email = email;
+    }
+    
+    return result;
+};
 
 /**
  * Get case counts for user
@@ -56,12 +65,51 @@ const getCaseCounts = async (userId, role) => {
     return { finished: 0, inProcess: 0 };
 };
 
+/**
+ * Get complete user profile with email (for current user)
+ * @param {string} userId - User ID
+ * @param {string} role - User role
+ * @returns {Promise<Object>} Complete profile with email
+ */
+const getCompleteProfileWithEmail = async (userId, role) => {
+    const [profile, user, counts] = await Promise.all([
+        getUserProfile(userId, role),
+        User.findById(userId),
+        getCaseCounts(userId, role)
+    ]);
+
+    if (!profile || !user) {
+        return null;
+    }
+
+    return formatProfileResponse(profile, role, counts, true, user.email);
+};
+
+/**
+ * Get user profile without email (for public view)
+ * @param {string} userId - User ID
+ * @param {string} role - User role
+ * @returns {Promise<Object>} Profile without email
+ */
+const getProfileWithoutEmail = async (userId, role) => {
+    const [profile, counts] = await Promise.all([
+        getUserProfile(userId, role),
+        getCaseCounts(userId, role)
+    ]);
+
+    if (!profile) {
+        return null;
+    }
+
+    return formatProfileResponse(profile, role, counts, false);
+};
+
 // ============================================================
 // 👤 USER PROFILE MANAGEMENT
 // ============================================================
 
 /**
- * @description Get current user profile
+ * @description Get current user profile (with email)
  * @route GET /api/users
  * @access Private
  */
@@ -73,38 +121,24 @@ module.exports.showUserProfile = asyncHandler(async (req, res) => {
         });
     }
 
-    const userId = req.user.id;
-    const userRole = req.user.role;
+    const completeProfile = await getCompleteProfileWithEmail(req.user.id, req.user.role);
 
-    // ✅ استخدام getUserProfile الموجود
-    const profile = await getUserProfile(userId, userRole);
-    const user=await User.findById(userId);
-    const email=user.email;
-    // دمج الإيميل داخل كائن البروفايل
-
-    if (!profile) {
+    if (!completeProfile) {
         return res.status(404).json({
             status: 'error',
             message: 'الملف الشخصي غير موجود'
         });
     }
 
-    const counts = await getCaseCounts(userId, userRole);
-    const formattedProfile = formatProfileResponse(profile, userRole, counts);
-    const profileWithEmail = {
-        ...formattedProfile.toObject ? formattedProfile.toObject() : formattedProfile, // تحويل إلى كائن عادي
-        email: email
-    };
-
     res.status(200).json({
         status: 'success',
         message: 'تم جلب البيانات بنجاح',
-        data: profileWithEmail
+        data: completeProfile
     });
 });
 
 /**
- * @description Get user profile by ID
+ * @description Get user profile by ID (without email)
  * @route GET /api/users/:id
  * @access Private
  */
@@ -126,10 +160,9 @@ module.exports.getProfile = asyncHandler(async (req, res) => {
         });
     }
 
-    const userRole = targetUser.role;
+    // ✅ لا نعرض الإيميل عند جلب بروفايل مستخدم آخر
+    const profile = await getProfileWithoutEmail(id, targetUser.role);
 
-    // ✅ استخدام getUserProfile الموجود
-    const profile = await getUserProfile(id, userRole);
     if (!profile) {
         return res.status(404).json({
             status: 'error',
@@ -137,13 +170,10 @@ module.exports.getProfile = asyncHandler(async (req, res) => {
         });
     }
 
-    const counts = await getCaseCounts(id, userRole);
-    const formattedProfile = formatProfileResponse(profile, userRole, counts);
-
     res.status(200).json({
         status: 'success',
         message: 'تم جلب البيانات بنجاح',
-        data: formattedProfile
+        data: profile
     });
 });
 
@@ -169,6 +199,7 @@ module.exports.updateUserProfile = asyncHandler(async (req, res) => {
     const userRole = req.user.role;
     const { first_name, last_name, father_name, university_number, bio, category } = req.body;
 
+    // جلب الملف الشخصي
     const profile = await getUserProfile(userId, userRole);
     if (!profile) {
         return res.status(404).json({
@@ -187,13 +218,13 @@ module.exports.updateUserProfile = asyncHandler(async (req, res) => {
 
     await profile.save();
 
-    // إزالة الحقول الزائدة من الاستجابة
-    const { _id, user, createdAt, updatedAt, __v, ...profileData } = profile._doc;
+    // ✅ بعد التحديث، نعيد البروفايل مع الإيميل (لأنه المستخدم نفسه)
+    const completeProfile = await getCompleteProfileWithEmail(userId, userRole);
 
     res.status(200).json({
         status: 'success',
         message: 'تم تحديث الملف الشخصي بنجاح',
-        data: profileData
+        data: completeProfile
     });
 });
 
@@ -213,7 +244,7 @@ module.exports.updateProfilePhoto = asyncHandler(async (req, res) => {
     const userId = req.user.id;
     const userRole = req.user.role;
 
-    // ✅ استخدام getUserProfile لجلب الملف الشخصي الحالي
+    // جلب الملف الشخصي
     const profile = await getUserProfile(userId, userRole);
     if (!profile) {
         return res.status(404).json({
@@ -234,10 +265,12 @@ module.exports.updateProfilePhoto = asyncHandler(async (req, res) => {
     profile.profile_photo = { url: `images/profile/${req.file.filename}` };
     await profile.save();
 
+    // ✅ إرجاع البروفايل مع الإيميل (لأنه المستخدم نفسه)
+    const completeProfile = await getCompleteProfileWithEmail(userId, userRole);
+
     res.status(200).json({
         status: 'success',
         message: 'تم تحديث الصورة الشخصية بنجاح',
-        data:{
-        profile_photo: { url: `images/profile/${req.file.filename}` }}
+        data: completeProfile
     });
 });
