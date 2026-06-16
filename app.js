@@ -4,6 +4,7 @@ const dotenv = require('dotenv');
 const http = require('http');
 const userRoutes = require('./routes/users');
 const socket = require('./socket/init');
+const { updateBaseUrlFromRequest } = require('./utils/updateEnv');
 
 dotenv.config();
 
@@ -14,6 +15,17 @@ const server = http.createServer(app);
 app.use(express.json());
 // في أعلى الملف مع باقي الاستيرادات
 
+
+let isBaseUrlSet = false;
+
+app.use((req, res, next) => {
+    if (!isBaseUrlSet) {
+        const baseUrl = updateBaseUrlFromRequest(req);
+        console.log(`✅ BASE_URL updated to: ${baseUrl}`);
+        isBaseUrlSet = true;
+    }
+    next();
+});
 
 app.use('/images', express.static(path.join(__dirname, 'images')));
 // راوتر المستخدمين
@@ -55,5 +67,5 @@ io.on('connection', (socket) => {
 module.exports=io
 
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT ;
 server.listen(PORT,'0.0.0.0', () => console.log(`Server running on port ${PORT}`));

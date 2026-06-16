@@ -3,6 +3,59 @@ const { Pending_request, validateTreatmentRequest } = require('../models/Pending
 const Treatment = require('../models/Treatment');
 
 // ============================================================
+// 📦 HELPER FUNCTIONS (دوال مساعدة)
+// ============================================================
+
+/**
+ * Format request response with consistent structure
+ * @param {Object} req - Express request object
+ * @param {Object} request - Request document
+ * @returns {Object} Formatted request
+ */
+const formatRequestResponse = (req, request) => {
+    // بناء رابط الصورة الكامل
+    let photoUrl = null;
+    if (request.photo?.url) {
+        photoUrl =`${process.env.BASE_URL}/${request.photo.url}`;
+    }
+
+    return {
+        _id: request._id,
+        Requestion: {
+            pain_severity: request.pain_severity,
+            pain_time: request.pain_time,
+            tooth_location: request.tooth_location,
+            gender: request.gender,
+            age: request.age,
+            photo: {url: photoUrl},
+            more_details: request.more_details,
+            notes: request.notes || null,
+            is_pregnant: request.is_pregnant || null
+        },
+        case_type: request.case_type,
+        created_at: request.createdAt,
+        updated_at: request.updatedAt
+    };
+};
+
+/**
+ * Format single request for response (with additional patient info for admin)
+ * @param {Object} req - Express request object
+ * @param {Object} request - Request document
+ * @param {boolean} isAdmin - Whether user is admin
+ * @returns {Object} Formatted request
+ */
+const formatRequestWithPatient = (req, request, isAdmin = false) => {
+    const formattedRequest = formatRequestResponse(req, request);
+    
+    if (isAdmin && request.user) {
+        formattedRequest.patient = request.user;
+    }
+    
+    return formattedRequest;
+};
+
+// ============================================================
 // 📝 PATIENT REQUESTS MANAGEMENT
 // ============================================================
 
@@ -73,15 +126,18 @@ exports.createTreatmentRequest = asyncHandler(async (req, res) => {
         photo: photoData
     });
 
+    // ✅ استخدام نفس التنسيق
+    const formattedRequest = formatRequestResponse(req, request);
+
     res.status(201).json({
         status: 'success',
         message: 'تم إنشاء الطلب بنجاح',
-        data: request
+        data: formattedRequest
     });
 });
 
 /**
- * @description Get current user requests
+ * @description Get user pending requests
  * @route GET /api/request/my
  * @access Private (Patient only)
  */
@@ -89,19 +145,8 @@ exports.getUserTreatmentRequests = asyncHandler(async (req, res) => {
     const requests = await Pending_request.find({ user: req.user.id })
         .populate('case_type', '_id case_type');
 
-    const formattedRequests = requests.map(request => ({
-        _id: request._id,
-        Requestion: {
-            pain_severity: request.pain_severity,
-            pain_time: request.pain_time,
-            tooth_location: request.tooth_location,
-            gender: request.gender,
-            age: request.age,
-            photo: request.photo,
-            more_details: request.more_details
-        },
-        case_type: request.case_type
-    }));
+    // ✅ استخدام نفس التنسيق
+    const formattedRequests = requests.map(request => formatRequestResponse(req, request));
 
     res.status(200).json({
         status: 'success',
@@ -170,10 +215,13 @@ module.exports.updateRequest = asyncHandler(async (req, res) => {
 
     await request.save();
 
+    // ✅ استخدام نفس التنسيق
+    const formattedRequest = formatRequestResponse(req, request);
+
     res.status(200).json({
         status: 'success',
         message: 'تم تعديل الحالة بنجاح',
-        data: request
+        data: formattedRequest
     });
 });
 
@@ -213,5 +261,50 @@ module.exports.deleteRequest = asyncHandler(async (req, res) => {
     res.status(200).json({
         status: 'success',
         message: 'تم حذف الحالة بنجاح'
+    });
+});
+
+/**
+ * @description Get all pending requests (for admin/student)
+ * @route GET /api/request
+ * @access Private (Admin or Student)
+ */
+module.exports.getAllRequests = asyncHandler(async (req, res) => {
+    const isAdmin = req.user.isAdmin;
+    const isStudent = req.user.role === 'student';
+
+    if (!isAdmin && !isStudent) {
+        return res.status(403).json({
+            status: 'error',
+            message: 'غير مصرح، هذه الخدمة للمشرفين والطلاب فقط'
+        });
+    }
+
+    let query = {};
+
+    if (isStudent) {
+        // الطلاب يرون الطلبات المتاحة (بدون مشرف)
+        query.overseer = null;
+    }
+
+    let requests = await Pending_request.find(query)
+        .populate('case_type', '_id case_type');
+
+    if (isAdmin) {
+        requests = await Pending_request.find(query)
+            .populate('case_type', '_id case_type')
+            .populate('user', 'email');
+    }
+
+    // ✅ استخدام نفس التنسيق مع بيانات المريض للأدمن
+    const formattedRequests = requests.map(request => 
+        formatRequestWithPatient(req, request, isAdmin)
+    );
+
+    res.status(200).json({
+        status: 'success',
+        message: 'هذه هي جميع الطلبات',
+        count: formattedRequests.length,
+        data: formattedRequests
     });
 });

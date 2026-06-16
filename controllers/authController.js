@@ -109,7 +109,7 @@ module.exports.loginUser = asyncHandler(async (req, res) => {
         gender: profile.gender,
         university_number: profile.university_number,
         is_verified: profile.is_verified,
-        profile_photo: profile.profile_photo,
+        profile_photo: {url:`${req.protocol}://${req.get('host')}/${profile.profile_photo?.url}`},
         ...(profile.category && { category: profile.category })
     };
 

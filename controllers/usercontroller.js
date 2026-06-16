@@ -10,22 +10,35 @@ const getUserProfile = require('../utils/users');
 // 📦 HELPER FUNCTIONS (دوال مساعدة)
 // ============================================================
 
+const BASE_URL = process.env.BASE_URL;
+
+
 /**
- * Format profile response
+ * Format profile response with full image URL
  * @param {Object} profile - User profile
  * @param {string} role - User role
  * @param {Object} counts - Counts object
  * @param {boolean} includeEmail - Whether to include email
+ * @param {string} email - User email
  * @returns {Object} Formatted profile
  */
 const formatProfileResponse = (profile, role, counts = { finished: 0, inProcess: 0 }, includeEmail = false, email = null) => {
+    // ✅ بناء رابط الصورة الكامل
+    let profilePhotoUrl = null;
+
+    if (profile.profile_photo?.url) {
+     
+            profilePhotoUrl = `${process.env.BASE_URL}/${profile.profile_photo.url}`;
+        }
+    
+
     const result = {
         user: profile.user,
         first_name: profile.first_name,
         father_name: profile.father_name,
         last_name: profile.last_name,
         bio: profile.bio,
-        profile_photo: profile.profile_photo || { url: null },
+        profile_photo:{ url: profilePhotoUrl },
         gender: profile.gender,
         role,
         category: profile.category,
@@ -160,7 +173,6 @@ module.exports.getProfile = asyncHandler(async (req, res) => {
         });
     }
 
-    // ✅ لا نعرض الإيميل عند جلب بروفايل مستخدم آخر
     const profile = await getProfileWithoutEmail(id, targetUser.role);
 
     if (!profile) {
@@ -199,7 +211,6 @@ module.exports.updateUserProfile = asyncHandler(async (req, res) => {
     const userRole = req.user.role;
     const { first_name, last_name, father_name, university_number, bio, category } = req.body;
 
-    // جلب الملف الشخصي
     const profile = await getUserProfile(userId, userRole);
     if (!profile) {
         return res.status(404).json({
@@ -208,7 +219,6 @@ module.exports.updateUserProfile = asyncHandler(async (req, res) => {
         });
     }
 
-    // تحديث الحقول
     if (first_name) profile.first_name = first_name;
     if (father_name) profile.father_name = father_name;
     if (last_name) profile.last_name = last_name;
@@ -218,7 +228,6 @@ module.exports.updateUserProfile = asyncHandler(async (req, res) => {
 
     await profile.save();
 
-    // ✅ بعد التحديث، نعيد البروفايل مع الإيميل (لأنه المستخدم نفسه)
     const completeProfile = await getCompleteProfileWithEmail(userId, userRole);
 
     res.status(200).json({
@@ -244,7 +253,6 @@ module.exports.updateProfilePhoto = asyncHandler(async (req, res) => {
     const userId = req.user.id;
     const userRole = req.user.role;
 
-    // جلب الملف الشخصي
     const profile = await getUserProfile(userId, userRole);
     if (!profile) {
         return res.status(404).json({
@@ -261,11 +269,10 @@ module.exports.updateProfilePhoto = asyncHandler(async (req, res) => {
         }
     }
 
-    // حفظ الصورة الجديدة
+    // حفظ الصورة الجديدة (تخزين المسار النسبي فقط)
     profile.profile_photo = { url: `images/profile/${req.file.filename}` };
     await profile.save();
 
-    // ✅ إرجاع البروفايل مع الإيميل (لأنه المستخدم نفسه)
     const completeProfile = await getCompleteProfileWithEmail(userId, userRole);
 
     res.status(200).json({

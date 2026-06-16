@@ -34,7 +34,9 @@ module.exports.getAllOverseers = asyncHandler(async (req, res) => {
             email: user?.email || null
         };
     });
-
+formattedOverseers.map((overseer)=>{
+if(overseer.profile_photo?.url){overseer.profile_photo.url=`${process.env.BASE_URL}/${overseer.profile_photo.url}`}
+})
     res.status(200).json({
         status: 'success',
         count: formattedOverseers.length,

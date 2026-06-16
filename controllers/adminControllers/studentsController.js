@@ -168,8 +168,10 @@ module.exports.getAllStudents = asyncHandler(async (req, res) => {
         });
     }
 
-    const students = await StudentProfile.find();
-
+    const students = await StudentProfile.find().populate(`category`);
+students.map((student)=>{
+    student.profile_photo.url=`${process.env.BASE_URL}/${student.profile_photo.url}`
+})
     res.status(200).json({
         status: 'success',
         count: students.length,

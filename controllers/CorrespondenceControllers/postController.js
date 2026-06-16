@@ -4,6 +4,8 @@ const { User } = require('../../models/User');
 const Post = require('../../models/Correspondence/Post');
 const Comment = require('../../models/Correspondence/Comment');
 const getUserProfile = require('../../utils/users');
+const fs = require('fs');
+const path = require('path');
 
 // ============================================================
 // 📦 HELPER FUNCTIONS
@@ -14,17 +16,27 @@ const getUserProfile = require('../../utils/users');
  */
 const formatPost = async (post, reqUserId) => {
     try {
-        if (!post.publisher) {
+        // ✅ تحويل post إلى كائن عادي باستخدام toObject
+        const postObj = post.toObject ? post.toObject() : post;
+        
+        const formattedImages = postObj.images?.map(img => ({
+            url: `${process.env.BASE_URL}/${img.url}`,
+            publicId: img.publicId,
+            _id: img._id
+        }
+    )) || [];
+
+        if (!postObj.publisher) {
             return {
-                _id: post._id,
-                content: post.content,
+                _id: postObj._id,
+                content: postObj.content,
                 is_for_me: false,
-                images: post.images || [],
-                count_likes: post.count_likes || 0,
-                count_dislikes: post.count_dislikes || 0,
-                count_comments: post.count_comments || 0,
-                created_at: post.createdAt,
-                publisher_role: post.publisher_role,
+                images: formattedImages,
+                count_likes: postObj.count_likes || 0,
+                count_dislikes: postObj.count_dislikes || 0,
+                count_comments: postObj.count_comments || 0,
+                created_at: postObj.createdAt,
+                publisher_role: postObj.publisher_role,
                 publisher: {
                     _id: null,
                     full_name: 'ناشر محذوف',
@@ -35,21 +47,21 @@ const formatPost = async (post, reqUserId) => {
             };
         }
 
-        const publisher = await User.findById(post.publisher);
+        const publisher = await User.findById(postObj.publisher);
         
         if (!publisher) {
             return {
-                _id: post._id,
-                content: post.content,
+                _id: postObj._id,
+                content: postObj.content,
                 is_for_me: false,
-                images: post.images || [],
-                count_likes: post.count_likes || 0,
-                count_dislikes: post.count_dislikes || 0,
-                count_comments: post.count_comments || 0,
-                created_at: post.createdAt,
-                publisher_role: post.publisher_role,
+                images: formattedImages,
+                count_likes: postObj.count_likes || 0,
+                count_dislikes: postObj.count_dislikes || 0,
+                count_comments: postObj.count_comments || 0,
+                created_at: postObj.createdAt,
+                publisher_role: postObj.publisher_role,
                 publisher: {
-                    _id: post.publisher,
+                    _id: postObj.publisher,
                     full_name: 'مستخدم غير موجود',
                     profile_photo: null,
                     gender: null,
@@ -58,25 +70,26 @@ const formatPost = async (post, reqUserId) => {
             };
         }
 
-        const publisherProfile = await getUserProfile(post.publisher, publisher.role);
-        const isForMe = post.publisher.toString() === reqUserId;
+        const publisherProfile = await getUserProfile(postObj.publisher, publisher.role);
+        const isForMe = postObj.publisher.toString() === reqUserId;
 
         return {
-            _id: post._id,
-            content: post.content,
+            _id: postObj._id,
+            content: postObj.content,
             is_for_me: isForMe,
-            images: post.images || [],
-            count_likes: post.count_likes || 0,
-            count_dislikes: post.count_dislikes || 0,
-            count_comments: post.count_comments || 0,
-            created_at: post.createdAt,
-            publisher_role: post.publisher_role,
+            images: formattedImages,
+            count_likes: postObj.count_likes || 0,
+            count_dislikes: postObj.count_dislikes || 0,
+            count_comments: postObj.count_comments || 0,
+            created_at: postObj.createdAt,
+            publisher_role: postObj.publisher_role,
             publisher: {
-                _id: post.publisher,
+                _id: postObj.publisher,
                 full_name: publisherProfile ? 
                     `${publisherProfile.first_name} ${publisherProfile.father_name} ${publisherProfile.last_name}` : 
                     publisher.email || 'مستخدم',
-                profile_photo: publisherProfile?.profile_photo || null,
+                profile_photo: publisherProfile?.profile_photo ? 
+                    `${process.env.BASE_URL}/${publisherProfile.profile_photo.url}` : null,
                 gender: publisherProfile?.gender || null,
                 is_verified: publisherProfile?.is_verified || false
             }
@@ -109,24 +122,24 @@ const formatPost = async (post, reqUserId) => {
  */
 const formatComment = async (comment, reqUserId) => {
     try {
+        // ✅ تحويل comment إلى كائن عادي
+        const commentObj = comment.toObject ? comment.toObject() : comment;
+        
         // ✅ تحويل المعرفات إلى string للمقارنة
         const currentUserId = String(reqUserId);
-        const commentUserId = comment.user ? String(comment.user) : null;
+        const commentUserId = commentObj.user ? String(commentObj.user) : null;
         
         // ✅ المقارنة المباشرة
         const isForMe = (commentUserId === currentUserId);
 
-        // ✅ للتأكد (يمكن إزالة بعد الاختبار)
-        console.log(`Comment ${comment._id}: commentUser=${commentUserId}, currentUser=${currentUserId}, isForMe=${isForMe}`);
-
         // حالة عدم وجود مستخدم
-        if (!comment.user) {
+        if (!commentObj.user) {
             return {
-                _id: comment._id,
-                content: comment.content,
+                _id: commentObj._id,
+                content: commentObj.content,
                 is_for_me: false,
-                likes_count: comment.likes_count || 0,
-                created_at: comment.createdAt,
+                likes_count: commentObj.likes_count || 0,
+                created_at: commentObj.createdAt,
                 user: {
                     _id: null,
                     full_name: 'مستخدم محذوف',
@@ -138,17 +151,17 @@ const formatComment = async (comment, reqUserId) => {
         }
 
         // جلب بيانات المستخدم
-        const user = await User.findById(comment.user);
+        const user = await User.findById(commentObj.user);
         
         if (!user) {
             return {
-                _id: comment._id,
-                content: comment.content,
-                is_for_me: isForMe,  // ✅ استخدام isForMe المحسوب
-                likes_count: comment.likes_count || 0,
-                created_at: comment.createdAt,
+                _id: commentObj._id,
+                content: commentObj.content,
+                is_for_me: isForMe,
+                likes_count: commentObj.likes_count || 0,
+                created_at: commentObj.createdAt,
                 user: {
-                    _id: comment.user,
+                    _id: commentObj.user,
                     full_name: 'مستخدم غير موجود',
                     profile_photo: null,
                     gender: null,
@@ -158,7 +171,7 @@ const formatComment = async (comment, reqUserId) => {
         }
 
         // جلب الملف الشخصي
-        const userProfile = await getUserProfile(comment.user, user.role);
+        const userProfile = await getUserProfile(commentObj.user, user.role);
 
         // بناء اسم كامل
         let fullName = user.email || 'مستخدم';
@@ -169,15 +182,16 @@ const formatComment = async (comment, reqUserId) => {
 
         // ✅ إرجاع الكائن مع is_for_me
         return {
-            _id: comment._id,
-            content: comment.content,
-            is_for_me: isForMe,  // ✅ مضمون أنها true للتعليقات الخاصة بالمستخدم
-            likes_count: comment.likes_count || 0,
-            created_at: comment.createdAt,
+            _id: commentObj._id,
+            content: commentObj.content,
+            is_for_me: isForMe,
+            likes_count: commentObj.likes_count || 0,
+            created_at: commentObj.createdAt,
             user: {
-                _id: comment.user,
+                _id: commentObj.user,
                 full_name: fullName,
-                profile_photo: userProfile?.profile_photo || null,
+                profile_photo: userProfile?.profile_photo ? 
+                    `${process.env.BASE_URL}/${userProfile.profile_photo.url}` : null,
                 gender: userProfile?.gender || null,
                 is_verified: userProfile?.is_verified || false
             }
@@ -202,6 +216,37 @@ const formatComment = async (comment, reqUserId) => {
 };
 
 // ============================================================
+// 🗑️ HELPER: DELETE IMAGES
+// ============================================================
+
+/**
+ * Delete images from filesystem
+ */
+const deleteImagesFromStorage = (images) => {
+    if (!images || images.length === 0) return;
+    
+    images.forEach(image => {
+        try {
+            // استخراج اسم الملف من URL
+            const urlParts = image.url.split('/');
+            const filename = urlParts[urlParts.length - 1];
+            
+            // تحديد المسار الكامل للملف
+            const filePath = path.join(__dirname, '../../public/images/posts', filename);
+            
+            if (fs.existsSync(filePath)) {
+                fs.unlinkSync(filePath);
+                console.log(`✅ Deleted image: ${filename}`);
+            } else {
+                console.log(`⚠️ Image not found: ${filename}`);
+            }
+        } catch (error) {
+            console.error(`❌ Error deleting image ${image.publicId}:`, error.message);
+        }
+    });
+};
+
+// ============================================================
 // 📝 POST CRUD OPERATIONS
 // ============================================================
 
@@ -222,7 +267,10 @@ exports.createPost = asyncHandler(async (req, res) => {
         });
     }
 
-    const images = req.files?.map(file => `images/posts/${file.filename}`) || [];
+    const images = req.files?.map(file => ({
+        url: `images/posts/${file.filename}`,
+        publicId: `posts/${file.filename.split('.')[0]}`
+    })) || [];
 
     const post = await Post.create({
         publisher: userId,
@@ -231,25 +279,21 @@ exports.createPost = asyncHandler(async (req, res) => {
         images
     });
 
+    // ✅ استخدام formatPost لتنسيق البوست مع معلومات الناشر
+    const formattedPost = await formatPost(post, userId);
+
     res.status(201).json({
         status: 'success',
         message: 'تم نشر البوست بنجاح',
-        data: post
+        data: formattedPost
     });
 });
 
-
-
-
-
-
-
-
-
-
-
-
-
+/**
+ * @description Get all posts with pagination and filtering
+ * @route GET /api/posts
+ * @access Private (any authenticated user)
+ */
 exports.getAllPosts = asyncHandler(async (req, res) => {
     // ============================================================
     // 📄 PAGINATION SETUP
@@ -286,10 +330,11 @@ exports.getAllPosts = asyncHandler(async (req, res) => {
     const totalPages = Math.ceil(totalPosts / limit);
     
     // ثانياً: جلب البوستات المفلترة مع Pagination
-    const posts = await Post.find(filter)  // ← التصفية تحدث هنا أولاً
+    const posts = await Post.find(filter)
         .sort(sortOptions)
         .skip(skip)
-        .limit(limit);
+        .limit(limit)
+        .lean(); // ✅ استخدام lean للحصول على كائنات JavaScript عادية
     
     // ثالثاً: تنسيق البوستات
     const formattedPosts = await Promise.all(
@@ -327,15 +372,6 @@ exports.getAllPosts = asyncHandler(async (req, res) => {
     });
 });
 
-
-
-
-
-
-
-
-
-
 /**
  * @description Get a specific post with comments
  * @route GET /api/posts/:id
@@ -343,7 +379,7 @@ exports.getAllPosts = asyncHandler(async (req, res) => {
  */
 exports.getPostById = asyncHandler(async (req, res) => {
     const { id: postId } = req.params;
-    const post = await Post.findById(postId);
+    const post = await Post.findById(postId).lean(); // ✅ استخدام lean
 
     if (!post) {
         return res.status(404).json({
@@ -353,7 +389,7 @@ exports.getPostById = asyncHandler(async (req, res) => {
     }
 
     const formattedPost = await formatPost(post, req.user.id);
-    const comments = await Comment.find({ post: postId }).sort({ createdAt: -1 });
+    const comments = await Comment.find({ post: postId }).sort({ createdAt: -1 }).lean(); // ✅ استخدام lean
     const formattedComments = await Promise.all(comments.map(comment => formatComment(comment, req.user.id)));
 
     res.status(200).json({
@@ -373,7 +409,7 @@ exports.getPostById = asyncHandler(async (req, res) => {
  * @access Private (publisher or admin)
  */
 exports.updatePost = asyncHandler(async (req, res) => {
-    const { content } = req.body;
+    const { content, deleteImages } = req.body;
     const userId = req.user.id;
     const isAdmin = req.user.isAdmin;
 
@@ -386,6 +422,7 @@ exports.updatePost = asyncHandler(async (req, res) => {
         });
     }
 
+    // ✅ Check authorization
     if (post.publisher.toString() !== userId && !isAdmin) {
         return res.status(403).json({
             status: 'error',
@@ -393,21 +430,41 @@ exports.updatePost = asyncHandler(async (req, res) => {
         });
     }
 
+    // ✅ Update content if provided
     if (content) {
         post.content = content.trim();
     }
 
+    // ✅ Delete specified images
+    if (deleteImages && Array.isArray(deleteImages) && deleteImages.length > 0) {
+        // Find images to delete
+        const imagesToDelete = post.images.filter(img => deleteImages.includes(img.publicId));
+        
+        // Delete from filesystem
+        deleteImagesFromStorage(imagesToDelete);
+        
+        // Remove from post
+        post.images = post.images.filter(img => !deleteImages.includes(img.publicId));
+    }
+
+    // ✅ Add new images
     if (req.files?.length > 0) {
-        const newImages = req.files.map(file => `images/posts/${file.filename}`);
+        const newImages = req.files.map(file => ({
+            url: `images/posts/${file.filename}`,
+            publicId: `posts/${file.filename.split('.')[0]}`
+        }));
         post.images.push(...newImages);
     }
 
     await post.save();
 
+    // ✅ استخدام formatPost لتنسيق البوست مع معلومات الناشر
+    const formattedPost = await formatPost(post, userId);
+
     res.status(200).json({
         status: 'success',
         message: 'تم تحديث البوست بنجاح',
-        data: post
+        data: formattedPost
     });
 });
 
@@ -429,11 +486,17 @@ exports.deletePost = asyncHandler(async (req, res) => {
         });
     }
 
+    // ✅ Check authorization
     if (post.publisher.toString() !== userId && !isAdmin) {
         return res.status(403).json({
             status: 'error',
             message: 'غير مصرح لك بحذف هذا البوست'
         });
+    }
+
+    // ✅ Delete all images from storage
+    if (post.images && post.images.length > 0) {
+        deleteImagesFromStorage(post.images);
     }
 
     await post.deleteOne();

@@ -1,3 +1,4 @@
+// controllers/CorrespondenceControllers/commentController.js
 const asyncHandler = require('express-async-handler');
 const Comment = require('../../models/Correspondence/Comment');
 const Post = require('../../models/Correspondence/Post');
@@ -28,7 +29,6 @@ exports.addComment = asyncHandler(async (req, res) => {
             message: 'البوست غير موجود'
         });
     }
-console.log(`user_id is ${userId} and user role is ${userRole}`)
     // 3. إنشاء التعليق
     const comment = await Comment.create({
         post: postId,

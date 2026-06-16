@@ -75,9 +75,16 @@ module.exports.getCourseOverseers = asyncHandler(async (req, res) => {
     }
 
     const course = await Course.findById(lesson.course);
+    console.log(lesson.overseers);
     const overseers = await Overseer_profile.find({
         user: { $in: lesson.overseers }
     }).select('first_name father_name last_name user profile_photo');
+
+    overseers.map(overseer => {
+        if (overseer.profile_photo && overseer.profile_photo.url) {
+            overseer.profile_photo.url = `${process.env.BASE_URL}/${overseer.profile_photo.url}`;
+        }
+    });
 
     res.status(200).json({
         status: 'success',
@@ -123,7 +130,7 @@ module.exports.showAllRequests = asyncHandler(async (req, res) => {
             gender: item.gender,
             more_details: item.more_details,
             age: item.age,
-            photo: item.photo,
+            photo: {url:`${process.env.BASE_URL}/${item.photo.url}`},
             createdAt: item.createdAt,
             updatedAt: item.updatedAt
         },

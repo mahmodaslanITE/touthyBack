@@ -4,7 +4,6 @@
 
 const asyncHandler = require('express-async-handler');
 
-const StudentProfile = require('../models/Student_profile');
 const Treatment = require('../models/Treatment');
 const { Practial_lesson } = require('../models/Practical_lesson');
 const socket = require('../socket/init');
@@ -35,6 +34,8 @@ module.exports.showOverseerRequests = asyncHandler(async (req, res) => {
         Model: InProcess_request,
         user: req.user
     });
+    requests.map(request => {
+        request.Requestion.photo.url=`${process.env.BASE_URL}/images/${request.Requestion.photo.url}`;});
 
     res.status(200).json({
         status: 'success',
