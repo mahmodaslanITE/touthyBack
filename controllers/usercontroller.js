@@ -10,7 +10,6 @@ const getUserProfile = require('../utils/users');
 // 📦 HELPER FUNCTIONS (دوال مساعدة)
 // ============================================================
 
-const BASE_URL = process.env.BASE_URL;
 
 
 /**
@@ -41,6 +40,7 @@ const formatProfileResponse = (profile, role, counts = { finished: 0, inProcess:
         profile_photo:{ url: profilePhotoUrl },
         gender: profile.gender,
         role,
+        phone_number:profile.phone_number,
         category: profile.category,
         university_number: profile.university_number,
         age: profile.age,
@@ -209,7 +209,7 @@ module.exports.getAllProfiles = asyncHandler(async (req, res) => {
 module.exports.updateUserProfile = asyncHandler(async (req, res) => {
     const userId = req.user.id;
     const userRole = req.user.role;
-    const { first_name, last_name, father_name, university_number, bio, category } = req.body;
+    const { first_name, last_name, father_name, university_number, bio, category,phone_number } = req.body;
 
     const profile = await getUserProfile(userId, userRole);
     if (!profile) {
@@ -225,6 +225,7 @@ module.exports.updateUserProfile = asyncHandler(async (req, res) => {
     if (university_number) profile.university_number = university_number;
     if (bio) profile.bio = bio;
     if (category) profile.category = category;
+    if(phone_number)profile.phone_number=phone_number
 
     await profile.save();
 
