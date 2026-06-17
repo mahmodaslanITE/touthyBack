@@ -39,6 +39,8 @@ app.use('/api/conversations',require('./routes/conversations'))
 app.use('/api/reports',require('./routes/reports'));
 app.use('/api/posts',require('./routes/posts'))
 app.use('/api/posts/comments',require('./routes/comments'))
+app.use('/api/dashboard',require('./routes/dashbord'))
+app.use('/api/advertisements',require('./routes/advertisements'))
 
 // خطأ 404 لأي راوتر آخر
 app.use((req, res) => {

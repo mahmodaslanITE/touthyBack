@@ -1,0 +1,2541 @@
+{
+  "info": {
+    "name": "firtst-project",
+    "description": null,
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "user",
+      "item": [
+        {
+          "name": "profile-photo",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "authorization",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5MDM3MzhkOGNkZmExNGIyZGQ4NmZiMyIsInJvbGUiOiJzaWNrIiwiaXNBZG1pbiI6ZmFsc2UsImlhdCI6MTc2MTgzNDkyMSwiZXhwIjoxNzYyNDM5NzIxfQ.36Se1TkLwBnaVL5O9wkgZjSkWgL7wOHHRediDvNCpxk",
+                "disabled": false,
+                "type": "default"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMjQ1ODU3Zjk3NjFlMmViZTk3OGFlNiIsInJvbGUiOiJvdmVyc2VlciIsImlzQWRtaW4iOmZhbHNlLCJpYXQiOjE3ODA4MzIxNTIsImV4cCI6MTc4Njg4MDE1Mn0.fsdUcY5YvlPIg9pdxovm7KmGhImnFprSTPagB64WHfA",
+                "type": "string"
+              }
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:5000/api/users/photo",
+              "protocol": "http",
+              "host": [
+                "localhost:5000"
+              ],
+              "path": [
+                "api",
+                "users",
+                "photo"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "profile_photo",
+                  "disabled": false,
+                  "type": "file",
+                  "src": "C:\\Users\\mahmoud\\Pictures\\Camera Roll\\WIN_20250407_00_55_23_Pro (2).jpg"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "update user profile",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMjQwZTI0MzMyYTZmZmQ0NWFjMzJhNCIsInJvbGUiOiJwYXRpZW50IiwiaXNBZG1pbiI6ZmFsc2UsImlhdCI6MTc4MDgyNTg2MCwiZXhwIjoxNzg2ODczODYwfQ.bURUqBr7SDdGZWAkng79-ZEIQzoT0dW2Fp_BJT45mBw",
+                "type": "string"
+              }
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:5000/api/users",
+              "protocol": "http",
+              "host": [
+                "localhost:5000"
+              ],
+              "path": [
+                "api",
+                "users"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"bio\":\"we dont eat morgoana because the mor is joana\",\n    \"father_name\":\"احمد عبسي\",\n  \"phone_number\":\"0931633930\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "report",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMjQwZTg2MzMyYTZmZmQ0NWFjMzJhYiIsInJvbGUiOiJzdHVkZW50IiwiaXNBZG1pbiI6ZmFsc2UsImlhdCI6MTc4MDc0ODY5NywiZXhwIjoxNzg2Nzk2Njk3fQ.AAiLYZjdgmjTccfxZDOO2De8SadYhC7kskddwFAaHqQ",
+                "type": "string"
+              }
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:5000/api/reports/6a240f1d332a6ffd45ac32b0",
+              "protocol": "http",
+              "host": [
+                "localhost:5000"
+              ],
+              "path": [
+                "api",
+                "reports",
+                "6a240f1d332a6ffd45ac32b0"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\":\"حمار\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "show my profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMjQwZTg2MzMyYTZmZmQ0NWFjMzJhYiIsInJvbGUiOiJzdHVkZW50IiwiaXNBZG1pbiI6ZmFsc2UsImlhdCI6MTc4MDc0ODY5NywiZXhwIjoxNzg2Nzk2Njk3fQ.AAiLYZjdgmjTccfxZDOO2De8SadYhC7kskddwFAaHqQ",
+                "type": "string"
+              }
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:5000/api/users",
+              "protocol": "http",
+              "host": [
+                "localhost:5000"
+              ],
+              "path": [
+                "api",
+                "users"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        },
+        {
+          "name": "show any profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMjQwZTg2MzMyYTZmZmQ0NWFjMzJhYiIsInJvbGUiOiJzdHVkZW50IiwiaXNBZG1pbiI6ZmFsc2UsImlhdCI6MTc4MDc0ODY5NywiZXhwIjoxNzg2Nzk2Njk3fQ.AAiLYZjdgmjTccfxZDOO2De8SadYhC7kskddwFAaHqQ",
+                "type": "string"
+              }
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:5000/api/users/6a240e86332a6ffd45ac32ab",
+              "protocol": "http",
+              "host": [
+                "localhost:5000"
+              ],
+              "path": [
+                "api",
+                "users",
+                "6a240e86332a6ffd45ac32ab"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        },
+        {
+          "name": "show all admins",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMjQwZTg2MzMyYTZmZmQ0NWFjMzJhYiIsInJvbGUiOiJzdHVkZW50IiwiaXNBZG1pbiI6ZmFsc2UsImlhdCI6MTc4MDc0ODY5NywiZXhwIjoxNzg2Nzk2Njk3fQ.AAiLYZjdgmjTccfxZDOO2De8SadYhC7kskddwFAaHqQ",
+                "type": "string"
+              }
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:5000/api/reports/admins",
+              "protocol": "http",
+              "host": [
+                "localhost:5000"
+              ],
+              "path": [
+                "api",
+                "reports",
+                "admins"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        },
+        {
+          "name": "show dashboard",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMjQwZTg2MzMyYTZmZmQ0NWFjMzJhYiIsInJvbGUiOiJzdHVkZW50IiwiaXNBZG1pbiI6ZmFsc2UsImlhdCI6MTc4MDc0ODY5NywiZXhwIjoxNzg2Nzk2Njk3fQ.AAiLYZjdgmjTccfxZDOO2De8SadYhC7kskddwFAaHqQ",
+                "type": "string"
+              }
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:5000/api/dashboard",
+              "protocol": "http",
+              "host": [
+                "localhost:5000"
+              ],
+              "path": [
+                "api",
+                "dashboard"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "auth",
+      "item": [
+        {
+          "name": "register",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:5000/api/auth/register",
+              "protocol": "http",
+              "host": [
+                "localhost:5000"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "register"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n       \"email\":\"admin2@gmail.com\",\n   \"password\":\"admin2@gmail.com\",\n   \"first_name\":\"محمد\",\n   \"father_name\":\"صادق\",\n   \"last_name\":\"عوض\",\n   \"role\":\"patient\",\n   \"gender\":\"male\",\n  \"university_number\":\"12345\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "login",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:5000/api/auth/login",
+              "protocol": "http",
+              "host": [
+                "localhost:5000"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\":\"admin@gmail.com\",\n   \"password\":\"admin@gmail.com\"\n}\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "verify request",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMjQwZTg2MzMyYTZmZmQ0NWFjMzJhYiIsInJvbGUiOiJzdHVkZW50IiwiaXNBZG1pbiI6ZmFsc2UsImlhdCI6MTc4MDc0ODY5NywiZXhwIjoxNzg2Nzk2Njk3fQ.AAiLYZjdgmjTccfxZDOO2De8SadYhC7kskddwFAaHqQ",
+                "type": "string"
+              }
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:5000/api/auth/verify",
+              "protocol": "http",
+              "host": [
+                "localhost:5000"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "verify"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "document",
+                  "disabled": false,
+                  "type": "file",
+                  "src": "C:\\Users\\mahmoud\\Desktop\\copes\\TABLES\\Screenshot 2025-06-11 013751.png"
+                },
+                {
+                  "key": "",
+                  "disabled": false,
+                  "type": "file",
+                  "src": null
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "change password",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMjQwZTg2MzMyYTZmZmQ0NWFjMzJhYiIsInJvbGUiOiJzdHVkZW50IiwiaXNBZG1pbiI6ZmFsc2UsImlhdCI6MTc4MDc0ODY5NywiZXhwIjoxNzg2Nzk2Njk3fQ.AAiLYZjdgmjTccfxZDOO2De8SadYhC7kskddwFAaHqQ",
+                "type": "string"
+              }
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:5000/api/auth/change-password",
+              "protocol": "http",
+              "host": [
+                "localhost:5000"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "change-password"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\":\"student@gmail.com\",\n   \"password\":\"student@gmail.com\"\n}\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "request",
+      "item": [
+        {
+          "name": "creat-request",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMjQwZTI0MzMyYTZmZmQ0NWFjMzJhNCIsInJvbGUiOiJwYXRpZW50IiwiaXNBZG1pbiI6ZmFsc2UsImlhdCI6MTc4MDgyNTg2MCwiZXhwIjoxNzg2ODczODYwfQ.bURUqBr7SDdGZWAkng79-ZEIQzoT0dW2Fp_BJT45mBw",
+                "type": "string"
+              }
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:5000/api/request",
+              "protocol": "http",
+              "host": [
+                "localhost:5000"
+              ],
+              "path": [
+                "api",
+                "request"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "gender",
+                  "disabled": false,
+                  "type": "text",
+                  "value": "male"
+                },
+                {
+                  "key": "pain_severity",
+                  "disabled": false,
+                  "type": "text",
+                  "value": "5"
+                },
+                {
+                  "key": "pain_time",
+                  "disabled": false,
+                  "type": "text",
+                  "value": "every day"
+                },
+                {
+                  "key": "tooth_location",
+                  "disabled": false,
+                  "type": "text",
+                  "value": "23"
+                },
+                {
+                  "key": "age",
+                  "disabled": false,
+                  "type": "text",
+                  "value": "12"
+                },
+                {
+                  "key": "case_type",
+                  "disabled": false,
+                  "type": "text",
+                  "value": "6a245cdce5e4159c8d00cb45"
+                },
+                {
+                  "key": "is_pragnent",
+                  "disabled": true,
+                  "type": "text",
+                  "value": "true"
+                },
+                {
+                  "key": "photo",
+                  "disabled": false,
+                  "type": "file",
+                  "src": "C:\\Users\\mahmoud\\Pictures\\Screenshot 2024-11-16 125010.png"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "update request",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMjQwZTI0MzMyYTZmZmQ0NWFjMzJhNCIsInJvbGUiOiJwYXRpZW50IiwiaXNBZG1pbiI6ZmFsc2UsImlhdCI6MTc4MDgyNTg2MCwiZXhwIjoxNzg2ODczODYwfQ.bURUqBr7SDdGZWAkng79-ZEIQzoT0dW2Fp_BJT45mBw",
+                "type": "string"
+              }
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:5000/api/request/6a2541f348a9e89165a8293d",
+              "protocol": "http",
+              "host": [
+                "localhost:5000"
+              ],
+              "path": [
+                "api",
+                "request",
+                "6a2541f348a9e89165a8293d"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "age",
+                  "disabled": false,
+                  "type": "text",
+                  "value": "20"
+                },
+                {
+                  "key": "pain_severity",
+                  "disabled": false,
+                  "type": "text",
+                  "value": "9"
+                },
+                {
+                  "key": "pain_time",
+                  "disabled": false,
+                  "type": "text",
+                  "value": "all"
+                },
+                {
+                  "key": "tooth_location",
+                  "disabled": false,
+                  "type": "text",
+                  "value": "20"
+                },
+                {
+                  "key": "gender",
+                  "disabled": true,
+                  "type": "text",
+                  "value": "female"
+                },
+                {
+                  "key": "case_type",
+                  "disabled": false,
+                  "type": "text",
+                  "value": "6a245cdce5e4159c8d00cb45"
+                },
+                {
+                  "key": "is_pregnant",
+                  "disabled": false,
+                  "type": "text",
+                  "value": "true"
+                },
+                {
+                  "key": "photo",
+                  "disabled": true,
+                  "type": "file",
+                  "src": "postman-cloud:///1f0ed7ab-e3e9-41d0-bdd2-9e589dff471f"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "delete request",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5YTY5NmVhOGIzNmNkYmY1ZWJjODM4NiIsInJvbGUiOiJwYXRpZW50IiwiaXNBZG1pbiI6ZmFsc2UsImlhdCI6MTc3MjUyNTMxNiwiZXhwIjoxNzc4NTczMzE2fQ.R9xj7YP_77PaTrquS9m0wNpf15UFVrvXIzweCqsoTGw",
+                "type": "string"
+              }
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:5000/api/request/697250e08aeb555fd67b0a13",
+              "protocol": "http",
+              "host": [
+                "localhost:5000"
+              ],
+              "path": [
+                "api",
+                "request",
+                "697250e08aeb555fd67b0a13"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "age",
+                  "disabled": false,
+                  "type": "text",
+                  "value": "20"
+                },
+                {
+                  "key": "pain_severity",
+                  "disabled": false,
+                  "type": "text",
+                  "value": "9"
+                },
+                {
+                  "key": "pain_time",
+                  "disabled": false,
+                  "type": "text",
+                  "value": "all"
+                },
+                {
+                  "key": "tooth_location",
+                  "disabled": false,
+                  "type": "text",
+                  "value": "20"
+                },
+                {
+                  "key": "gender",
+                  "disabled": false,
+                  "type": "text",
+                  "value": "female"
+                },
+                {
+                  "key": "case_type",
+                  "disabled": false,
+                  "type": "text",
+                  "value": "sex"
+                },
+                {
+                  "key": "is_regnant",
+                  "disabled": false,
+                  "type": "text",
+                  "value": "true"
+                },
+                {
+                  "key": "photo",
+                  "disabled": false,
+                  "type": "file",
+                  "src": "postman-cloud:///1f0ed7ab-e3e9-41d0-bdd2-9e589dff471f"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "accept request",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMjQwZTg2MzMyYTZmZmQ0NWFjMzJhYiIsInJvbGUiOiJzdHVkZW50IiwiaXNBZG1pbiI6ZmFsc2UsImlhdCI6MTc4MDgyNzkxMiwiZXhwIjoxNzg2ODc1OTEyfQ.zt5UEqardJ3Ay6kGUIXdnQ1pQcUBRVTtftPMmexi5gA",
+                "type": "string"
+              }
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:5000/api/request/accept/6a2541f348a9e89165a8293d/6a245857f9761e2ebe978ae6",
+              "protocol": "http",
+              "host": [
+                "localhost:5000"
+              ],
+              "path": [
+                "api",
+                "request",
+                "accept",
+                "6a2541f348a9e89165a8293d",
+                "6a245857f9761e2ebe978ae6"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"date\":\"12/12/12\",\r\n    \"hour\":\"9:30\",\r\n    \"location\":\"A3\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "reassign-overseer",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5YTY5N2EyOGIzNmNkYmY1ZWJjODM5MCIsInJvbGUiOiJzdHVkZW50IiwiaXNBZG1pbiI6ZmFsc2UsImlhdCI6MTc3MjUyNTQ5MSwiZXhwIjoxNzc4NTczNDkxfQ.Y3bwcdq4lQlaFyFvoSuYPpVEtlIotSDebsXVIm5XsKM",
+                "type": "string"
+              }
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:5000/api/request/reassign-overseer/69ee1485196bf9f662d19fea/69b515ea25d9a9b9c0a3f373",
+              "protocol": "http",
+              "host": [
+                "localhost:5000"
+              ],
+              "path": [
+                "api",
+                "request",
+                "reassign-overseer",
+                "69ee1485196bf9f662d19fea",
+                "69b515ea25d9a9b9c0a3f373"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"date\":\"12/12/12\",\r\n    \"hour\":\"9:30\",\r\n    \"location\":\"A3\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "show all request",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMjQwZTg2MzMyYTZmZmQ0NWFjMzJhYiIsInJvbGUiOiJzdHVkZW50IiwiaXNBZG1pbiI6ZmFsc2UsImlhdCI6MTc4MDgyNzkxMiwiZXhwIjoxNzg2ODc1OTEyfQ.zt5UEqardJ3Ay6kGUIXdnQ1pQcUBRVTtftPMmexi5gA",
+                "type": "string"
+              }
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:5000/api/request",
+              "protocol": "http",
+              "host": [
+                "localhost:5000"
+              ],
+              "path": [
+                "api",
+                "request"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        },
+        {
+          "name": "show my requests",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMjQwZTI0MzMyYTZmZmQ0NWFjMzJhNCIsInJvbGUiOiJwYXRpZW50IiwiaXNBZG1pbiI6ZmFsc2UsImlhdCI6MTc4MDgyNTg2MCwiZXhwIjoxNzg2ODczODYwfQ.bURUqBr7SDdGZWAkng79-ZEIQzoT0dW2Fp_BJT45mBw",
+                "type": "string"
+              }
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:5000/api/request/my",
+              "protocol": "http",
+              "host": [
+                "localhost:5000"
+              ],
+              "path": [
+                "api",
+                "request",
+                "my"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        },
+        {
+          "name": "show my processing requests",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMjQwZjFkMzMyYTZmZmQ0NWFjMzJiMCIsInJvbGUiOiJvdmVyc2VlciIsImlzQWRtaW4iOnRydWUsImlhdCI6MTc4MDgzMDk4NiwiZXhwIjoxNzg2ODc4OTg2fQ.GVYDIY4uuvPAhBzza6Z-Dawu89faNuPok-nP3r8PerI",
+                "type": "string"
+              }
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:5000/api/request/processing",
+              "protocol": "http",
+              "host": [
+                "localhost:5000"
+              ],
+              "path": [
+                "api",
+                "request",
+                "processing"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        },
+        {
+          "name": "show overseers for course",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMjQwZTg2MzMyYTZmZmQ0NWFjMzJhYiIsInJvbGUiOiJzdHVkZW50IiwiaXNBZG1pbiI6ZmFsc2UsImlhdCI6MTc4MDgyNzkxMiwiZXhwIjoxNzg2ODc1OTEyfQ.zt5UEqardJ3Ay6kGUIXdnQ1pQcUBRVTtftPMmexi5gA",
+                "type": "string"
+              }
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:5000/api/request/course-overseers/6a245bd7b3bfaf25ec919ca4",
+              "protocol": "http",
+              "host": [
+                "localhost:5000"
+              ],
+              "path": [
+                "api",
+                "request",
+                "course-overseers",
+                "6a245bd7b3bfaf25ec919ca4"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"bio\":\"we dont eat morgoana because the mor is joana\",\r\n    \"father_name\":\"ahmed folol nezam\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "text"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "finish treatment",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMjQ1ODU3Zjk3NjFlMmViZTk3OGFlNiIsInJvbGUiOiJvdmVyc2VlciIsImlzQWRtaW4iOmZhbHNlLCJpYXQiOjE3ODA4MzIxNTIsImV4cCI6MTc4Njg4MDE1Mn0.fsdUcY5YvlPIg9pdxovm7KmGhImnFprSTPagB64WHfA",
+                "type": "string"
+              }
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:5000/api/overseer/treatment/complete/6a254b0215d7495f96e4fb28",
+              "protocol": "http",
+              "host": [
+                "localhost:5000"
+              ],
+              "path": [
+                "api",
+                "overseer",
+                "treatment",
+                "complete",
+                "6a254b0215d7495f96e4fb28"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"rating\":\"5\",\r\n     \"feedback\":\"good\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "recect treatment",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMjQ1ODU3Zjk3NjFlMmViZTk3OGFlNiIsInJvbGUiOiJvdmVyc2VlciIsImlzQWRtaW4iOmZhbHNlLCJpYXQiOjE3ODA4MzIxNTIsImV4cCI6MTc4Njg4MDE1Mn0.fsdUcY5YvlPIg9pdxovm7KmGhImnFprSTPagB64WHfA",
+                "type": "string"
+              }
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:5000/api/overseer/treatment/reject/6a256bb8ad9ed4339273dd14",
+              "protocol": "http",
+              "host": [
+                "localhost:5000"
+              ],
+              "path": [
+                "api",
+                "overseer",
+                "treatment",
+                "reject",
+                "6a256bb8ad9ed4339273dd14"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"note\":\"ما بيمشي الحال \"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "recect treatment with option",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5YjE4MGY4MTRiMGFkMzg2MjAyZTlkZCIsInJvbGUiOiJvdmVyc2VlciIsImlzQWRtaW4iOnRydWUsImlhdCI6MTc3NTY2MzcwMywiZXhwIjoxNzgxNzExNzAzfQ.JOqxsHAv_4YW0ycBvIEF4gVoEMbDm15lUYY-N1Y2m2g",
+                "type": "string"
+              }
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:5000/api/overseer/treatment/complete/69d6838234fa57d014d17025",
+              "protocol": "http",
+              "host": [
+                "localhost:5000"
+              ],
+              "path": [
+                "api",
+                "overseer",
+                "treatment",
+                "complete",
+                "69d6838234fa57d014d17025"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"rating\":\"5\",\r\n     \"feedback\":\"good\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "add-evaluation",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5YjE4MGY4MTRiMGFkMzg2MjAyZTlkZCIsInJvbGUiOiJvdmVyc2VlciIsImlzQWRtaW4iOnRydWUsImlhdCI6MTc3NTY2MzcwMywiZXhwIjoxNzgxNzExNzAzfQ.JOqxsHAv_4YW0ycBvIEF4gVoEMbDm15lUYY-N1Y2m2g",
+                "type": "string"
+              }
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:5000/api/overseer/treatment/add-evaluation/69ee54290aeb60b4a2d94f75",
+              "protocol": "http",
+              "host": [
+                "localhost:5000"
+              ],
+              "path": [
+                "api",
+                "overseer",
+                "treatment",
+                "add-evaluation",
+                "69ee54290aeb60b4a2d94f75"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"evaluationText\":\"ابو مصعب يريد ينيجني\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "show overseer requests in processer",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMjQ1ODU3Zjk3NjFlMmViZTk3OGFlNiIsInJvbGUiOiJvdmVyc2VlciIsImlzQWRtaW4iOmZhbHNlLCJpYXQiOjE3ODA4MzIxNTIsImV4cCI6MTc4Njg4MDE1Mn0.fsdUcY5YvlPIg9pdxovm7KmGhImnFprSTPagB64WHfA",
+                "type": "string"
+              }
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:5000/api/overseer/treatment",
+              "protocol": "http",
+              "host": [
+                "localhost:5000"
+              ],
+              "path": [
+                "api",
+                "overseer",
+                "treatment"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        },
+        {
+          "name": "get all treatments",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMjQ1ODU3Zjk3NjFlMmViZTk3OGFlNiIsInJvbGUiOiJvdmVyc2VlciIsImlzQWRtaW4iOmZhbHNlLCJpYXQiOjE3ODA4MzIxNTIsImV4cCI6MTc4Njg4MDE1Mn0.fsdUcY5YvlPIg9pdxovm7KmGhImnFprSTPagB64WHfA",
+                "type": "string"
+              }
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:5000/api/admin/treatment",
+              "protocol": "http",
+              "host": [
+                "localhost:5000"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "treatment"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"treatment_case\": \"علاج تقويم أسنان مرحلة أولى\",\r\n    \"course\": \"69cd8e32f790497c93ab423e\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "show finished treatment",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMjQwZjFkMzMyYTZmZmQ0NWFjMzJiMCIsInJvbGUiOiJvdmVyc2VlciIsImlzQWRtaW4iOnRydWUsImlhdCI6MTc4MDgzMDk4NiwiZXhwIjoxNzg2ODc4OTg2fQ.GVYDIY4uuvPAhBzza6Z-Dawu89faNuPok-nP3r8PerI",
+                "type": "string"
+              }
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:5000/api/request/finished",
+              "protocol": "http",
+              "host": [
+                "localhost:5000"
+              ],
+              "path": [
+                "api",
+                "request",
+                "finished"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        },
+        {
+          "name": "show rejected treatment ",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMjQwZjFkMzMyYTZmZmQ0NWFjMzJiMCIsInJvbGUiOiJvdmVyc2VlciIsImlzQWRtaW4iOnRydWUsImlhdCI6MTc4MDgzMDk4NiwiZXhwIjoxNzg2ODc4OTg2fQ.GVYDIY4uuvPAhBzza6Z-Dawu89faNuPok-nP3r8PerI",
+                "type": "string"
+              }
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:5000/api/request/rejected",
+              "protocol": "http",
+              "host": [
+                "localhost:5000"
+              ],
+              "path": [
+                "api",
+                "request",
+                "rejected"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "admin",
+      "item": [
+        {
+          "name": "overseer",
+          "item": [
+            {
+              "name": "creat overseer",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "auth": {
+                  "type": "bearer",
+                  "bearer": {
+                    "key": "token",
+                    "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMjQwZjFkMzMyYTZmZmQ0NWFjMzJiMCIsInJvbGUiOiJvdmVyc2VlciIsImlzQWRtaW4iOnRydWUsImlhdCI6MTc4MDc2NDEyOSwiZXhwIjoxNzg2ODEyMTI5fQ.ZeqSG3zyXljDMAWYakT072lnndXrohlnW88IlcE9wLI",
+                    "type": "string"
+                  }
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:5000/api/admin/overseer",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:5000"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "overseer"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"email\":\"overseer1@gmail.com\",\n    \"password\":\"123456\",\n  \"first_name\":\"مشرف\",\n  \"father_name\":\"ابن\",\n  \"last_name\":\"كلب\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "assign overseer",
+              "request": {
+                "method": "PUT",
+                "header": [],
+                "auth": {
+                  "type": "bearer",
+                  "bearer": {
+                    "key": "token",
+                    "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMjQwZjFkMzMyYTZmZmQ0NWFjMzJiMCIsInJvbGUiOiJvdmVyc2VlciIsImlzQWRtaW4iOnRydWUsImlhdCI6MTc4MDc2NDEyOSwiZXhwIjoxNzg2ODEyMTI5fQ.ZeqSG3zyXljDMAWYakT072lnndXrohlnW88IlcE9wLI",
+                    "type": "string"
+                  }
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:5000/api/admin/overseer/assign",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:5000"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "overseer",
+                    "assign"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"lesson_id\":\"6a245f5e635c61f1ff3b6e84\",\n  \"overseer_id\":\"6a245857f9761e2ebe978ae6\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "get all overseers",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "auth": {
+                  "type": "bearer",
+                  "bearer": {
+                    "key": "token",
+                    "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMjQwZjFkMzMyYTZmZmQ0NWFjMzJiMCIsInJvbGUiOiJvdmVyc2VlciIsImlzQWRtaW4iOnRydWUsImlhdCI6MTc4MDc2NDEyOSwiZXhwIjoxNzg2ODEyMTI5fQ.ZeqSG3zyXljDMAWYakT072lnndXrohlnW88IlcE9wLI",
+                    "type": "string"
+                  }
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:5000/api/admin/overseers",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:5000"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "overseers"
+                  ],
+                  "query": [],
+                  "variable": []
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "students",
+          "item": [
+            {
+              "name": "accept verify account",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "auth": {
+                  "type": "bearer",
+                  "bearer": {
+                    "key": "token",
+                    "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMjQwZjFkMzMyYTZmZmQ0NWFjMzJiMCIsInJvbGUiOiJvdmVyc2VlciIsImlzQWRtaW4iOnRydWUsImlhdCI6MTc4MDc2NDEyOSwiZXhwIjoxNzg2ODEyMTI5fQ.ZeqSG3zyXljDMAWYakT072lnndXrohlnW88IlcE9wLI",
+                    "type": "string"
+                  }
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:5000/api/admin/verify/accept/6a244feb947520bc4dd0706b",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:5000"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "verify",
+                    "accept",
+                    "6a244feb947520bc4dd0706b"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "reject verify account",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "auth": {
+                  "type": "bearer",
+                  "bearer": {
+                    "key": "token",
+                    "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMjQwZjFkMzMyYTZmZmQ0NWFjMzJiMCIsInJvbGUiOiJvdmVyc2VlciIsImlzQWRtaW4iOnRydWUsImlhdCI6MTc4MDc2NDEyOSwiZXhwIjoxNzg2ODEyMTI5fQ.ZeqSG3zyXljDMAWYakT072lnndXrohlnW88IlcE9wLI",
+                    "type": "string"
+                  }
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:5000/api/admin/verify/reject/6a244fca947520bc4dd07065",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:5000"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "verify",
+                    "reject",
+                    "6a244fca947520bc4dd07065"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"reject_reason\":\"لم تدخل صورة واضحة\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "get all students",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "auth": {
+                  "type": "bearer",
+                  "bearer": {
+                    "key": "token",
+                    "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMjQwZjFkMzMyYTZmZmQ0NWFjMzJiMCIsInJvbGUiOiJvdmVyc2VlciIsImlzQWRtaW4iOnRydWUsImlhdCI6MTc4MDc2NDEyOSwiZXhwIjoxNzg2ODEyMTI5fQ.ZeqSG3zyXljDMAWYakT072lnndXrohlnW88IlcE9wLI",
+                    "type": "string"
+                  }
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:5000/api/admin/students",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:5000"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "students"
+                  ],
+                  "query": [],
+                  "variable": []
+                }
+              }
+            },
+            {
+              "name": "get all verify requests",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "auth": {
+                  "type": "bearer",
+                  "bearer": {
+                    "key": "token",
+                    "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMjQwZTI0MzMyYTZmZmQ0NWFjMzJhNCIsInJvbGUiOiJwYXRpZW50IiwiaXNBZG1pbiI6ZmFsc2UsImlhdCI6MTc4MDc2OTE0OSwiZXhwIjoxNzg2ODE3MTQ5fQ.Uaxev1Nu2tFSoI6CZSIOI-2MXiR1eElXuo9F1CXd4jA",
+                    "type": "string"
+                  }
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:5000/api/admin/verify",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:5000"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "verify"
+                  ],
+                  "query": [],
+                  "variable": []
+                }
+              }
+            },
+            {
+              "name": "add category",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "auth": {
+                  "type": "bearer",
+                  "bearer": {
+                    "key": "token",
+                    "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMjQwZjFkMzMyYTZmZmQ0NWFjMzJiMCIsInJvbGUiOiJvdmVyc2VlciIsImlzQWRtaW4iOnRydWUsImlhdCI6MTc4MDc2NDEyOSwiZXhwIjoxNzg2ODEyMTI5fQ.ZeqSG3zyXljDMAWYakT072lnndXrohlnW88IlcE9wLI",
+                    "type": "string"
+                  }
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:5000/api/admin/category",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:5000"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "category"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n\"category\":\"A1\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "get categories",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "auth": {
+                  "type": "bearer",
+                  "bearer": {
+                    "key": "token",
+                    "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMjQwZjFkMzMyYTZmZmQ0NWFjMzJiMCIsInJvbGUiOiJvdmVyc2VlciIsImlzQWRtaW4iOnRydWUsImlhdCI6MTc4MDc2NDEyOSwiZXhwIjoxNzg2ODEyMTI5fQ.ZeqSG3zyXljDMAWYakT072lnndXrohlnW88IlcE9wLI",
+                    "type": "string"
+                  }
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:5000/api/admin/category",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:5000"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "category"
+                  ],
+                  "query": [],
+                  "variable": []
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "patients",
+          "item": [
+            {
+              "name": "get all patients",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "auth": {
+                  "type": "bearer",
+                  "bearer": {
+                    "key": "token",
+                    "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMjQwZjFkMzMyYTZmZmQ0NWFjMzJiMCIsInJvbGUiOiJvdmVyc2VlciIsImlzQWRtaW4iOnRydWUsImlhdCI6MTc4MDc2NDEyOSwiZXhwIjoxNzg2ODEyMTI5fQ.ZeqSG3zyXljDMAWYakT072lnndXrohlnW88IlcE9wLI",
+                    "type": "string"
+                  }
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:5000/api/admin/patients",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:5000"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "patients"
+                  ],
+                  "query": [],
+                  "variable": []
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "courses and treatments",
+          "item": [
+            {
+              "name": "add course",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "auth": {
+                  "type": "bearer",
+                  "bearer": {
+                    "key": "token",
+                    "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5YjE4MGY4MTRiMGFkMzg2MjAyZTlkZCIsInJvbGUiOiJvdmVyc2VlciIsImlzQWRtaW4iOnRydWUsImlhdCI6MTc3NTA3NjMwMSwiZXhwIjoxNzgxMTI0MzAxfQ.bC82p-po2FOTV4qU7j8RvYnW_wD22M7Fb_2kGR4dbCI",
+                    "type": "string"
+                  }
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:5000/api/admin/course",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:5000"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "course"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"course_name\": \"متحركة\"\n}\n",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "get courses",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [],
+                "auth": {
+                  "type": "bearer",
+                  "bearer": {
+                    "key": "token",
+                    "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMjQwZjFkMzMyYTZmZmQ0NWFjMzJiMCIsInJvbGUiOiJvdmVyc2VlciIsImlzQWRtaW4iOnRydWUsImlhdCI6MTc4MDc2NDEyOSwiZXhwIjoxNzg2ODEyMTI5fQ.ZeqSG3zyXljDMAWYakT072lnndXrohlnW88IlcE9wLI",
+                    "type": "string"
+                  }
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:5000/api/admin/course",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:5000"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "course"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "add practial lesson",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "auth": {
+                  "type": "bearer",
+                  "bearer": {
+                    "key": "token",
+                    "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5YjE4MGY4MTRiMGFkMzg2MjAyZTlkZCIsInJvbGUiOiJvdmVyc2VlciIsImlzQWRtaW4iOnRydWUsImlhdCI6MTc3NTA3NjMwMSwiZXhwIjoxNzgxMTI0MzAxfQ.bC82p-po2FOTV4qU7j8RvYnW_wD22M7Fb_2kGR4dbCI",
+                    "type": "string"
+                  }
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:5000/api/admin/practical-lessons",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:5000"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "practical-lessons"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n \"course\":\"6a245bd7b3bfaf25ec919ca4\",\n  \"category\":\"6a24529e947520bc4dd07077\",\n  \"time\":\"يوم الأحد بعد صلاة الجمعة \",\n  \"hall\":\"قاعة الاطفال\" \n}\n",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "get practial lessons",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [],
+                "auth": {
+                  "type": "bearer",
+                  "bearer": {
+                    "key": "token",
+                    "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMjQwZjFkMzMyYTZmZmQ0NWFjMzJiMCIsInJvbGUiOiJvdmVyc2VlciIsImlzQWRtaW4iOnRydWUsImlhdCI6MTc4MDc2NDEyOSwiZXhwIjoxNzg2ODEyMTI5fQ.ZeqSG3zyXljDMAWYakT072lnndXrohlnW88IlcE9wLI",
+                    "type": "string"
+                  }
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:5000/api/admin/practical-lessons",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:5000"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "practical-lessons"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n\n}\n",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "add treatment",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "auth": {
+                  "type": "bearer",
+                  "bearer": {
+                    "key": "token",
+                    "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMjQwZjFkMzMyYTZmZmQ0NWFjMzJiMCIsInJvbGUiOiJvdmVyc2VlciIsImlzQWRtaW4iOnRydWUsImlhdCI6MTc4MDc2NDEyOSwiZXhwIjoxNzg2ODEyMTI5fQ.ZeqSG3zyXljDMAWYakT072lnndXrohlnW88IlcE9wLI",
+                    "type": "string"
+                  }
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:5000/api/admin/treatment",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:5000"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "treatment"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"case_type\":\"مصطفى الحجي\",\n    \"course\": \"6a245bd7b3bfaf25ec919ca4\"\n}\n",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "update proccessing request",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [],
+                "auth": {
+                  "type": "bearer",
+                  "bearer": {
+                    "key": "token",
+                    "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5YjE4MGY4MTRiMGFkMzg2MjAyZTlkZCIsInJvbGUiOiJvdmVyc2VlciIsImlzQWRtaW4iOnRydWUsImlhdCI6MTc3MzQ3NTM5NywiZXhwIjoxNzc5NTIzMzk3fQ.PHotdfQRoNBX9VFae4sQkQ1aeSpX18xZzMsg04Y0HZ4",
+                    "type": "string"
+                  }
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:5000/api/admin/in_proccess/",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:5000"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "in_proccess",
+                    ""
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"pain_severity\": 7,\r\n  \"pain_time\": \"evening\",\r\n  \"tooth_location\": \"18\",\r\n  \"notes\": \"تم تعديل الحالة بواسطة المشرف - يحتاج متابعة عاجلة\",\r\n  \"overseer\": \"Dr. Ahmed Mohamed\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "get all treatments",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [],
+                "auth": {
+                  "type": "bearer",
+                  "bearer": {
+                    "key": "token",
+                    "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMjQwZTI0MzMyYTZmZmQ0NWFjMzJhNCIsInJvbGUiOiJwYXRpZW50IiwiaXNBZG1pbiI6ZmFsc2UsImlhdCI6MTc4MDgyNTg2MCwiZXhwIjoxNzg2ODczODYwfQ.bURUqBr7SDdGZWAkng79-ZEIQzoT0dW2Fp_BJT45mBw",
+                    "type": "string"
+                  }
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:5000/api/admin/treatment",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:5000"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "treatment"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"treatment_case\": \"علاج تقويم أسنان مرحلة أولى\",\r\n    \"course\": \"69cd8e32f790497c93ab423e\"\r\n}\r\n",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "delete treatment",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "auth": {
+                  "type": "bearer",
+                  "bearer": {
+                    "key": "token",
+                    "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5YjE4MGY4MTRiMGFkMzg2MjAyZTlkZCIsInJvbGUiOiJvdmVyc2VlciIsImlzQWRtaW4iOnRydWUsImlhdCI6MTc3NTA3NjMwMSwiZXhwIjoxNzgxMTI0MzAxfQ.bC82p-po2FOTV4qU7j8RvYnW_wD22M7Fb_2kGR4dbCI",
+                    "type": "string"
+                  }
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:5000/api/admin/treatment",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:5000"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "treatment"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"treatment_case\": \"علاج تقويم أسنان مرحلة أولى\",\r\n    \"course\": \"69cd8e32f790497c93ab423e\"\r\n}\r\n",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "adversantation",
+          "item": [
+            {
+              "name": "add advertisement (1)",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "auth": {
+                  "type": "bearer",
+                  "bearer": {
+                    "key": "token",
+                    "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMjQwZjFkMzMyYTZmZmQ0NWFjMzJiMCIsInJvbGUiOiJvdmVyc2VlciIsImlzQWRtaW4iOnRydWUsImlhdCI6MTc4MTcxMTAzNywiZXhwIjoxNzg3NzU5MDM3fQ.sANcjOMSpwAJc-vMtr_dvzzllLXsgALa8Vxn6xFmxXI",
+                    "type": "string"
+                  }
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:5000/api/advertisements",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:5000"
+                  ],
+                  "path": [
+                    "api",
+                    "advertisements"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "content",
+                      "disabled": false,
+                      "type": "text",
+                      "value": "يالله بينا"
+                    },
+                    {
+                      "key": "image",
+                      "disabled": false,
+                      "type": "file",
+                      "src": "C:\\Users\\mahmoud\\Pictures\\Camera Roll\\WIN_20240801_07_04_31_Pro.jpg"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "get advertisements (1)",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [],
+                "auth": {
+                  "type": "bearer",
+                  "bearer": {
+                    "key": "token",
+                    "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMjQwZjFkMzMyYTZmZmQ0NWFjMzJiMCIsInJvbGUiOiJvdmVyc2VlciIsImlzQWRtaW4iOnRydWUsImlhdCI6MTc4MTcxMTAzNywiZXhwIjoxNzg3NzU5MDM3fQ.sANcjOMSpwAJc-vMtr_dvzzllLXsgALa8Vxn6xFmxXI",
+                    "type": "string"
+                  }
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:5000/api/advertisements",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:5000"
+                  ],
+                  "path": [
+                    "api",
+                    "advertisements"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "content",
+                      "disabled": false,
+                      "type": "text",
+                      "value": "يالله بينا"
+                    },
+                    {
+                      "key": "image",
+                      "disabled": false,
+                      "type": "file",
+                      "src": "C:\\Users\\mahmoud\\Pictures\\Camera Roll\\WIN_20240801_07_04_31_Pro.jpg"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "delete advertisements",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "auth": {
+                  "type": "bearer",
+                  "bearer": {
+                    "key": "token",
+                    "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMjQwZjFkMzMyYTZmZmQ0NWFjMzJiMCIsInJvbGUiOiJvdmVyc2VlciIsImlzQWRtaW4iOnRydWUsImlhdCI6MTc4MTcxMTAzNywiZXhwIjoxNzg3NzU5MDM3fQ.sANcjOMSpwAJc-vMtr_dvzzllLXsgALa8Vxn6xFmxXI",
+                    "type": "string"
+                  }
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:5000/api/advertisements/:id",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:5000"
+                  ],
+                  "path": [
+                    "api",
+                    "advertisements",
+                    ":id"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": ""
+                    }
+                  ]
+                },
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "content",
+                      "disabled": false,
+                      "type": "text",
+                      "value": "يالله بينا"
+                    },
+                    {
+                      "key": "image",
+                      "disabled": false,
+                      "type": "file",
+                      "src": "C:\\Users\\mahmoud\\Pictures\\Camera Roll\\WIN_20240801_07_04_31_Pro.jpg"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "get reports",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMjQwZTg2MzMyYTZmZmQ0NWFjMzJhYiIsInJvbGUiOiJzdHVkZW50IiwiaXNBZG1pbiI6ZmFsc2UsImlhdCI6MTc4MDc0ODY5NywiZXhwIjoxNzg2Nzk2Njk3fQ.AAiLYZjdgmjTccfxZDOO2De8SadYhC7kskddwFAaHqQ",
+                "type": "string"
+              }
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:5000/api/reports",
+              "protocol": "http",
+              "host": [
+                "localhost:5000"
+              ],
+              "path": [
+                "api",
+                "reports"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "update in-process request admin",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "",
+            "url": {
+              "raw": "",
+              "protocol": "",
+              "host": [],
+              "path": [],
+              "query": [],
+              "variable": []
+            }
+          }
+        },
+        {
+          "name": "reviw report",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5YjUxYmI5ZTc5ZWRmNGUwYjg5NGRhZiIsInJvbGUiOiJvdmVyc2VlciIsImlzQWRtaW4iOmZhbHNlLCJpYXQiOjE3NzM1MTMzNTAsImV4cCI6MTc3OTU2MTM1MH0.c9-V7GxcLMtXqWjYQPbSH-yJ9YoByaxztX1QFdE50Go",
+                "type": "string"
+              }
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:5000/api/reports",
+              "protocol": "http",
+              "host": [
+                "localhost:5000"
+              ],
+              "path": [
+                "api",
+                "reports"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "المراسلات والمحادثات",
+      "item": [
+        {
+          "name": "open",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMjQwZTg2MzMyYTZmZmQ0NWFjMzJhYiIsInJvbGUiOiJzdHVkZW50IiwiaXNBZG1pbiI6ZmFsc2UsImlhdCI6MTc4MDgzODc3NywiZXhwIjoxNzg2ODg2Nzc3fQ.Qln59OXSy7D82sBu8NQS2qIhgIVquGInQ2WE5GN8oMM",
+                "type": "string"
+              }
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:5000/api/conversations/6a240e24332a6ffd45ac32a4",
+              "protocol": "http",
+              "host": [
+                "localhost:5000"
+              ],
+              "path": [
+                "api",
+                "conversations",
+                "6a240e24332a6ffd45ac32a4"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        },
+        {
+          "name": "like post",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5YjUxYmI5ZTc5ZWRmNGUwYjg5NGRhZiIsInJvbGUiOiJvdmVyc2VlciIsImlzQWRtaW4iOmZhbHNlLCJpYXQiOjE3ODA1MTM4NDgsImV4cCI6MTc4NjU2MTg0OH0.l1GyFTsxFgNymiChyRW15LywOAoGHbGqUjJkJy04OJc",
+                "type": "string"
+              }
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:5000/api/posts/6a25ba64b0e1e45bdc3a52fa/like",
+              "protocol": "http",
+              "host": [
+                "localhost:5000"
+              ],
+              "path": [
+                "api",
+                "posts",
+                "6a25ba64b0e1e45bdc3a52fa",
+                "like"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        },
+        {
+          "name": "send message",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMjQwZTI0MzMyYTZmZmQ0NWFjMzJhNCIsInJvbGUiOiJwYXRpZW50IiwiaXNBZG1pbiI6ZmFsc2UsImlhdCI6MTc4MDgyNTg2MCwiZXhwIjoxNzg2ODczODYwfQ.bURUqBr7SDdGZWAkng79-ZEIQzoT0dW2Fp_BJT45mBw",
+                "type": "string"
+              }
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:5000/api/conversations/6a257006fce7e381f3267d26",
+              "protocol": "http",
+              "host": [
+                "localhost:5000"
+              ],
+              "path": [
+                "api",
+                "conversations",
+                "6a257006fce7e381f3267d26"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\":\"حاول قدر المستطاع متزنيييييش \"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "add post",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMjQwZTg2MzMyYTZmZmQ0NWFjMzJhYiIsInJvbGUiOiJzdHVkZW50IiwiaXNBZG1pbiI6ZmFsc2UsImlhdCI6MTc4MDg2MDYyNSwiZXhwIjoxNzg2OTA4NjI1fQ.odG3SRxslqsIc-OuFpCaW71NCIMEpmyhPExAvPJGris",
+                "type": "string"
+              }
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:5000/api/posts",
+              "protocol": "http",
+              "host": [
+                "localhost:5000"
+              ],
+              "path": [
+                "api",
+                "posts"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "content",
+                  "disabled": false,
+                  "type": "text",
+                  "value": "انتي ست ما تربيتيييييييييييش"
+                },
+                {
+                  "key": "images",
+                  "disabled": false,
+                  "type": "file",
+                  "src": "C:\\Users\\mahmoud\\Pictures\\Camera Roll\\WIN_20240801_07_04_31_Pro.jpg"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "add comment",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMjQwZTg2MzMyYTZmZmQ0NWFjMzJhYiIsInJvbGUiOiJzdHVkZW50IiwiaXNBZG1pbiI6ZmFsc2UsImlhdCI6MTc4MDg2MDYyNSwiZXhwIjoxNzg2OTA4NjI1fQ.odG3SRxslqsIc-OuFpCaW71NCIMEpmyhPExAvPJGris",
+                "type": "string"
+              }
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:5000/api/posts/comments/6a25ba64b0e1e45bdc3a52fa",
+              "protocol": "http",
+              "host": [
+                "localhost:5000"
+              ],
+              "path": [
+                "api",
+                "posts",
+                "comments",
+                "6a25ba64b0e1e45bdc3a52fa"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\":\"الحسييييين\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "get posts",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMjQwZTg2MzMyYTZmZmQ0NWFjMzJhYiIsInJvbGUiOiJzdHVkZW50IiwiaXNBZG1pbiI6ZmFsc2UsImlhdCI6MTc4MDgzODc3NywiZXhwIjoxNzg2ODg2Nzc3fQ.Qln59OXSy7D82sBu8NQS2qIhgIVquGInQ2WE5GN8oMM",
+                "type": "string"
+              }
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:5000/api/posts?page=2&limit=3&filter=student",
+              "protocol": "http",
+              "host": [
+                "localhost:5000"
+              ],
+              "path": [
+                "api",
+                "posts"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "2"
+                },
+                {
+                  "key": "limit",
+                  "value": "3"
+                },
+                {
+                  "key": "filter",
+                  "value": "student"
+                }
+              ],
+              "variable": []
+            }
+          }
+        },
+        {
+          "name": "get post by id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5YjUxYmI5ZTc5ZWRmNGUwYjg5NGRhZiIsInJvbGUiOiJvdmVyc2VlciIsImlzQWRtaW4iOmZhbHNlLCJpYXQiOjE3ODA1MTM4NDgsImV4cCI6MTc4NjU2MTg0OH0.l1GyFTsxFgNymiChyRW15LywOAoGHbGqUjJkJy04OJc",
+                "type": "string"
+              }
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:5000/api/posts/6a3129ea656cda659da22042",
+              "protocol": "http",
+              "host": [
+                "localhost:5000"
+              ],
+              "path": [
+                "api",
+                "posts",
+                "6a3129ea656cda659da22042"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        },
+        {
+          "name": "update post",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMjQwZTg2MzMyYTZmZmQ0NWFjMzJhYiIsInJvbGUiOiJzdHVkZW50IiwiaXNBZG1pbiI6ZmFsc2UsImlhdCI6MTc4MDg2MDYyNSwiZXhwIjoxNzg2OTA4NjI1fQ.odG3SRxslqsIc-OuFpCaW71NCIMEpmyhPExAvPJGris",
+                "type": "string"
+              }
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:5000/api/posts/6a25c6e100f299a529665844",
+              "protocol": "http",
+              "host": [
+                "localhost:5000"
+              ],
+              "path": [
+                "api",
+                "posts",
+                "6a25c6e100f299a529665844"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "content",
+                  "disabled": false,
+                  "type": "text",
+                  "value": "حاييكن الشرتح يا عرصات *"
+                },
+                {
+                  "key": "images",
+                  "disabled": false,
+                  "type": "file",
+                  "src": "C:\\Users\\mahmoud\\Pictures\\Camera Roll\\WIN_20240801_07_04_31_Pro.jpg"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "get user conversation",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMjQwZTg2MzMyYTZmZmQ0NWFjMzJhYiIsInJvbGUiOiJzdHVkZW50IiwiaXNBZG1pbiI6ZmFsc2UsImlhdCI6MTc4MDgzODc3NywiZXhwIjoxNzg2ODg2Nzc3fQ.Qln59OXSy7D82sBu8NQS2qIhgIVquGInQ2WE5GN8oMM",
+                "type": "string"
+              }
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:5000/api/conversations",
+              "protocol": "http",
+              "host": [
+                "localhost:5000"
+              ],
+              "path": [
+                "api",
+                "conversations"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        },
+        {
+          "name": "dislike post ",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5YjUxYmI5ZTc5ZWRmNGUwYjg5NGRhZiIsInJvbGUiOiJvdmVyc2VlciIsImlzQWRtaW4iOmZhbHNlLCJpYXQiOjE3ODA1MTM4NDgsImV4cCI6MTc4NjU2MTg0OH0.l1GyFTsxFgNymiChyRW15LywOAoGHbGqUjJkJy04OJc",
+                "type": "string"
+              }
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:5000/api/posts/6a1e964d9556516b792ddc91/like",
+              "protocol": "http",
+              "host": [
+                "localhost:5000"
+              ],
+              "path": [
+                "api",
+                "posts",
+                "6a1e964d9556516b792ddc91",
+                "like"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        },
+        {
+          "name": "like comment ",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5YjUxYmI5ZTc5ZWRmNGUwYjg5NGRhZiIsInJvbGUiOiJvdmVyc2VlciIsImlzQWRtaW4iOmZhbHNlLCJpYXQiOjE3ODA1MTM4NDgsImV4cCI6MTc4NjU2MTg0OH0.l1GyFTsxFgNymiChyRW15LywOAoGHbGqUjJkJy04OJc",
+                "type": "string"
+              }
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:5000/api/posts/comments/6a25c82100f299a5296658a7/like",
+              "protocol": "http",
+              "host": [
+                "localhost:5000"
+              ],
+              "path": [
+                "api",
+                "posts",
+                "comments",
+                "6a25c82100f299a5296658a7",
+                "like"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\":\"الحسييييين\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": []
+}
