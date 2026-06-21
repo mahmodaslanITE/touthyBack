@@ -4,6 +4,12 @@ const { Pending_request } = require('../models/Pending_request');
 const InProcess_request = require('../models/InProcess_request');
 const Finished_request = require('../models/Finished_request');
 const Post = require('../models/Correspondence/Post');
+const Advertisement = require('../models/Advertisement');
+const { User } = require('../models/User');
+const getUserProfile = require('../utils/users');
+const Student_profile = require('../models/Student_profile');
+const Patient_profile = require('../models/Patient_profile');
+const { Overseer_profile } = require('../models/Overseer_profile');
 
 // ============================================================
 // 📦 HELPER FUNCTIONS (دوال مساعدة)
@@ -11,32 +17,160 @@ const Post = require('../models/Correspondence/Post');
 
 /**
  * Build full image URL from request
- * @param {Object} req - Express request object
- * @param {string} imagePath - Image path from database
- * @returns {string|null} - Full image URL
  */
-const buildImageUrl = ( imagePath) => {
-    return `${process.env.BASE_URL}/${imagePath.url}`;
+const buildImageUrl = (imagePath) => {
+    if(imagePath){
+    return `${process.env.BASE_URL}/${imagePath}`;}
 };
 
 /**
- * Format post with full image URL
- * @param {Object} req - Express request object
- * @param {Object} post - Post document
- * @returns {Object} Formatted post
+ * Format post with full image URL (url + publicId)
  */
-const formatPost = ( post) => {
-    const images = post.images?.map(img => buildImageUrl( img)) || [];
-    
+// const formatPost = ( post) => {
+//     // ✅ تنسيق الصور مع الرابط الكامل (لكل صورة url و publicId)
+//     let formattedImages = [];
+//     if (post.images && Array.isArray(post.images)) {
+//         formattedImages = post.images.map(img => ({
+//             url: buildImageUrl(img.url),
+//             publicId: img.publicId || null
+//         }));
+//     }
+
+//     return {
+//         _id: post._id,
+//         content: post.content,
+//         images: formattedImages,
+//         likes_count: post.count_likes || post.likesCount || 0,
+//         comments_count: post.count_comments || post.commentsCount || 0,
+//         created_at: post.createdAt,
+//         publisher: post.publisher,
+//         publisher_role: post.publisher_role
+//     };
+// };
+
+const formatPost = async (post) => {
+    try {
+        // ✅ تحويل post إلى كائن عادي باستخدام toObject
+        const postObj = post.toObject ? post.toObject() : post;
+        const formattedImages = postObj.images?.map(img => ({
+           url: `${process.env.BASE_URL}/${img.url}`,
+
+            publicId: img.publicId,
+            _id: img._id
+        }
+
+    ))
+ 
+    || [];
+
+        if (!postObj.publisher) {
+            return {
+                _id: postObj._id,
+                content: postObj.content,
+                is_for_me: false,
+                images: formattedImages,
+                count_likes: postObj.count_likes || 0,
+                count_dislikes: postObj.count_dislikes || 0,
+                count_comments: postObj.count_comments || 0,
+                created_at: postObj.createdAt,
+                publisher_role: postObj.publisher_role,
+                publisher: {
+                    _id: null,
+                    full_name: 'ناشر محذوف',
+                    profile_photo: null,
+                    gender: null,
+                    is_verified: false
+                }
+            };
+        }
+
+        const publisher = await User.findById(postObj.publisher);
+        
+        if (!publisher) {
+            return {
+                _id: postObj._id,
+                content: postObj.content,
+                is_for_me: false,
+                images: formattedImages,
+                count_likes: postObj.count_likes || 0,
+                count_dislikes: postObj.count_dislikes || 0,
+                count_comments: postObj.count_comments || 0,
+                created_at: postObj.createdAt,
+                publisher_role: postObj.publisher_role,
+                publisher: {
+                    _id: postObj.publisher,
+                    full_name: 'مستخدم غير موجود',
+                    profile_photo: null,
+                    gender: null,
+                    is_verified: false
+                }
+            };
+        }
+
+        const publisherProfile = await getUserProfile(postObj.publisher, publisher.role);
+        const isForMe =false;
+
+        return {
+            _id: postObj._id,
+            content: postObj.content,
+            is_for_me: isForMe,
+            images: formattedImages,
+            count_likes: postObj.count_likes || 0,
+            count_dislikes: postObj.count_dislikes || 0,
+            count_comments: postObj.count_comments || 0,
+            created_at: postObj.createdAt,
+            publisher_role: postObj.publisher_role,
+            publisher: {
+                _id: postObj.publisher,
+                full_name: publisherProfile ? 
+                    `${publisherProfile.first_name} ${publisherProfile.father_name} ${publisherProfile.last_name}` : 
+                    publisher.email || 'مستخدم',
+                profile_photo: publisherProfile?.profile_photo ? 
+                    `${process.env.BASE_URL}/${publisherProfile.profile_photo.url}` : null,
+                gender: publisherProfile?.gender || null,
+                is_verified: publisherProfile?.is_verified || false
+            }
+        };
+    } catch (error) {
+        console.error('Error in formatPost:', error);
+        return {
+            _id: post._id,
+            content: post.content,
+            is_for_me: false,
+            images: post.images || [],
+            count_likes: post.count_likes || 0,
+            count_dislikes: post.count_dislikes || 0,
+            count_comments: post.count_comments || 0,
+            created_at: post.createdAt,
+            publisher_role: post.publisher_role,
+            publisher: {
+                _id: null,
+                full_name: 'خطأ في جلب البيانات',
+                profile_photo: null,
+                gender: null,
+                is_verified: false
+            }
+        };
+    }
+};
+
+
+/**
+ * Format advertisement with full image URL
+ */
+const formatAdvertisement = (ad) => {
+    let imageUrl = null;
+    if (ad.image) {
+        imageUrl = buildImageUrl(ad.image.url);
+    }
+
     return {
-        _id: post._id,
-        content: post.content,
-        images: images,
-        likes_count: post.count_likes || post.likesCount || 0,
-        comments_count: post.count_comments || post.commentsCount || 0,
-        created_at: post.createdAt,
-        publisher: post.publisher,
-        publisher_role: post.publisher_role
+        _id: ad._id,
+        content: ad.content,
+        image: {url:imageUrl},
+        is_active: ad.is_active,
+        created_at: ad.createdAt,
+        updated_at: ad.updatedAt
     };
 };
 
@@ -49,172 +183,81 @@ const formatPost = ( post) => {
  * @route GET /api/dashboard
  * @access Private (any authenticated user)
  */
-module.exports.getDashboard = asyncHandler(async (req, res) => {
-    const userId = req.user.id;
-    const userRole = req.user.role;
-    const isAdmin = req.user.isAdmin;
+module.exports.getUserDashboard = asyncHandler(async (req, res) => {
 
     // ============================================================
     // 1. 📊 حالة الطلبات (حسب الدور)
     // ============================================================
 
-    let stats = {};
+    let requests = {};
 
-    if (userRole === 'patient') {
-        // ============================================================
-        // 🏥 PATIENT DASHBOARD
-        // ============================================================
-        
-        // عدد الطلبات المعلقة (Pending)
-        const pendingCount = await Pending_request.countDocuments({ user: userId });
-        
-        // عدد الطلبات قيد المعالجة (Processing)
-        const processingCount = await InProcess_request.countDocuments({ patient: userId });
-        
-        // عدد الطلبات المنتهية (Finished)
-        const finishedCount = await Finished_request.countDocuments({ patient: userId });
+        const [pendingCount, processingCount, finishedCount] = await Promise.all([
+            Pending_request.countDocuments({}),
+            InProcess_request.countDocuments({}),
+            Finished_request.countDocuments({})
+        ]);
 
-        stats = {
+        requests = {
             pending: pendingCount,
             processing: processingCount,
             finished: finishedCount,
             total: pendingCount + processingCount + finishedCount
         };
-
-    } else if (userRole === 'student' || userRole === 'overseer' || isAdmin) {
-        // ============================================================
-        // 🎓 STUDENT / 👨‍🏫 OVERSEER / 👑 ADMIN DASHBOARD
-        // ============================================================
-        
-        let query = {};
-        
-        if (userRole === 'student') {
-            query.student = userId;
-        } else if (userRole === 'overseer') {
-            query.overseer = userId;
-        }
-        // إذا كان أدمن، لا نضيف شرط (يرى كل الطلبات)
-
-        // عدد الطلبات قيد المعالجة
-        const processingCount = await InProcess_request.countDocuments(query);
-        
-        // عدد الطلبات المنتهية
-        const finishedCount = await Finished_request.countDocuments(query);
-
-        stats = {
-            processing: processingCount,
-            finished: finishedCount,
-            total: processingCount + finishedCount
-        };
-    }
 
     // ============================================================
     // 2. 🔥 أكثر 3 بوستات تفاعلاً (من حيث عدد الإعجابات)
     // ============================================================
 
-    // جلب البوستات مرتبة حسب عدد الإعجابات (تنازلياً) مع حد 3
     const topPosts = await Post.find({})
         .sort({ count_likes: -1, createdAt: -1 })
         .limit(3)
-console.log(`the top posts is ${topPosts}`)
-    // تنسيق البوستات
-    const formattedPosts = topPosts.map(post => formatPost(req, post));
+
+        
+        const formattedPosts = await Promise.all(
+            topPosts.map(async (post) => {
+                return await formatPost(post);
+            })
+        );
 
     // ============================================================
-    // 3. 📤 إرسال الرد
+    // 3. 📢 الإعلانات النشطة (حد أقصى 3)
+    // ============================================================
+
+    const advertisements = await Advertisement.find()
+        .sort({ createdAt: -1 })
+        
+
+    const formattedAdvertisements = advertisements.map(ad => formatAdvertisement(ad));
+
+    // ============================================================
+    //4 جلب اعداد المستخدمين 
+    // ============================================================
+
+        const count_users=await User.countDocuments({})
+        const count_students=await Student_profile.countDocuments({})
+        const count_patients=await Patient_profile.countDocuments({})
+        const count_overseers=await Overseer_profile.countDocuments({})
+        const users={
+            count_users,count_students,count_patients,count_overseers
+        }
+    // ============================================================
+    // 5. 📤 إرسال الرد
     // ============================================================
 
     res.status(200).json({
         status: 'success',
-        message: 'تم جلب بيانات لوحة التحكم بنجاح',
+        message: 'هذه لوحة التحكم الرئيسية',
         data: {
-            role: userRole,
-            stats: stats,
+            requests: requests,
+            users,
             top_posts: {
                 count: formattedPosts.length,
                 data: formattedPosts
+            },
+            adv: {
+                count: formattedAdvertisements.length,
+                data: formattedAdvertisements
             }
         }
-    });
-});
-
-/**
- * @description Get dashboard statistics only (without top posts)
- * @route GET /api/dashboard/stats
- * @access Private (any authenticated user)
- */
-module.exports.getDashboardStats = asyncHandler(async (req, res) => {
-    const userId = req.user.id;
-    const userRole = req.user.role;
-    const isAdmin = req.user.isAdmin;
-
-    let stats = {};
-
-    if (userRole === 'patient') {
-        const [pendingCount, processingCount, finishedCount] = await Promise.all([
-            Pending_request.countDocuments({ user: userId }),
-            InProcess_request.countDocuments({ patient: userId }),
-            Finished_request.countDocuments({ patient: userId })
-        ]);
-
-        stats = {
-            pending: pendingCount,
-            processing: processingCount,
-            finished: finishedCount,
-            total: pendingCount + processingCount + finishedCount
-        };
-
-    } else if (userRole === 'student' || userRole === 'overseer' || isAdmin) {
-        let query = {};
-        
-        if (userRole === 'student') {
-            query.student = userId;
-        } else if (userRole === 'overseer') {
-            query.overseer = userId;
-        }
-
-        const [processingCount, finishedCount] = await Promise.all([
-            InProcess_request.countDocuments(query),
-            Finished_request.countDocuments(query)
-        ]);
-
-        stats = {
-            processing: processingCount,
-            finished: finishedCount,
-            total: processingCount + finishedCount
-        };
-    }
-
-    res.status(200).json({
-        status: 'success',
-        message: 'تم جلب إحصائيات لوحة التحكم بنجاح',
-        data: {
-            role: userRole,
-            stats: stats
-        }
-    });
-});
-
-/**
- * @description Get top posts only (most liked)
- * @route GET /api/dashboard/top-posts
- * @access Private (any authenticated user)
- */
-module.exports.getTopPosts = asyncHandler(async (req, res) => {
-    const { limit = 3 } = req.query;
-
-    const topPosts = await Post.find({})
-        .sort({ count_likes: -1, createdAt: -1 })
-        .limit(parseInt(limit))
-        .populate('publisher', 'email role')
-        .lean();
-
-    const formattedPosts = topPosts.map(post => formatPost(req, post));
-
-    res.status(200).json({
-        status: 'success',
-        message: `أكثر ${formattedPosts.length} بوست تفاعلاً`,
-        count: formattedPosts.length,
-        data: formattedPosts
     });
 });
