@@ -2,6 +2,8 @@
 // 📦 UTILS / REQUEST HELPER (التابع المساعد الموحد) - المُحسّن
 // ============================================================
 
+const { request } = require("express");
+
 /**
  * Format requests to separate case_type from course
  * @param {Array} requests - Array of request documents
@@ -52,6 +54,15 @@ function getStatusMessage(status) {
     };
     return messages[status] || 'هذه هي طلباتك';
 }
+function getStatusRequest(model) {
+    const messages = {
+        processing: 'processing',
+        finished: 'finished',
+        rejected: 'rejected'
+    };
+    return messages[model] || 'هذه هي طلباتك';
+}
+
 
 /**
  * Generic function to get requests by status and role
@@ -61,7 +72,7 @@ function getStatusMessage(status) {
  * @param {Object} params.additionalQuery - Additional query conditions
  * @returns {Promise<Array>} - Formatted requests
  */
-async function getRequestsByStatus({ Model, user, additionalQuery = {} }) {
+async function getRequestsByStatus({ Model,status, user, additionalQuery = {} }) {
     const role = user.role;
     const isAdmin = user.isAdmin;
     let query = { ...additionalQuery };
@@ -131,9 +142,13 @@ async function getRequestsByStatus({ Model, user, additionalQuery = {} }) {
         .select('-__v')
         .populate(populateFields)
         .lean();
-    
+    requests.map((request)=>{
+        request.status=getStatusRequest(status);
+        console.log(`the model is ${status}`)
+    })
     // Format requests
     const formattedRequests = formatRequests(requests, role);
+    
     
     return formattedRequests;
 }
@@ -141,5 +156,5 @@ async function getRequestsByStatus({ Model, user, additionalQuery = {} }) {
 module.exports = {
     getRequestsByStatus,
     formatRequests,
-    getStatusMessage
+    getStatusMessage,
 };

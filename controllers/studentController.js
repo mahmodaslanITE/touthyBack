@@ -122,6 +122,7 @@ module.exports.showAllRequests = asyncHandler(async (req, res) => {
 
     const formattedRequests = requests.map(item => ({
         _id: item._id,
+        status:'pending',
         ...(req.user.isAdmin && { patient: item.user }),
         Requestion: {
             pain_severity: item.pain_severity,

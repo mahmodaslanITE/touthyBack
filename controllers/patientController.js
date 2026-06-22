@@ -21,6 +21,7 @@ const formatRequestResponse = (req, request) => {
 
     return {
         _id: request._id,
+        status:"pending",
         Requestion: {
             pain_severity: request.pain_severity,
             pain_time: request.pain_time,
@@ -289,6 +290,7 @@ module.exports.getAllRequests = asyncHandler(async (req, res) => {
 
     let requests = await Pending_request.find(query)
         .populate('case_type', '_id case_type');
+        
 
     if (isAdmin) {
         requests = await Pending_request.find(query)
@@ -297,8 +299,11 @@ module.exports.getAllRequests = asyncHandler(async (req, res) => {
     }
 
     // ✅ استخدام نفس التنسيق مع بيانات المريض للأدمن
-    const formattedRequests = requests.map(request => 
-        formatRequestWithPatient(req, request, isAdmin)
+    const formattedRequests = requests.map((request) => {
+        request.status='pending';
+        formatRequestWithPatient(req, request, isAdmin);
+        console.log(`request status is ${request.status}`)
+    }
     );
 
     res.status(200).json({

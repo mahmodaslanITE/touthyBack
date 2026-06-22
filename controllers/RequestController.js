@@ -17,14 +17,15 @@ const Rejected_request = require('../models/Rejected_request');
 exports.getProcessingRequests = asyncHandler(async (req, res) => {
     const requests = await getRequestsByStatus({
         Model: InProcess_request,
-        user: req.user
+        user: req.user,
+        status:'processing'
     });
-
     res.status(200).json({
         status: 'success',
         message: getStatusMessage('processing'),
         count: requests.length,
-        data: requests
+        data: requests,
+        
     });
 });
 
@@ -36,7 +37,8 @@ exports.getProcessingRequests = asyncHandler(async (req, res) => {
 exports.getFinishedRequests = asyncHandler(async (req, res) => {
     const requests = await getRequestsByStatus({
         Model: Finished_request,
-        user: req.user
+        user: req.user,
+        status:'finished'
     });
 
     res.status(200).json({
@@ -55,7 +57,8 @@ exports.getFinishedRequests = asyncHandler(async (req, res) => {
 exports.getRejectedRequests = asyncHandler(async (req, res) => {
     const requests = await getRequestsByStatus({
         Model: Rejected_request,
-        user: req.user
+        user: req.user,
+        status:'rejected',
     });
 
     res.status(200).json({

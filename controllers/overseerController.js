@@ -32,7 +32,8 @@ module.exports.showOverseerRequests = asyncHandler(async (req, res) => {
 
     const requests = await getRequestsByStatus({
         Model: InProcess_request,
-        user: req.user
+        user: req.user,
+        status:'processing'
     });
     requests.map(request => {
         request.Requestion.photo.url=`${process.env.BASE_URL}/images/${request.Requestion.photo.url}`;});
