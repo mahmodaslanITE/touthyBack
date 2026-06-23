@@ -36,7 +36,7 @@ module.exports.showOverseerRequests = asyncHandler(async (req, res) => {
         status:'processing'
     });
     requests.map(request => {
-        if(request.Requestion.photo.url){
+        if(request.Requestion.photo?.url){
         request.Requestion.photo.url=`${process.env.BASE_URL}/${request.Requestion.photo.url}`};});
         
     res.status(200).json({

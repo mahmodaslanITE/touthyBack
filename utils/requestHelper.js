@@ -144,7 +144,7 @@ async function getRequestsByStatus({ Model,status, user, additionalQuery = {} })
         .lean();
     requests.map((request)=>{
         request.status=getStatusRequest(status);
-        console.log(`the model is ${status}`)
+       
     })
     // Format requests
     const formattedRequests = formatRequests(requests, role);
