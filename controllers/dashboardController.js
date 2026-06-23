@@ -247,14 +247,18 @@ module.exports.getUserDashboard = asyncHandler(async (req, res) => {
     // ============================================================ 
 let finished=0;
 let inProcess=0;
+let pending=0;
     if(req.user){
         const userId=req.user.id;
         const role=req.user.role
          const cases=await getCaseCounts(userId,role);
          finished=cases.finished;
          inProcess=cases.inProcess;
+         if(cases.pending){pending=cases.pending}
         console.log(` the count of finish is ${finished},
-            and the count of processing ${inProcess}`)
+            and the count of processing ${inProcess}
+            and the pending is ${pending}`
+        )
        
     }
     // ============================================================
@@ -269,7 +273,8 @@ let inProcess=0;
             my_cases:(req.user)? {
                     
                     finished: finished || 0,
-                    in_process: inProcess || 0
+                    in_process: inProcess || 0,
+                    pending:(req.user.role==="patient")?pending:null
              }:" ليس لديك اي حالة لانك لم تسجل الدخول على منصتنا بعد ",
             users,
             top_posts: {
