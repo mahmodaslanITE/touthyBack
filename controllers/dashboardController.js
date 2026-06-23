@@ -10,6 +10,7 @@ const getUserProfile = require('../utils/users');
 const Student_profile = require('../models/Student_profile');
 const Patient_profile = require('../models/Patient_profile');
 const { Overseer_profile } = require('../models/Overseer_profile');
+const getCaseCounts = require('../utils/count_cases');
 
 // ============================================================
 // 📦 HELPER FUNCTIONS (دوال مساعدة)
@@ -240,8 +241,24 @@ module.exports.getUserDashboard = asyncHandler(async (req, res) => {
         const users={
             count_users,count_students,count_patients,count_overseers
         }
+
+       // ============================================================
+    // 5. في حال وجود توكن 
+    // ============================================================ 
+let finished=0;
+let inProcess=0;
+    if(req.user){
+        const userId=req.user.id;
+        const role=req.user.role
+         const cases=await getCaseCounts(userId,role);
+         finished=cases.finished;
+         inProcess=cases.inProcess;
+        console.log(` the count of finish is ${finished},
+            and the count of processing ${inProcess}`)
+       
+    }
     // ============================================================
-    // 5. 📤 إرسال الرد
+    // 6. 📤 إرسال الرد
     // ============================================================
 
     res.status(200).json({
@@ -249,6 +266,11 @@ module.exports.getUserDashboard = asyncHandler(async (req, res) => {
         message: 'هذه لوحة التحكم الرئيسية',
         data: {
             requests: requests,
+            my_cases:(req.user)? {
+                    
+                    finished: finished || 0,
+                    in_process: inProcess || 0
+             }:" ليس لديك اي حالة لانك لم تسجل الدخول على منصتنا بعد ",
             users,
             top_posts: {
                 count: formattedPosts.length,
