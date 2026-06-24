@@ -6,6 +6,7 @@ const { User } = require('../../models/User');
 const Patient_profil = require('../../models/Patient_profile');
 const { OverseerProfile } = require('../../models/Overseer_profile');
 const getUserProfile = require('../../utils/users');
+const formateImageUrl = require('../../utils/formate');
 
 /**
  * دالة مساعدة لجلب ملف المستخدم الشخصي بناءً على دوره
@@ -23,7 +24,7 @@ const formatOtherPartyProfile = (profile, userId, role) => {
     return {
         userId: userId,
         full_name: `${profile.first_name} ${profile.father_name} ${profile.last_name}`.trim(),
-        profile_photo:profile.profile_photo.url? {url:`${process.env.BASE_URL}/${profile.profile_photo.url}`}:null,
+        profile_photo:profile.profile_photo?.url? {url:`${process.env.BASE_URL}/${profile.profile_photo.url}`}:null,
         role: role,
         
     };
@@ -100,7 +101,13 @@ exports.open_conversation = asyncHandler(async (req, res) => {
 
     const messages = await Message.find({
         conversationId: conversation._id
-    }).select('-conversationId').sort({ createdAt: 1 });
+    }).select('-conversationId').sort({ createdAt: -1 });
+    messages.map((mes)=>{
+        if(mes.message_type==='file'){
+            console.log("this is is file")
+            mes.content=formateImageUrl(mes.content)
+        }
+    })
 
     const formattedMessages = formatMessages(messages, senderId);
 

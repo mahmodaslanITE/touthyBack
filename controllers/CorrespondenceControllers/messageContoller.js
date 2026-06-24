@@ -40,8 +40,8 @@ if(req.file){
 content=`images/conversation/${req.file.filename}`;
 message_type='file';
 conversation.last_message='file';
-
 }
+
 else{ 
     content=req.body.text;
     message_type="text",
@@ -65,6 +65,9 @@ if (io) {
   });
  
 }
+if(req.file){
+   newMessage.content=`${process.env.BASE_URL}/${newMessage.content}`
+    }
 res.status(201).json({
     status:'success',
     message:'تم ارسال الرسالة بنجاح ',
