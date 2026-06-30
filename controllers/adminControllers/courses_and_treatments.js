@@ -2,6 +2,7 @@ const asyncHandler = require('express-async-handler');
 const { Practial_lesson, validate_practical_lesson } = require('../../models/Practical_lesson');
 const Course = require('../../models/Course');
 const Treatment = require('../../models/Treatment');
+const getUserProfile = require('../../utils/users');
 
 // ============================================================
 // 📚 COURSES MANAGEMENT
@@ -237,12 +238,27 @@ module.exports.getAllLessons = asyncHandler(async (req, res) => {
         });
     }
 
-    const lessons = await Practial_lesson.find().populate('course', 'course_name');
+    const lessons = await Practial_lesson.find().populate('course', 'course_name').populate('category','category');
+   
+// ✅ جلب المشرفين لكل درس
+const lessonsWithOverseers = await Promise.all(
+    lessons.map(async (lesson) => {
+        const overseerProfiles = await Promise.all(
+            lesson.overseers.map(async (overseerId) => {
+                return await getUserProfile(overseerId, 'overseer');
+            })
+        );
+        return {
+            ...lesson.toObject(),
+            overseers: overseerProfiles
+        };
+    })
+);
 
     res.status(200).json({
         status: 'success',
         message: 'هذه جميع الدروس العملية المسجلة',
-        count: lessons.length,
-        data: lessons
+        count: lessonsWithOverseers.length,
+        data: lessonsWithOverseers
     });
 });

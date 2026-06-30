@@ -6,7 +6,7 @@ const { User } = require('../../models/User');
 const Patient_profil = require('../../models/Patient_profile');
 const { OverseerProfile } = require('../../models/Overseer_profile');
 const getUserProfile = require('../../utils/users');
-const formateImageUrl = require('../../utils/formate');
+const {formateImageUrl }= require('../../utils/formate');
 
 /**
  * دالة مساعدة لجلب ملف المستخدم الشخصي بناءً على دوره

@@ -100,7 +100,7 @@ module.exports.loginUser = asyncHandler(async (req, res) => {
     const userData = {
         _id: user._id,
         email: user.email,
-        role: user.role,
+        role: (user.isAdmin)?'admin':user.role,
         ...(user.isAdmin && { is_admin: true }),
         first_name: profile.first_name,
         father_name: profile.father_name,
