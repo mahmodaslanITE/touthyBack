@@ -274,8 +274,9 @@ let pending=0;
                     
                     finished: finished || 0,
                     in_process: inProcess || 0,
-                    pending:(req.user.role==="patient")?pending:null
-             }:" ليس لديك اي حالة لانك لم تسجل الدخول على منصتنا بعد ",
+                    ...(req.user.role==='patient' && {pending})
+
+             }:null,
             users,
             top_posts: {
                 count: formattedPosts.length,

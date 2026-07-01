@@ -3,7 +3,7 @@ const verifyToken = require('../Middlewares/verifyToken');
 const { createOverseer, getAllOverseers, assignOverseerToLesson } = require('../controllers/adminControllers/overseersController');
 const { verifyAccountAccept, verifyAccountReject, getAllStudents, addCategory, getCategories, getAllVerifyRequests } = require('../controllers/adminControllers/studentsController');
 const { getAllPatients } = require('../controllers/adminControllers/patientsController');
-const { createCourse, getCourses, addTreatment, getAllTreatments, deleteTreatment, addPracticalLesson, getAllLessons } = require('../controllers/adminControllers/courses_and_treatments');
+const { createCourse, getCourses, addTreatment, getAllTreatments, deleteTreatment, addPracticalLesson, getAllLessons, updatePracialLesson } = require('../controllers/adminControllers/courses_and_treatments');
 const { adminUpdateInProcess } = require('../controllers/adminControllers/requestions_controller');
 
 const router=express.Router();
@@ -36,6 +36,7 @@ router.get('/category',verifyToken,getCategories)
 //practical-lessons
 router.post('/practical-lessons',verifyToken,addPracticalLesson)
 router.get('/practical-lessons',verifyToken,getAllLessons)
+router.put('/practical-lessons/:id',verifyToken,updatePracialLesson)
 
 // inprocess 
 router.put('/in-proccess/:id',verifyToken,adminUpdateInProcess)

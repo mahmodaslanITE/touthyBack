@@ -1,11 +1,11 @@
 const jwt = require('jsonwebtoken');
 
 const checkAuthOrGuest = (req, res, next) => {
-  const authHeader = req.headers.authorization;
+  const authHeader = req.headers?.authorization;
   console.log("token is :", authHeader);
   
   // التحقق من وجود التوكن
-  if (!authHeader /*|| !authHeader.startsWith('Bearer ')*/) {
+  if (!authHeader||authHeader==='Bearer') { 
     // إضافة واصفة للضيف
     
     return next(); // الاستمرار كضيف

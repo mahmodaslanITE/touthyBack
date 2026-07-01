@@ -262,3 +262,44 @@ const lessonsWithOverseers = await Promise.all(
         data: lessonsWithOverseers
     });
 });
+
+/**
+ * @description تعديل درس عملي 
+ * @route /api/admin/practical-lessons
+ * @method POST
+ * @access private (Admin only)
+ */
+module.exports.updatePracialLesson = asyncHandler(async (req, res) => {
+  const lessonId=req.params.id;
+  const {category,course,overseers,hall,time,}=req.body
+    // 2. التحقق من الصلاحيات (يجب أن يكون Admin)
+    if (!req.user.isAdmin) {
+        return res.status(403).json({ 
+            status: 'error', 
+            message: 'عذراً، هذه الصلاحية للمشرفين فقط' 
+        });
+    }
+
+    const lesson=await Practial_lesson.findById(lessonId);
+    if(!lesson){
+        return  res.status(404).json({
+            status:'error',
+            message:'الدرس العملي غير موجود او تم حذفه '
+        })
+    }
+    if(category){lesson.category=category}
+    if(course){lesson.course=course}
+    if(hall){lesson.hall=hall}
+    if(time){lesson.time=time}
+    if(overseers){lesson.overseers=overseers}
+    await lesson.save();
+
+   
+
+    // 4. الرد بنجاح
+    res.status(201).json({
+        status: 'success',
+        message: ' تم تعديل الدرس العملي بنجاح ',
+        data:lesson
+    });
+});

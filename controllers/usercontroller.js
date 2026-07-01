@@ -21,7 +21,7 @@ const getUserProfile = require('../utils/users');
  * @param {string} email - User email
  * @returns {Object} Formatted profile
  */
-const formatProfileResponse = (profile, role, counts = { finished: 0, inProcess: 0 }, includeEmail = false, email = null) => {
+const formatProfileResponse = (profile, role, counts = { finished: 0, inProcess: 0 }, includeEmail = false, email = null,isAdmin) => {
     // ✅ بناء رابط الصورة الكامل
     let profilePhotoUrl = null;
 
@@ -39,7 +39,7 @@ const formatProfileResponse = (profile, role, counts = { finished: 0, inProcess:
         bio: profile.bio,
         profile_photo:{ url: profilePhotoUrl },
         gender: profile.gender,
-        role,
+        role:(isAdmin)?'admin':role,
         phone_number:profile.phone_number,
         category: profile.category,
         university_number: profile.university_number,
@@ -94,8 +94,8 @@ const getCompleteProfileWithEmail = async (userId, role) => {
     if (!profile || !user) {
         return null;
     }
-
-    return formatProfileResponse(profile, role, counts, true, user.email);
+const isAdmin=user.isAdmin;
+    return formatProfileResponse(profile, role, counts, true, user.email,isAdmin);
 };
 
 /**
