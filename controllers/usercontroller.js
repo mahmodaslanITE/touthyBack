@@ -5,6 +5,7 @@ const { User } = require('../models/User');
 const Finished = require('../models/Finished_request');
 const InProcess = require('../models/InProcess_request');
 const getUserProfile = require('../utils/users');
+const { formateImageUrl } = require('../utils/formate');
 
 // ============================================================
 // 📦 HELPER FUNCTIONS (دوال مساعدة)
@@ -27,7 +28,7 @@ const formatProfileResponse = (profile, role, counts = { finished: 0, inProcess:
 
     if (profile.profile_photo?.url) {
      
-            profilePhotoUrl = `${process.env.BASE_URL}/${profile.profile_photo.url}`;
+            profilePhotoUrl = formateImageUrl(profile.profile_photo.url);
         }
     
 
