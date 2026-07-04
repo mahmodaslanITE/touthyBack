@@ -1,5 +1,6 @@
 const Patient_profile = require('../../models/Patient_profile');
-const asyncHandler=require('express-async-handler')
+const asyncHandler=require('express-async-handler');
+const { formateImageUrl } = require('../../utils/formate');
 // ============================================================
 // 👨‍⚕️ PATIENTS MANAGEMENT
 // ============================================================
@@ -19,8 +20,8 @@ module.exports.getAllPatients = asyncHandler(async (req, res) => {
 
     const patients = await Patient_profile.find();
 patients.map((patient)=>{
-    if( patient.profile_photo.url){
-    patient.profile_photo.url=`${process.env.BASE_URL}/${patient.profile_photo.url}`}
+    if( patient.profile_photo?.url){
+    patient.profile_photo.url=formateImageUrl(patient.profile_photo.url)}
 })
     res.status(200).json({
         status: 'success',

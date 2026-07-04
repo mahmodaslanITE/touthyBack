@@ -4,6 +4,9 @@ const { validateUserRegister, validateUserLogin, User } = require('../models/Use
 const getUserProfile = require('../utils/users'); 
 const Student_profile = require('../models/Student_profile');
 const Patient_profile = require('../models/Patient_profile');
+const BlacklistService = require('../Middlewares/blacklistService');
+const jwt=require('jsonwebtoken');
+const { formateImageUrl } = require('../utils/formate');
 
 /**
  * @desc Register new user
@@ -93,6 +96,9 @@ module.exports.loginUser = asyncHandler(async (req, res) => {
             message: 'الملف الشخصي غير موجود'
         });
     }
+    if(profile.profile_photo?.url){
+        profile.profile_photo.url=formateImageUrl(profile.profile_photo.url)
+    }
 
     const token = user.generateToken();
 
@@ -109,7 +115,7 @@ module.exports.loginUser = asyncHandler(async (req, res) => {
         gender: profile.gender,
         university_number: profile.university_number,
         is_verified: profile.is_verified,
-        profile_photo: {url:`${req.protocol}://${req.get('host')}/${profile.profile_photo?.url}`},
+        profile_photo: profile.profile_photo,
         ...(profile.category && { category: profile.category })
     };
 
@@ -157,5 +163,108 @@ module.exports.changePassword = asyncHandler(async (req, res) => {
     res.status(200).json({
         status: 'success',
         message: 'تم تغيير كلمة المرور بنجاح'
+    });
+});
+
+
+
+
+/**
+ * @desc تسجيل الخروج وإبطال التوكن
+ * @route POST /api/auth/logout
+ * @access Private
+ */
+module.exports.logout = asyncHandler(async (req, res) => {
+    const token = req.token || req.headers.authorization?.split(' ')[1];
+    
+    if (!token) {
+        return res.status(400).json({
+            status: 'error',
+            message: 'لا يوجد توكن نشط'
+        });
+    }
+
+    try {
+        // ✅ حساب المدة المتبقية للتوكن
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const now = Math.floor(Date.now() / 1000);
+        const expiresIn = decoded.exp - now;
+        
+        // ✅ إضافة التوكن إلى القائمة السوداء
+        if (expiresIn > 0) {
+            await BlacklistService.addToBlacklist(token, expiresIn);
+            console.log(`✅ Token blacklisted for ${expiresIn}s`);
+        }
+        console.log(` done `)
+        res.status(200).json({
+            status: 'success',
+            message: 'تم تسجيل الخروج بنجاح'
+        });
+        
+    } catch (error) {
+        // إذا كان التوكن منتهي الصلاحية
+        console.log(`the proplem is here`)
+
+        if (error.name === 'TokenExpiredError') {
+            await BlacklistService.addToBlacklist(token, 3600); 
+            return res.status(200).json({
+                status: 'success',
+                message: 'تم تسجيل الخروج بنجاح'
+            });
+        }
+        
+        console.error('❌ Logout error:', error);
+        return res.status(500).json({
+            status: 'error',
+            message: 'حدث خطأ أثناء تسجيل الخروج'
+        });
+    }
+});
+
+/**
+ * @desc تغيير كلمة المرور (مع إبطال التوكن)
+ * @route PUT /api/auth/change-password
+ * @access Private
+ */
+module.exports.changePassword = asyncHandler(async (req, res) => {
+    const { old_password, new_password } = req.body;
+    const user = await User.findById(req.user.id);
+    
+    // ... التحقق من كلمة المرور القديمة ...
+    
+    // ✅ تغيير كلمة المرور
+    user.password = await bcrypt.hash(new_password, 10);
+    await user.save();
+    
+    // ✅ إبطال التوكن الحالي
+    const token = req.token;
+    if (token) {
+        await BlacklistService.addToBlacklist(token, 3600);
+    }
+    
+    res.status(200).json({
+        status: 'success',
+        message: 'تم تغيير كلمة المرور بنجاح، يرجى تسجيل الدخول مرة أخرى'
+    });
+});
+
+/**
+ * @desc تنظيف التوكنات المنتهية (يمكن تشغيلها كـ Cron Job)
+ * @route POST /api/admin/clean-blacklist
+ * @access Private (Admin only)
+ */
+module.exports.cleanBlacklist = asyncHandler(async (req, res) => {
+    if (!req.user.isAdmin) {
+        return res.status(403).json({
+            status: 'error',
+            message: 'غير مصرح بالوصول'
+        });
+    }
+
+    const deletedCount = await BlacklistService.cleanExpiredTokens();
+    
+    res.status(200).json({
+        status: 'success',
+        message: `تم حذف ${deletedCount} توكن منتهي`
     });
 });

@@ -2,8 +2,10 @@ const { User } = require("../models/User");
 const getUserProfile = require("./users");
 
 function formateImageUrl(image){
+    if(image){
      image=`${process.env.BASE_URL}/${image}`
     return image
+    }
 }
 
 async function formatPost  (post, reqUserId)  {

@@ -1,14 +1,25 @@
 const jwt = require('jsonwebtoken');
+const BlacklistService = require('./blacklistService');
 
-const verifyToken = (req, res, next) => {
+const verifyToken =async (req, res, next) => {
   const authHeader = req.headers.authorization;
   console.log("token is :",authHeader)
   // التحقق من وجود التوكن
   if (!authHeader /*|| !authHeader.startsWith('Bearer ')*/) {
     return res.status(401).json({ message: 'توكن غير موجود أو غير صالح' });
   }
+
+
   try {
     const token = authHeader.split(' ')[1];
+    const isBlacklisted = await BlacklistService.isBlacklisted(token);
+    if (isBlacklisted) {
+        return res.status(401).json({
+            status: 'error',
+            message: 'جلسة غير صالحة، يرجى تسجيل الدخول مرة أخرى'
+        });
+    }
+     
     // فك التوكن والتحقق منه
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 

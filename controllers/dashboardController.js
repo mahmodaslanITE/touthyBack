@@ -11,6 +11,7 @@ const Student_profile = require('../models/Student_profile');
 const Patient_profile = require('../models/Patient_profile');
 const { Overseer_profile } = require('../models/Overseer_profile');
 const getCaseCounts = require('../utils/count_cases');
+const { formatPost } = require('../utils/formate');
 
 // ============================================================
 // 📦 HELPER FUNCTIONS (دوال مساعدة)
@@ -24,136 +25,7 @@ const buildImageUrl = (imagePath) => {
     return `${process.env.BASE_URL}/${imagePath}`;}
 };
 
-/**
- * Format post with full image URL (url + publicId)
- */
-// const formatPost = ( post) => {
-//     // ✅ تنسيق الصور مع الرابط الكامل (لكل صورة url و publicId)
-//     let formattedImages = [];
-//     if (post.images && Array.isArray(post.images)) {
-//         formattedImages = post.images.map(img => ({
-//             url: buildImageUrl(img.url),
-//             publicId: img.publicId || null
-//         }));
-//     }
 
-//     return {
-//         _id: post._id,
-//         content: post.content,
-//         images: formattedImages,
-//         likes_count: post.count_likes || post.likesCount || 0,
-//         comments_count: post.count_comments || post.commentsCount || 0,
-//         created_at: post.createdAt,
-//         publisher: post.publisher,
-//         publisher_role: post.publisher_role
-//     };
-// };
-
-const formatPost = async (post) => {
-    try {
-        // ✅ تحويل post إلى كائن عادي باستخدام toObject
-        const postObj = post.toObject ? post.toObject() : post;
-        const formattedImages = postObj.images?.map(img => ({
-           url: `${process.env.BASE_URL}/${img.url}`,
-
-            publicId: img.publicId,
-            _id: img._id
-        }
-
-    ))
- 
-    || [];
-
-        if (!postObj.publisher) {
-            return {
-                _id: postObj._id,
-                content: postObj.content,
-                is_for_me: false,
-                images: formattedImages,
-                count_likes: postObj.count_likes || 0,
-                count_dislikes: postObj.count_dislikes || 0,
-                count_comments: postObj.count_comments || 0,
-                created_at: postObj.createdAt,
-                publisher_role: postObj.publisher_role,
-                publisher: {
-                    _id: null,
-                    full_name: 'ناشر محذوف',
-                    profile_photo: null,
-                    gender: null,
-                    is_verified: false
-                }
-            };
-        }
-
-        const publisher = await User.findById(postObj.publisher);
-        
-        if (!publisher) {
-            return {
-                _id: postObj._id,
-                content: postObj.content,
-                is_for_me: false,
-                images: formattedImages,
-                count_likes: postObj.count_likes || 0,
-                count_dislikes: postObj.count_dislikes || 0,
-                count_comments: postObj.count_comments || 0,
-                created_at: postObj.createdAt,
-                publisher_role: postObj.publisher_role,
-                publisher: {
-                    _id: postObj.publisher,
-                    full_name: 'مستخدم غير موجود',
-                    profile_photo: null,
-                    gender: null,
-                    is_verified: false
-                }
-            };
-        }
-
-        const publisherProfile = await getUserProfile(postObj.publisher, publisher.role);
-        const isForMe =false;
-
-        return {
-            _id: postObj._id,
-            content: postObj.content,
-            is_for_me: isForMe,
-            images: formattedImages,
-            count_likes: postObj.count_likes || 0,
-            count_dislikes: postObj.count_dislikes || 0,
-            count_comments: postObj.count_comments || 0,
-            created_at: postObj.createdAt,
-            publisher_role: postObj.publisher_role,
-            publisher: {
-                _id: postObj.publisher,
-                full_name: publisherProfile ? 
-                    `${publisherProfile.first_name} ${publisherProfile.father_name} ${publisherProfile.last_name}` : 
-                    publisher.email || 'مستخدم',
-                profile_photo: publisherProfile?.profile_photo ? 
-                    `${process.env.BASE_URL}/${publisherProfile.profile_photo.url}` : null,
-                gender: publisherProfile?.gender || null,
-                is_verified: publisherProfile?.is_verified || false
-            }
-        };
-    } catch (error) {
-        console.error('Error in formatPost:', error);
-        return {
-            _id: post._id,
-            content: post.content,
-            is_for_me: false,
-            images: post.images || [],
-            count_likes: post.count_likes || 0,
-            count_dislikes: post.count_dislikes || 0,
-            count_comments: post.count_comments || 0,
-            created_at: post.createdAt,
-            publisher_role: post.publisher_role,
-            publisher: {
-                _id: null,
-                full_name: 'خطأ في جلب البيانات',
-                profile_photo: null,
-                gender: null,
-                is_verified: false
-            }
-        };
-    }
-};
 
 
 /**
@@ -255,10 +127,7 @@ let pending=0;
          finished=cases.finished;
          inProcess=cases.inProcess;
          if(cases.pending){pending=cases.pending}
-        console.log(` the count of finish is ${finished},
-            and the count of processing ${inProcess}
-            and the pending is ${pending}`
-        )
+      
        
     }
     // ============================================================

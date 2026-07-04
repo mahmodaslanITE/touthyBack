@@ -5,6 +5,7 @@ const socket = require('../../socket/init');
 const { Verify_request } = require('../../models/VerifyRequest');
 const StudentProfile = require('../../models/Student_profile');
 const { Category, valedate_add_category } = require('../../models/Category');
+const { formateImageUrl } = require('../../utils/formate');
 
 // ============================================================
 // 📝 VERIFICATION REQUESTS MANAGEMENT
@@ -26,6 +27,15 @@ module.exports.getAllVerifyRequests = asyncHandler(async (req, res) => {
     const requests = await Verify_request.find()
         .populate('student_profile', 'user first_name father_name last_name university_number profile_photo')
         .sort('-createdAt');
+
+        requests.map((req)=>{
+            if(req.document){
+                req.document=formateImageUrl(req.document)
+            }
+            if(req.student_profile.profile_photo?.url){
+                console.log(` ther  is here `)
+            req.student_profile.profile_photo.url=formateImageUrl(req.student_profile.profile_photo.url)}
+        })
 
     res.status(200).json({
         status: 'success',
@@ -170,7 +180,8 @@ module.exports.getAllStudents = asyncHandler(async (req, res) => {
 
     const students = await StudentProfile.find().populate(`category`);
 students.map((student)=>{
-    student.profile_photo.url=`${process.env.BASE_URL}/${student.profile_photo.url}`
+    if(student.profile_photo?.url){
+    student.profile_photo.url=formateImageUrl(student.profile_photo.url)}
 })
     res.status(200).json({
         status: 'success',

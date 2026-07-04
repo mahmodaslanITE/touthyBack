@@ -39,6 +39,8 @@ UserSchema.methods.generateToken = function () {
     { expiresIn: '70d' } // Token valid for 7 days
   );
 };
+UserSchema.method.signOut=function(){
+}
 // Validation for registration
 const validateUserRegister = (data) => {
   const schema = Joi.object({

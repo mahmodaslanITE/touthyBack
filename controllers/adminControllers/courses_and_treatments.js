@@ -191,37 +191,42 @@ module.exports.deleteTreatment = asyncHandler(async (req, res) => {
  * @access private (Admin only)
  */
 module.exports.addPracticalLesson = asyncHandler(async (req, res) => {
-    // 1. التحقق من صحة البيانات المدخلة باستخدام Joi
-    const { error } = validate_practical_lesson(req.body);
-    if (error) {
-        return res.status(400).json({ 
-            status: 'error', 
-            message: error.details[0].message 
-        });
-    }
 
-    // 2. التحقق من الصلاحيات (يجب أن يكون Admin)
     if (!req.user.isAdmin) {
         return res.status(403).json({ 
             status: 'error', 
             message: 'عذراً، هذه الصلاحية للمشرفين فقط' 
         });
     }
+    const lessons=req.body
+    let final_data=lessons
+    let index=0
+    lessons.map(async(lesson)=>{
+        const { error } = validate_practical_lesson(lesson);
+        index=index+1
+        if (error) {
+            return res.status(400).json({ 
+                status: 'error', 
+                message: `${error.details[0].message } في الكورس رقم ${index}`
+            });
+        }
 
-    // 3. إنشاء سجل الدرس العملي في قاعدة البيانات
-    const data = await Practial_lesson.create({
-        course: req.body.course,
-        category: req.body.category,
-        overseers: req.body.overseers,
-        time: req.body.time,
-        hall: req.body.hall
-    });
+      const data=  await Practial_lesson.create({
+            course: lesson.course,
+            category: lesson.category,
+            overseers: lesson.overseers,
+            time: lesson.time,
+            hall: lesson.hall
+        });
+        
 
+    })
+    
     // 4. الرد بنجاح
     res.status(201).json({
         status: 'success',
-        message: 'تم إضافة الدرس العملي بنجاح',
-        data
+        message: 'تم إضافة الدروس العملي بنجاح',
+        data:final_data
     });
 });
 
@@ -240,7 +245,6 @@ module.exports.getAllLessons = asyncHandler(async (req, res) => {
 
     const lessons = await Practial_lesson.find().populate('course', 'course_name').populate('category','category');
    
-// ✅ جلب المشرفين لكل درس
 const lessonsWithOverseers = await Promise.all(
     lessons.map(async (lesson) => {
         const overseerProfiles = await Promise.all(

@@ -104,7 +104,6 @@ exports.open_conversation = asyncHandler(async (req, res) => {
     }).select('-conversationId').sort({ createdAt: -1 });
     messages.map((mes)=>{
         if(mes.message_type==='file'){
-            console.log("this is is file")
             mes.content=formateImageUrl(mes.content)
         }
     })
