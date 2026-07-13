@@ -16,7 +16,7 @@
               {
                 "key": "authorization",
                 "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5MDM3MzhkOGNkZmExNGIyZGQ4NmZiMyIsInJvbGUiOiJzaWNrIiwiaXNBZG1pbiI6ZmFsc2UsImlhdCI6MTc2MTgzNDkyMSwiZXhwIjoxNzYyNDM5NzIxfQ.36Se1TkLwBnaVL5O9wkgZjSkWgL7wOHHRediDvNCpxk",
-                "disabled": false,
+                "disabled": true,
                 "type": "default"
               }
             ],
@@ -24,7 +24,7 @@
               "type": "bearer",
               "bearer": {
                 "key": "token",
-                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMjQ1ODU3Zjk3NjFlMmViZTk3OGFlNiIsInJvbGUiOiJvdmVyc2VlciIsImlzQWRtaW4iOmZhbHNlLCJpYXQiOjE3ODA4MzIxNTIsImV4cCI6MTc4Njg4MDE1Mn0.fsdUcY5YvlPIg9pdxovm7KmGhImnFprSTPagB64WHfA",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNDkwNWY2OTY0YzU2Y2U3NDBmZDcwZiIsInJvbGUiOiJzdHVkZW50IiwiaXNBZG1pbiI6ZmFsc2UsImlhdCI6MTc4MzE3MDgyNCwiZXhwIjoxNzg5MjE4ODI0fQ.iTEcUXs_2PxRJje7QHuezHrAFIsRvyaslNJ-n9Rm3tE",
                 "type": "string"
               }
             },
@@ -50,7 +50,7 @@
                   "key": "profile_photo",
                   "disabled": false,
                   "type": "file",
-                  "src": "C:\\Users\\mahmoud\\Pictures\\Camera Roll\\WIN_20250407_00_55_23_Pro (2).jpg"
+                  "src": "C:\\Users\\mahmoud\\Pictures\\Camera Roll\\WIN_20240801_07_04_31_Pro.jpg"
                 }
               ]
             }
@@ -142,7 +142,7 @@
               "type": "bearer",
               "bearer": {
                 "key": "token",
-                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMjQwZTg2MzMyYTZmZmQ0NWFjMzJhYiIsInJvbGUiOiJzdHVkZW50IiwiaXNBZG1pbiI6ZmFsc2UsImlhdCI6MTc4MDc0ODY5NywiZXhwIjoxNzg2Nzk2Njk3fQ.AAiLYZjdgmjTccfxZDOO2De8SadYhC7kskddwFAaHqQ",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNDkwYTI0NDRmZDc1NTIzZTI0YmY0MCIsInJvbGUiOiJvdmVyc2VlciIsImlzQWRtaW4iOmZhbHNlLCJpYXQiOjE3ODMxNzE2NDAsImV4cCI6MTc4OTIxOTY0MH0.JAqsxnh8mTzWm9Jb2Shn_4DqWArjhSawzy8ejhkffGg",
                 "type": "string"
               }
             },
@@ -177,7 +177,7 @@
             },
             "description": "",
             "url": {
-              "raw": "http://localhost:5000/api/users/6a240e86332a6ffd45ac32ab",
+              "raw": "http://localhost:5000/api/users/6a240f1d332a6ffd45ac32b0",
               "protocol": "http",
               "host": [
                 "localhost:5000"
@@ -185,7 +185,7 @@
               "path": [
                 "api",
                 "users",
-                "6a240e86332a6ffd45ac32ab"
+                "6a240f1d332a6ffd45ac32b0"
               ],
               "query": [],
               "variable": []
@@ -201,7 +201,7 @@
               "type": "bearer",
               "bearer": {
                 "key": "token",
-                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMjQwZTg2MzMyYTZmZmQ0NWFjMzJhYiIsInJvbGUiOiJzdHVkZW50IiwiaXNBZG1pbiI6ZmFsc2UsImlhdCI6MTc4MDc0ODY5NywiZXhwIjoxNzg2Nzk2Njk3fQ.AAiLYZjdgmjTccfxZDOO2De8SadYhC7kskddwFAaHqQ",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNDU4MGI2MDg2NDA4NzIyZDY3ZWM4OCIsInJvbGUiOiJwYXRpZW50IiwiaXNBZG1pbiI6ZmFsc2UsImlhdCI6MTc4MzE2OTg0MywiZXhwIjoxNzg5MjE3ODQzfQ.jQlGEuc_At6ogP6-4AINDml7vJGTPx-hd-MmH3yMFR8",
                 "type": "string"
               }
             },
@@ -231,7 +231,7 @@
               "type": "bearer",
               "bearer": {
                 "key": "token",
-                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMjQwZTg2MzMyYTZmZmQ0NWFjMzJhYiIsInJvbGUiOiJzdHVkZW50IiwiaXNBZG1pbiI6ZmFsc2UsImlhdCI6MTc4MDc0ODY5NywiZXhwIjoxNzg2Nzk2Njk3fQ.AAiLYZjdgmjTccfxZDOO2De8SadYhC7kskddwFAaHqQ",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNDU4MGI2MDg2NDA4NzIyZDY3ZWM4OCIsInJvbGUiOiJwYXRpZW50IiwiaXNBZG1pbiI6ZmFsc2UsImlhdCI6MTc4MzE2OTYyMywiZXhwIjoxNzg5MjE3NjIzfQ.mYzRB-irLiTdg1q0qMoQWEWjkUjftExZpa61ruAD4ww",
                 "type": "string"
               }
             },
@@ -281,7 +281,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n       \"email\":\"admin2@gmail.com\",\n   \"password\":\"admin2@gmail.com\",\n   \"first_name\":\"محمد\",\n   \"father_name\":\"صادق\",\n   \"last_name\":\"عوض\",\n   \"role\":\"patient\",\n   \"gender\":\"male\",\n  \"university_number\":\"12345\"\n}",
+              "raw": "{\n       \"email\":\"papo2@gmail.com\",\n   \"password\":\"papo2@gmail.com\",\n   \"first_name\":\"محمد\",\n   \"father_name\":\"صادق\",\n   \"last_name\":\"عوض\",\n   \"role\":\"student\",\n   \"gender\":\"male\",\n  \"university_number\":\"12345\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -315,7 +315,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"email\":\"admin@gmail.com\",\n   \"password\":\"admin@gmail.com\"\n}\n",
+              "raw": "{\n   \"email\":\"overseer4@gmail.com\",\n    \"password\":\"123456\"\n}\n",
               "options": {
                 "raw": {
                   "language": "json"
@@ -333,7 +333,7 @@
               "type": "bearer",
               "bearer": {
                 "key": "token",
-                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMjQwZTg2MzMyYTZmZmQ0NWFjMzJhYiIsInJvbGUiOiJzdHVkZW50IiwiaXNBZG1pbiI6ZmFsc2UsImlhdCI6MTc4MDc0ODY5NywiZXhwIjoxNzg2Nzk2Njk3fQ.AAiLYZjdgmjTccfxZDOO2De8SadYhC7kskddwFAaHqQ",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNDkwNWY2OTY0YzU2Y2U3NDBmZDcwZiIsInJvbGUiOiJzdHVkZW50IiwiaXNBZG1pbiI6ZmFsc2UsImlhdCI6MTc4MzE3MDgyNCwiZXhwIjoxNzg5MjE4ODI0fQ.iTEcUXs_2PxRJje7QHuezHrAFIsRvyaslNJ-n9Rm3tE",
                 "type": "string"
               }
             },
@@ -402,6 +402,45 @@
             "body": {
               "mode": "raw",
               "raw": "{\n    \"email\":\"student@gmail.com\",\n   \"password\":\"student@gmail.com\"\n}\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "loOut",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNDU4MGI2MDg2NDA4NzIyZDY3ZWM4OCIsInJvbGUiOiJwYXRpZW50IiwiaXNBZG1pbiI6ZmFsc2UsImlhdCI6MTc4MzE2OTYyMywiZXhwIjoxNzg5MjE3NjIzfQ.mYzRB-irLiTdg1q0qMoQWEWjkUjftExZpa61ruAD4ww",
+                "type": "string"
+              }
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:5000/api/auth/logout",
+              "protocol": "http",
+              "host": [
+                "localhost:5000"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "logout"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \n}\n",
               "options": {
                 "raw": {
                   "language": "json"
@@ -678,7 +717,7 @@
             },
             "description": "",
             "url": {
-              "raw": "http://localhost:5000/api/request/accept/6a2541f348a9e89165a8293d/6a245857f9761e2ebe978ae6",
+              "raw": "http://localhost:5000/api/request/accept/6a3a7e5b107b91c0f6122e28/6a245857f9761e2ebe978ae6",
               "protocol": "http",
               "host": [
                 "localhost:5000"
@@ -687,7 +726,7 @@
                 "api",
                 "request",
                 "accept",
-                "6a2541f348a9e89165a8293d",
+                "6a3a7e5b107b91c0f6122e28",
                 "6a245857f9761e2ebe978ae6"
               ],
               "query": [],
@@ -1122,7 +1161,7 @@
               "type": "bearer",
               "bearer": {
                 "key": "token",
-                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMjQwZjFkMzMyYTZmZmQ0NWFjMzJiMCIsInJvbGUiOiJvdmVyc2VlciIsImlzQWRtaW4iOnRydWUsImlhdCI6MTc4MDgzMDk4NiwiZXhwIjoxNzg2ODc4OTg2fQ.GVYDIY4uuvPAhBzza6Z-Dawu89faNuPok-nP3r8PerI",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMjQwZTg2MzMyYTZmZmQ0NWFjMzJhYiIsInJvbGUiOiJzdHVkZW50IiwiaXNBZG1pbiI6ZmFsc2UsImlhdCI6MTc4MDgyNzkxMiwiZXhwIjoxNzg2ODc1OTEyfQ.zt5UEqardJ3Ay6kGUIXdnQ1pQcUBRVTtftPMmexi5gA",
                 "type": "string"
               }
             },
@@ -1152,7 +1191,7 @@
               "type": "bearer",
               "bearer": {
                 "key": "token",
-                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMjQwZjFkMzMyYTZmZmQ0NWFjMzJiMCIsInJvbGUiOiJvdmVyc2VlciIsImlzQWRtaW4iOnRydWUsImlhdCI6MTc4MDgzMDk4NiwiZXhwIjoxNzg2ODc4OTg2fQ.GVYDIY4uuvPAhBzza6Z-Dawu89faNuPok-nP3r8PerI",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMjQwZTg2MzMyYTZmZmQ0NWFjMzJhYiIsInJvbGUiOiJzdHVkZW50IiwiaXNBZG1pbiI6ZmFsc2UsImlhdCI6MTc4MDgyNzkxMiwiZXhwIjoxNzg2ODc1OTEyfQ.zt5UEqardJ3Ay6kGUIXdnQ1pQcUBRVTtftPMmexi5gA",
                 "type": "string"
               }
             },
@@ -1211,7 +1250,7 @@
                 },
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n    \"email\":\"overseer1@gmail.com\",\n    \"password\":\"123456\",\n  \"first_name\":\"مشرف\",\n  \"father_name\":\"ابن\",\n  \"last_name\":\"كلب\"\n}",
+                  "raw": "{\n    \"email\":\"overseer4@gmail.com\",\n    \"password\":\"123456\",\n  \"first_name\":\"مشرف\",\n  \"father_name\":\"ابن\",\n  \"last_name\":\"كلب\"\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -1251,7 +1290,7 @@
                 },
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n    \"lesson_id\":\"6a245f5e635c61f1ff3b6e84\",\n  \"overseer_id\":\"6a245857f9761e2ebe978ae6\"\n}",
+                  "raw": "{\n    \"lesson_id\":\"6a245eca635c61f1ff3b6e80\",\n  \"overseer_id\":\"6a240f1d332a6ffd45ac32b0\"\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -1416,7 +1455,7 @@
                   "type": "bearer",
                   "bearer": {
                     "key": "token",
-                    "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMjQwZTI0MzMyYTZmZmQ0NWFjMzJhNCIsInJvbGUiOiJwYXRpZW50IiwiaXNBZG1pbiI6ZmFsc2UsImlhdCI6MTc4MDc2OTE0OSwiZXhwIjoxNzg2ODE3MTQ5fQ.Uaxev1Nu2tFSoI6CZSIOI-2MXiR1eElXuo9F1CXd4jA",
+                    "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMjQwZjFkMzMyYTZmZmQ0NWFjMzJiMCIsInJvbGUiOiJvdmVyc2VlciIsImlzQWRtaW4iOnRydWUsImlhdCI6MTc4MDc2NDEyOSwiZXhwIjoxNzg2ODEyMTI5fQ.ZeqSG3zyXljDMAWYakT072lnndXrohlnW88IlcE9wLI",
                     "type": "string"
                   }
                 },
@@ -1636,7 +1675,7 @@
                   "type": "bearer",
                   "bearer": {
                     "key": "token",
-                    "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5YjE4MGY4MTRiMGFkMzg2MjAyZTlkZCIsInJvbGUiOiJvdmVyc2VlciIsImlzQWRtaW4iOnRydWUsImlhdCI6MTc3NTA3NjMwMSwiZXhwIjoxNzgxMTI0MzAxfQ.bC82p-po2FOTV4qU7j8RvYnW_wD22M7Fb_2kGR4dbCI",
+                    "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMjQwZjFkMzMyYTZmZmQ0NWFjMzJiMCIsInJvbGUiOiJvdmVyc2VlciIsImlzQWRtaW4iOnRydWUsImlhdCI6MTc4MDc2NDEyOSwiZXhwIjoxNzg2ODEyMTI5fQ.ZeqSG3zyXljDMAWYakT072lnndXrohlnW88IlcE9wLI",
                     "type": "string"
                   }
                 },
@@ -1657,7 +1696,7 @@
                 },
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n \"course\":\"6a245bd7b3bfaf25ec919ca4\",\n  \"category\":\"6a24529e947520bc4dd07077\",\n  \"time\":\"يوم الأحد بعد صلاة الجمعة \",\n  \"hall\":\"قاعة الاطفال\" \n}\n",
+                  "raw": "[\n{\n \"course\":\"6a245bd7b3bfaf25ec919ca4\",\n  \"category\":\"6a24529e947520bc4dd07077\",\n  \"time\":\"بعد العيد بشوي \",\n  \"hall\":\"قاعة الاطفال\"\n},\n  {\n \"course\":\"6a245bd7b3bfaf25ec919ca4\",\n  \"category\":\"6a24529e947520bc4dd07077\",\n  \"time\":\"بعد العيد بشوي \",\n  \"hall\":\"قاعة الاطفال\"\n},\n  {\n \"course\":\"6a245bd7b3bfaf25ec919ca4\",\n  \"category\":\"6a24529e947520bc4dd07077\",\n  \"time\":\"بعد العيد بشوي \",\n  \"hall\":\"قاعة الاطفال\"\n}\n]\n",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -1863,6 +1902,46 @@
                 "body": {
                   "mode": "raw",
                   "raw": "{\r\n    \"treatment_case\": \"علاج تقويم أسنان مرحلة أولى\",\r\n    \"course\": \"69cd8e32f790497c93ab423e\"\r\n}\r\n",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "update practial lesson ",
+              "request": {
+                "method": "PUT",
+                "header": [],
+                "auth": {
+                  "type": "bearer",
+                  "bearer": {
+                    "key": "token",
+                    "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMjQwZjFkMzMyYTZmZmQ0NWFjMzJiMCIsInJvbGUiOiJvdmVyc2VlciIsImlzQWRtaW4iOnRydWUsImlhdCI6MTc4MDc2NDEyOSwiZXhwIjoxNzg2ODEyMTI5fQ.ZeqSG3zyXljDMAWYakT072lnndXrohlnW88IlcE9wLI",
+                    "type": "string"
+                  }
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:5000/api/admin/practical-lessons/6a245eca635c61f1ff3b6e80",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:5000"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "practical-lessons",
+                    "6a245eca635c61f1ff3b6e80"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n\"overseers\":[\n  \"6a245857f9761e2ebe978ae6\",\n  \"6a240f1d332a6ffd45ac32b0\"\n  ]  \n}\n",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -2173,7 +2252,7 @@
             },
             "description": "",
             "url": {
-              "raw": "http://localhost:5000/api/posts/6a25ba64b0e1e45bdc3a52fa/like",
+              "raw": "http://localhost:5000/api/posts/6a25ba040408b9d0ac75d931/like",
               "protocol": "http",
               "host": [
                 "localhost:5000"
@@ -2181,7 +2260,7 @@
               "path": [
                 "api",
                 "posts",
-                "6a25ba64b0e1e45bdc3a52fa",
+                "6a25ba040408b9d0ac75d931",
                 "like"
               ],
               "query": [],
@@ -2218,13 +2297,15 @@
               "variable": []
             },
             "body": {
-              "mode": "raw",
-              "raw": "{\n  \"text\":\"حاول قدر المستطاع متزنيييييش \"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "disabled": false,
+                  "type": "file",
+                  "src": "C:\\Users\\mahmoud\\Pictures\\Camera Roll\\WIN_20240801_07_04_31_Pro.jpg"
                 }
-              }
+              ]
             }
           }
         },
@@ -2526,6 +2607,48 @@
             "body": {
               "mode": "raw",
               "raw": "{\n  \"content\":\"الحسييييين\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "mi",
+      "item": [
+        {
+          "name": "Untitled",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:5000/api/ml/predict",
+              "protocol": "http",
+              "host": [
+                "localhost:5000"
+              ],
+              "path": [
+                "api",
+                "ml",
+                "predict"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"age\": 25,\n    \"gender\": \"male\",\n    \"pain_severity\": 8,\n    \"pain_time\": \"night\",\n    \"tooth_location\": 20,\n    \"is_pregnant\": false,\n    \"previous_treatment\": false,\n    \"takes_medication\": true,\n    \"medication_type\": \"painkiller\",\n    \"rating\": 4\n}",
               "options": {
                 "raw": {
                   "language": "json"

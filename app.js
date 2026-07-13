@@ -42,6 +42,10 @@ app.use('/api/posts/comments',require('./routes/comments'))
 app.use('/api/dashboard',require('./routes/dashbord'))
 app.use('/api/advertisements',require('./routes/advertisements'))
 
+// روت تدريب اول مودلليتنبأ بامكانية معالجة الحالة 
+app.use('/api/ml', require('./ml/routes/mlRoutes'));
+
+
 // خطأ 404 لأي راوتر آخر
 app.use((req, res) => {
   res.status(404).json({ message: 'Route not found' });

@@ -1,0 +1,25 @@
+{
+    "training": {
+        "batchSize": 10,
+        "testSize": 0.2,
+        "randomState": 42,
+        "kValues": [1, 3, 5, 7, 9, 11, 13, 15]
+    },
+    "model": {
+        "defaultK": 5,
+        "weights": "distance",
+        "metric": "euclidean"
+    },
+    "features": [
+        "age",
+        "gender",
+        "pain_severity",
+        "pain_time",
+        "tooth_location",
+        "is_pregnant",
+        "previous_treatment",
+        "takes_medication",
+        "medication_type",
+        "rating"
+    ]
+}

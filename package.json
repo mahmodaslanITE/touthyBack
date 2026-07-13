@@ -4,14 +4,21 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon app.js"
+    "start": "nodemon app.js",
+    "ml-export": "node ml/scripts/exportData.js",
+    "ml-preprocess": "node ml/scripts/preprocessData.js",
+    "ml-train": "node ml/scripts/trainModel.js",
+    "ml-full": "node ml/scripts/fullTrain.js"
   },
   "author": "mahmoud asslan",
   "license": "ISC",
   "dependencies": {
+    "@kanaries/ml": "^1.0.1",
     "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.2",
     "cloudinary": "^1.41.0",
+    "csv-parser": "^3.2.1",
+    "csv-writer": "^1.6.0",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "express-async-handler": "^1.2.0",
