@@ -1,0 +1,24 @@
+{
+    "training": {
+        "iterations": 5000,
+        "errorThresh": 0.005,
+        "learningRate": 0.3,
+        "hiddenLayers": [13, 7]
+    },
+    "features": [
+        "age",
+        "gender",
+        "pain_severity",
+        "pain_time",
+        "tooth_location",
+        "is_pregnant",
+        "previous_treatment",
+        "takes_medication",
+        "medication_type"
+    ],
+    "image": {
+        "width": 64,
+        "height": 64,
+        "channels": 3
+    }
+}

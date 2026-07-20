@@ -45,6 +45,10 @@ app.use('/api/advertisements',require('./routes/advertisements'))
 // روت تدريب اول مودلليتنبأ بامكانية معالجة الحالة 
 app.use('/api/ml', require('./ml/routes/mlRoutes'));
 
+// تدريب مودل على توقع نوع الحالة 
+app.use('/api/treatment-ml', require('./ml-treatment/routes/treatmentRoutes'));
+
+
 
 // خطأ 404 لأي راوتر آخر
 app.use((req, res) => {

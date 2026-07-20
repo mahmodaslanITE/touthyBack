@@ -3,6 +3,7 @@
 // ============================================================
 
 const { request } = require("express");
+const { formateImageUrl } = require("./formate");
 
 /**
  * Format requests to separate case_type from course
@@ -144,6 +145,10 @@ async function getRequestsByStatus({ Model,status, user, additionalQuery = {} })
         .lean();
     requests.map((request)=>{
         request.status=getStatusRequest(status);
+        if(request.Requestion.photo?.url){
+            request.Requestion.photo.url=formateImageUrl(request.Requestion.photo.url)
+        }
+        
        
     })
     // Format requests

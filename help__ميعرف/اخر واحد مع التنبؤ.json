@@ -2622,14 +2622,16 @@
       "item": [
         {
           "name": "Untitled",
-          "protocolProfileBehavior": {
-            "disableBodyPruning": true
-          },
           "request": {
-            "method": "GET",
+            "method": "POST",
             "header": [],
             "auth": {
-              "type": "noauth"
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNDkwYTI0NDRmZDc1NTIzZTI0YmY0MCIsInJvbGUiOiJvdmVyc2VlciIsImlzQWRtaW4iOmZhbHNlLCJpYXQiOjE3ODQwMjQxMzcsImV4cCI6MTc5MDA3MjEzN30.YqRQBtjgKwaWTna-g8_0vNWmnkK61cYHaIUxPJLRzBA",
+                "type": "string"
+              }
             },
             "description": "",
             "url": {
@@ -2654,6 +2656,129 @@
                   "language": "json"
                 }
               }
+            }
+          }
+        },
+        {
+          "name": "treatment with image",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNDkwYTI0NDRmZDc1NTIzZTI0YmY0MCIsInJvbGUiOiJvdmVyc2VlciIsImlzQWRtaW4iOmZhbHNlLCJpYXQiOjE3ODQwMjQxMzcsImV4cCI6MTc5MDA3MjEzN30.YqRQBtjgKwaWTna-g8_0vNWmnkK61cYHaIUxPJLRzBA",
+                "type": "string"
+              }
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:5000/api/treatment-predict/predict-with-image",
+              "protocol": "http",
+              "host": [
+                "localhost:5000"
+              ],
+              "path": [
+                "api",
+                "treatment-predict",
+                "predict-with-image"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"age\": 25,\n    \"gender\": \"male\",\n    \"pain_severity\": 8,\n    \"pain_time\": \"night\",\n    \"tooth_location\": 20,\n    \"is_pregnant\": false,\n    \"previous_treatment\": false,\n    \"takes_medication\": true,\n    \"medication_type\": \"painkiller\",\n    \"rating\": 4\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "predact treatment with image",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMjQwZTI0MzMyYTZmZmQ0NWFjMzJhNCIsInJvbGUiOiJwYXRpZW50IiwiaXNBZG1pbiI6ZmFsc2UsImlhdCI6MTc4MDgyNTg2MCwiZXhwIjoxNzg2ODczODYwfQ.bURUqBr7SDdGZWAkng79-ZEIQzoT0dW2Fp_BJT45mBw",
+                "type": "string"
+              }
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:5000/api/treatment-ml/predict-with-image",
+              "protocol": "http",
+              "host": [
+                "localhost:5000"
+              ],
+              "path": [
+                "api",
+                "treatment-ml",
+                "predict-with-image"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "gender",
+                  "disabled": false,
+                  "type": "text",
+                  "value": "male"
+                },
+                {
+                  "key": "pain_severity",
+                  "disabled": false,
+                  "type": "text",
+                  "value": "5"
+                },
+                {
+                  "key": "pain_time",
+                  "disabled": false,
+                  "type": "text",
+                  "value": "every day"
+                },
+                {
+                  "key": "tooth_location",
+                  "disabled": false,
+                  "type": "text",
+                  "value": "23"
+                },
+                {
+                  "key": "age",
+                  "disabled": false,
+                  "type": "text",
+                  "value": "12"
+                },
+                {
+                  "key": "case_type",
+                  "disabled": false,
+                  "type": "text",
+                  "value": "6a245cdce5e4159c8d00cb45"
+                },
+                {
+                  "key": "is_pragnent",
+                  "disabled": true,
+                  "type": "text",
+                  "value": "true"
+                },
+                {
+                  "key": "image",
+                  "disabled": false,
+                  "type": "file",
+                  "src": "C:\\Users\\mahmoud\\Pictures\\knn.png",
+                  "contentType": "image/png"
+                }
+              ]
             }
           }
         }
