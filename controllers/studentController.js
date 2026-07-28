@@ -7,7 +7,8 @@ const Treatment = require('../models/Treatment');
 const socket = require('../socket/init');
 const { Pending_request } = require('../models/Pending_request');
 const {  Overseer_profile } = require('../models/Overseer_profile');
-const InProcess_request=require('../models/InProcess_request')
+const InProcess_request=require('../models/InProcess_request');
+const { formatRequestResponse } = require('../utils/formatedRequests');
 
 // ============================================================
 // 🎓 STUDENT CONTROLLER
@@ -120,30 +121,9 @@ module.exports.showAllRequests = asyncHandler(async (req, res) => {
             select: '-_id first_name father_name last_name'
         });
 
-    const formattedRequests = requests.map(item => ({
-        _id: item._id,
-        status:'pending',
-        ...(req.user.isAdmin && { patient: item.user }),
-        Requestion: {
-            pain_severity: item.pain_severity,
-            pain_time: item.pain_time,
-            tooth_location: item.tooth_location,
-            gender: item.gender,
-            more_details: item.more_details,
-            age: item.age,
-            photo: {url:`${process.env.BASE_URL}/${item.photo.url}`},
-            createdAt: item.createdAt,
-            updatedAt: item.updatedAt
-        },
-        case_type: {
-            _id: item.case_type?._id,
-            case_type: item.case_type?.case_type
-        },
-        course_info: item.case_type?.course ? {
-            _id: item.case_type.course._id,
-            course_name: item.case_type.course.course_name
-        } : null
-    }));
+    const formattedRequests = requests.map((item)=>{
+       return  formatRequestResponse(req,item)
+    })
 
     res.status(200).json({
         status: 'success',

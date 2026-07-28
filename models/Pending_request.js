@@ -35,15 +35,27 @@ const TreatmentRequestSchema = new mongoose.Schema(
     is_pregnant: {
       type: Boolean,
     },
-    more_details: {
-      type: Object,
-      maxlength: 1000
-    },
     age:{
 type:String,
 required:true,
-
-    },
+},
+previous_treatment: {
+  type: String,
+  maxlength: 50,
+  required: true
+},
+medicines: {
+  type: String,
+  maxlength: 50,
+},
+chronic_diseases: {
+  type: String,
+  maxlength: 50,
+},
+notes: {
+  type: String,
+  maxlength: 50,
+},
     photo: {
         type: Object,
         default: {
@@ -69,6 +81,10 @@ const validateTreatmentRequest = (data) => {
       }),
       otherwise: Joi.optional()
     }),
+    notes:Joi.string().max(50).required(),
+    chronic_diseases:Joi.string().max(50).required(),
+    medicines:Joi.string().max(50).required(),
+    previous_treatment:Joi.string().max(50).required(),
     caseImageUrl: Joi.string().uri().optional(),
     case_type: Joi.string().max(100).required(),
     

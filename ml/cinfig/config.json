@@ -18,8 +18,8 @@
         "tooth_location",
         "is_pregnant",
         "previous_treatment",
-        "takes_medication",
-        "medication_type",
-        "rating"
+        "medicines",
+        "chronic_diseases",
+        "notes"
     ]
 }

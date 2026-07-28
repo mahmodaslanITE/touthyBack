@@ -1,5 +1,5 @@
 // ml/scripts/exportData.js
-require('dotenv').config();  // ✅ أضف هذا السطر في البداية
+require('dotenv').config();  
 const DataService = require('../services/dataService');
 
 async function main() {

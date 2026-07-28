@@ -86,27 +86,7 @@ async checkBatchSize() {
     }
 }
 
-    // ============================================================
-    // 📊 استخراج more_details
-    // ============================================================
-
-    extractMoreDetails(item) {
-        let previous_treatment = false;
-        let takes_medication = false;
-        let medication_type = null;
-
-        if (item.more_details) {
-            const details = typeof item.more_details === 'string'
-                ? JSON.parse(item.more_details)
-                : item.more_details;
-
-            previous_treatment = details.previous_treatment || false;
-            takes_medication = details.takes_medication || false;
-            medication_type = details.medication_type || null;
-        }
-
-        return { previous_treatment, takes_medication, medication_type };
-    }
+   
 
     // ============================================================
     // 📊 تنسيق البيانات للتدريب
@@ -114,7 +94,6 @@ async checkBatchSize() {
 
     formatData(items, status) {
         return items.map(item => {
-            const details = this.extractMoreDetails(item);
             return {
                 age: item.age || 25,
                 gender: item.gender || 'male',
@@ -122,10 +101,10 @@ async checkBatchSize() {
                 pain_time: item.pain_time || 'all',
                 tooth_location: parseInt(item.tooth_location) || 20,
                 is_pregnant: item.is_pregnant || false,
-                previous_treatment: details.previous_treatment,
-                takes_medication: details.takes_medication,
-                medication_type: details.medication_type,
-                rating: item.rating || (status === 1 ? 4 : 1),
+                previous_treatment: item.previous_treatment,
+                medicines:item.medicines,
+                chronic_diseases:item.medicines,
+                notes:item.notes,
                 status: status
             };
         });
@@ -138,8 +117,9 @@ async checkBatchSize() {
     async saveToCSV(data, filePath) {
         const headers = [
             'age', 'gender', 'pain_severity', 'pain_time', 'tooth_location',
-            'is_pregnant', 'previous_treatment', 'takes_medication', 'medication_type',
-            'rating', 'status'
+            'is_pregnant', 'previous_treatment',  "medicines",
+        "chronic_diseases",
+        "notes",'status'
         ];
 
         const dir = path.dirname(filePath);
