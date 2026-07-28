@@ -7,6 +7,7 @@ const getUserProfile = require('../../utils/users');
 const fs = require('fs');
 const path = require('path');
 const { formatPost } = require('../../utils/formate');
+const Pending_posts = require('../../models/Correspondence/Pending_posts');
 
 // ============================================================
 // 📦 HELPER FUNCTIONS
@@ -166,7 +167,7 @@ exports.createPost = asyncHandler(async (req, res) => {
         publicId: `posts/${file.filename.split('.')[0]}`
     })) || [];
 
-    const post = await Post.create({
+    const post = await Pending_posts.create({
         publisher: userId,
         publisher_role: userRole,
         content: content.trim(),
@@ -482,3 +483,75 @@ exports.dislikePost = asyncHandler(async (req, res) => {
         }
     });
 });
+
+// ============================================================
+// ❤️ Pending posts 
+// ============================================================
+/**
+ * @description Get all pending posts (Only admins) and user pending posts 
+ * @route GET /api/posts/pending
+ * @access Private (any authenticated user)
+ */
+module.exports.getPendingPosts=asyncHandler(async(req,res)=>{
+    const user=req.user;
+    const userRole=user.role;
+    const isAdmin=user.isAdmin
+    let result=null;
+    let message=''
+    if(isAdmin){
+        result=await Pending_posts.find();
+        message='هذه هي جميع البوستات المعلقة وبانتظار موافقتك  كونك الأدمن'
+    }
+    else{
+        result=await Pending_posts.find({publisher:req.user.id})
+        message='هذه هي البوستات المعلقة الخاصة بك '
+    }
+    const formattedPosts = await Promise.all(
+        result.map(post => formatPost(post, req.user.id))
+    );
+    res.status(200).json({
+        status:'success',
+        count:result.length,
+        message:message,
+        data:formattedPosts
+    })
+})
+
+
+/**
+ * @description accept pending posts
+ * @route POST /api/posts/pending/accept/:id
+ * @access Private (any authenticated user)
+ */
+module.exports.acceptPendingPost=asyncHandler(async(req,res)=>{
+    const isAdmin=req.user.isAdmin;
+    const postId=req.params.id
+    if(!isAdmin){
+        return res.status(403).json({
+            status:'erroe',
+            message:'غير مصرح لك فقط للمشرفين '
+        })
+    }
+const post=await Pending_posts.findById(postId);
+if(!post){
+    return res.status(404).json({
+        status:'error',
+        message:'البوست غير موجود او تم قبوله او حذفه '
+    })
+}
+
+const newpost=await Post.create({
+    publisher:post.publisher,
+    publisher_role:post.publisher_role,
+    content:post.content,
+    images:post.images
+})
+
+await Pending_posts.findByIdAndDelete(postId)
+res.status(201).json({
+    status:'success',
+    message:' تمت الموافقة على المنشور ونشره للعامة ',
+    data:newpost
+})
+})
+

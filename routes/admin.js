@@ -5,6 +5,7 @@ const { verifyAccountAccept, verifyAccountReject, getAllStudents, addCategory, g
 const { getAllPatients } = require('../controllers/adminControllers/patientsController');
 const { createCourse, getCourses, addTreatment, getAllTreatments, deleteTreatment, addPracticalLesson, getAllLessons, updatePracialLesson } = require('../controllers/adminControllers/courses_and_treatments');
 const { adminUpdateInProcess } = require('../controllers/adminControllers/requestions_controller');
+const { notifyAll } = require('../controllers/adminControllers/notifyController');
 
 const router=express.Router();
 // add over seer 
@@ -39,6 +40,9 @@ router.get('/practical-lessons',verifyToken,getAllLessons)
 router.put('/practical-lessons/:id',verifyToken,updatePracialLesson)
 
 // inprocess 
-router.put('/in-proccess/:id',verifyToken,adminUpdateInProcess)
+router.put('/in-proccess/:id',verifyToken,adminUpdateInProcess) 
+
+//  notify 
+router.post('/notify',verifyToken,notifyAll)
 
 module.exports=router

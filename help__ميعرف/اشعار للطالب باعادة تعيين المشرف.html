@@ -30,6 +30,10 @@
       console.log("وصل إشعار:", data);
       alert(data.message);
     });
+    socket.on("noify", (data) => {
+      console.log("وصل إشعار:", data);
+      alert(data.message);
+    });
 
     // عند انقطاع الاتصال
     socket.on("disconnect", () => {

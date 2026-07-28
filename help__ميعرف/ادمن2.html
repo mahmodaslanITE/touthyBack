@@ -20,8 +20,12 @@
     socket.on("connect", () => {
       console.log("متصل بالسيرفر عبر socket.io, id:", socket.id);
 
-      const patientId = '69c4e8436c62669c644346a6'; 
+      const patientId = '6a240f1d332a6ffd45ac32b0'; 
       socket.emit("registerPatient", patientId);
+    });
+    socket.on("noify", (data) => {
+      console.log("وصل إشعار:", data);
+      alert(data.message);
     });
 
     // استقبال الإشعار من السيرفر
