@@ -81,9 +81,9 @@ const validateTreatmentRequest = (data) => {
       }),
       otherwise: Joi.optional()
     }),
-    notes:Joi.string().max(50).required(),
-    chronic_diseases:Joi.string().max(50).required(),
-    medicines:Joi.string().max(50).required(),
+    notes:Joi.string().max(50),
+    chronic_diseases:Joi.string().max(50),
+    medicines:Joi.string().max(50),
     previous_treatment:Joi.string().max(50).required(),
     caseImageUrl: Joi.string().uri().optional(),
     case_type: Joi.string().max(100).required(),
