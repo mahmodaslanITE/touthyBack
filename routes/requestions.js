@@ -9,7 +9,7 @@ const router=express.Router();
 router.post('/',verifyToken,uploadRequestPhoto.single('photo'),createTreatmentRequest);
 
 // show all requestions from student
-router.get('/',verifyToken,showAllRequests)
+router.get('/pending',verifyToken,showAllRequests)
 
 // the user can see his own requests
 router.get('/my',verifyToken,getUserTreatmentRequests);

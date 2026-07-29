@@ -100,14 +100,11 @@ module.exports.getCourseOverseers = asyncHandler(async (req, res) => {
  * @access Private (Student or Admin)
  */
 module.exports.showAllRequests = asyncHandler(async (req, res) => {
-    if (req.user.role === 'patient') {
-        return res.status(403).json({
-            status: 'error',
-            message: 'المرضى لا يمكنهم رؤية طلبات الآخرين'
-        });
-    }
-
-    const requests = await Pending_request.find()
+    const userRole=req.user.role
+let requests
+let message;
+if(userRole=='student'){
+     requests = await Pending_request.find()
         .populate({
             path: 'case_type',
             select: '_id case_type course',
@@ -120,14 +117,20 @@ module.exports.showAllRequests = asyncHandler(async (req, res) => {
             localField: 'user',
             select: '-_id first_name father_name last_name'
         });
-
+        message='هذه هي جميع الطلبات الخاصة بالمرضى'
+    }
+    else if(userRole=='patient'){
+        requests = await Pending_request.find({ user: req.user.id })
+        .populate('case_type', '_id case_type');
+        message='أنت مريض ...يمكنك رؤية طلباتك فقط '
+    }
     const formattedRequests = requests.map((item)=>{
        return  formatRequestResponse(req,item)
     })
 
     res.status(200).json({
         status: 'success',
-        message: 'هذه هي جميع الطلبات',
+        message: message,
         count: formattedRequests.length,
         data: formattedRequests
     });
@@ -142,7 +145,7 @@ module.exports.acceptRequest = asyncHandler(async (req, res) => {
     const { id, overseer: overseerId } = req.params;
     const studentId = req.user.id;
 
-    if (req.user.role !== 'student') {
+    if (req.user.role !== 'student' ) {
         return res.status(403).json({
             status: 'error',
             message: 'غير مسموح، هذه الخدمة للطلاب فقط'
