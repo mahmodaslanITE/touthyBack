@@ -40,8 +40,7 @@ type:String,
 required:true,
 },
 previous_treatment: {
-  type: String,
-  maxlength: 50,
+  type: Boolean,
   required: true
 },
 medicines: {
@@ -84,7 +83,7 @@ const validateTreatmentRequest = (data) => {
     notes:Joi.string().max(50),
     chronic_diseases:Joi.string().max(50),
     medicines:Joi.string().max(50),
-    previous_treatment:Joi.string().max(50).required(),
+    previous_treatment:Joi.boolean().required(),
     caseImageUrl: Joi.string().uri().optional(),
     case_type: Joi.string().max(100).required(),
     
