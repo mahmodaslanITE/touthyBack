@@ -555,3 +555,35 @@ res.status(201).json({
 })
 })
 
+
+/**
+ * @description delete pending post
+ * @route POST /api/posts/pending/accept/:id
+ * @access Private (any authenticated user)
+ */
+module.exports.deletePendingPost=asyncHandler(async(req,res)=>{
+    const isAdmin=req.user.isAdmin;
+    const postId=req.params.id
+    if(!isAdmin){
+        return res.status(403).json({
+            status:'erroe',
+            message:'غير مصرح لك فقط للمشرفين '
+        })
+    }
+const post=await Pending_posts.findById(postId);
+if(!post){
+    return res.status(404).json({
+        status:'error',
+        message:'البوست غير موجود او تم قبوله او حذفه '
+    })
+}
+
+
+
+await Pending_posts.findByIdAndDelete(postId)
+res.status(201).json({
+    status:'success',
+    message:' تم حذف المنشور بنجاح ',
+    
+})
+})

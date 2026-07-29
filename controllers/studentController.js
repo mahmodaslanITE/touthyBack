@@ -103,7 +103,8 @@ module.exports.showAllRequests = asyncHandler(async (req, res) => {
     const userRole=req.user.role
 let requests
 let message;
-if(userRole=='student'){
+const isAdmin=req.user.isAdmin
+if(userRole=='student' || isAdmin){
      requests = await Pending_request.find()
         .populate({
             path: 'case_type',

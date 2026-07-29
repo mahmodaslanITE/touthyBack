@@ -11,7 +11,8 @@ const {
     dislikePost,
     likePost,
     getPendingPosts,
-    acceptPendingPost
+    acceptPendingPost,
+    deletePendingPost
 } = require('../controllers/CorrespondenceControllers/postController');
 
 // 🔓 جميع الروتات تحتاج مصادقة
@@ -21,9 +22,10 @@ router.use(verifyToken);
 router.post('/', uploadPostImages.array('images'),verifyToken, createPost);
 router.get('/', getAllPosts);
 router.get('/pending', getPendingPosts);
+router.delete('/pending/:id', deletePendingPost);
 router.post('/pending/accept/:id', acceptPendingPost);
 router.get('/:id', getPostById);
-router.put('/:id', uploadPostImages.array('images', 5), updatePost);
+router.put('/:id', uploadPostImages.array('images', 5), updatePost);    
 router.delete('/:id', deletePost);
 
 // ❤️ تفاعلات
