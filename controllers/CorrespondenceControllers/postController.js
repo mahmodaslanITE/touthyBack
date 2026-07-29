@@ -583,7 +583,7 @@ if(!post){
 await Pending_posts.findByIdAndDelete(postId)
 res.status(201).json({
     status:'success',
-    message:' تم حذف المنشور بنجاح ',
+    message:' تم حذف المنشور بنجاح من المنشورات المعلقة ',
     
 })
 })
