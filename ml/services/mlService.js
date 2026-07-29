@@ -22,12 +22,12 @@ class MLService {
                 return config;
             }
             return {
-                model: { defaultK: 5, weights: 'distance' },
-                training: { kValues: [1, 3, 5, 7, 9, 11, 13, 15] }
+                model: { defaultK: 3, weights: 'distance' },
+                training: { kValues: [1, 3, 5, 7] }
             };
         } catch (error) {
             console.error('Error loading config:', error.message);
-            return { model: { defaultK: 5, weights: 'distance' } };
+            return { model: { defaultK: 3, weights: 'distance' } };
         }
     }
 
@@ -45,6 +45,26 @@ class MLService {
         }
     }
 
+    // ✅ دالة محسنة لحساب الثقة
+    calculateConfidence(prediction, nearestK, y, X, normalizedFeatures) {
+        // 1. ثقة التصويت (نسبة الجيران المتفقين مع التنبؤ)
+        const votes = nearestK.map(d => y[d.index]);
+        const positiveVotes = votes.filter(v => v === prediction).length;
+        const voteConfidence = (positiveVotes / votes.length) * 100;
+        
+        // 2. ثقة المسافة (كلما كانت المسافة أصغر، زادت الثقة)
+        const avgDistance = nearestK.reduce((sum, d) => sum + d.distance, 0) / nearestK.length;
+        
+        // تطبيع المسافة: نفترض أن أقصى مسافة ممكنة هي 10
+        const normalizedDistance = Math.min(avgDistance / 10, 1);
+        const distanceConfidence = (1 - normalizedDistance) * 100;
+        
+        // 3. دمج الثقتين (وزن أكبر للتصويت)
+        const finalConfidence = (voteConfidence * 0.6) + (distanceConfidence * 0.4);
+        
+        return Math.min(100, Math.max(0, finalConfidence));
+    }
+
     async train() {
         try {
             console.log('⏳ Training KNN model...');
@@ -56,14 +76,31 @@ class MLService {
                 return { success: false, message: 'No training data found' };
             }
 
-            const features = ['age', 'gender', 'pain_severity', 'pain_time', 'tooth_location',
-                'is_pregnant', 'previous_treatment', 'takes_medication', 'medication_type', 'rating'];
+            // ✅ استخدم الميزات من config أو الميزات المتاحة
+            const config = this.loadConfig();
+            let features = config.features || ['age', 'gender', 'pain_severity', 'pain_time', 
+                'tooth_location', 'is_pregnant', 'previous_treatment', 'medicines', 
+                'chronic_diseases', 'notes', 'case_type'];
 
-            const X = data.map(row => features.map(f => parseFloat(row[f])));
+            // ✅ تحويل البيانات إلى أرقام
+            const X = data.map(row => {
+                return features.map(f => {
+                    const val = row[f];
+                    if (f === 'medicines' || f === 'chronic_diseases' || f === 'notes') {
+                        return val ? val.length : 0;
+                    }
+                    if (f === 'case_type') {
+                        return val ? val.toString().split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) : 0;
+                    }
+                    return parseFloat(val) || 0;
+                });
+            });
+            
             const y = data.map(row => parseInt(row.status));
 
             console.log(`📊 Training data: ${X.length} samples, ${features.length} features`);
 
+            // ✅ استخدام 80% للتدريب و 20% للاختبار
             const splitIndex = Math.floor(X.length * 0.8);
             const X_train = X.slice(0, splitIndex);
             const y_train = y.slice(0, splitIndex);
@@ -73,10 +110,9 @@ class MLService {
             console.log(`📊 Training set: ${X_train.length} samples`);
             console.log(`📊 Testing set: ${X_test.length} samples`);
 
-            const config = this.loadConfig();
-            const kValues = config.training.kValues || [1, 3, 5, 7, 9, 11, 13, 15];
-
-            let bestK = config.model.defaultK || 5;
+            // ✅ البحث عن أفضل قيمة K (استخدم قيم أصغر لبيانات قليلة)
+            const kValues = [1, 3, 5, 7];
+            let bestK = 3;
             let bestScore = 0;
 
             for (const k of kValues) {
@@ -106,6 +142,7 @@ class MLService {
 
             console.log(`✅ Best K: ${bestK} (Accuracy: ${(bestScore * 100).toFixed(2)}%)`);
 
+            // ✅ تدريب النموذج النهائي بأفضل قيمة K
             const finalKnn = new Neighbors.KNearstNeighbors(bestK, 'distance', '2-norm');
             finalKnn.fit(X, y);
 
@@ -133,7 +170,6 @@ class MLService {
             console.log(`   Training samples: ${X.length}`);
             console.log(`\n✅ Model saved to: ${this.modelPath}`);
 
-            // ✅ تحديث العدد الذي تم التدريب عليه
             const totalRecords = await DataService.getTotalRecordsCount();
             DataService.setLastTrainedCount(totalRecords);
 
@@ -175,19 +211,25 @@ class MLService {
         }
     }
 
+    // ✅ دالة predict المحسنة
     async predict(patientData) {
         try {
+            // 1. تحميل المعيار
             if (!this.loadScaler()) {
                 throw new Error('Scaler not found. Please preprocess data first.');
             }
 
+            // 2. تحميل النموذج
             if (!this.isTrained) {
-                this.loadModel();
+                const loaded = this.loadModel();
+                if (!loaded) {
+                    throw new Error('Model is not trained. Please train first.');
+                }
             }
 
+            // 3. ترميز البيانات
             const genderMap = { male: 0, female: 1 };
             const painTimeMap = { morning: 0, evening: 1, night: 2, all: 3 };
-            const medTypeMap = { '': 0, painkiller: 1, antibiotic: 2, multiple: 3 };
 
             const features = [
                 parseFloat(patientData.age) || 25,
@@ -197,36 +239,67 @@ class MLService {
                 parseFloat(patientData.tooth_location) || 20,
                 patientData.is_pregnant ? 1 : 0,
                 patientData.previous_treatment ? 1 : 0,
-                patientData.takes_medication ? 1 : 0,
-                medTypeMap[patientData.medication_type] !== undefined ? medTypeMap[patientData.medication_type] : 0,
-                parseFloat(patientData.rating) || 3
+                patientData.medicines ? patientData.medicines.length : 0,
+                patientData.chronic_diseases ? patientData.chronic_diseases.length : 0,
+                patientData.notes ? patientData.notes.length : 0,
+                patientData.case_type ? patientData.case_type.toString().split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) : 0
             ];
 
+            // 4. تطبيع البيانات
             const { means, stds } = this.scaler;
             const normalizedFeatures = features.map((val, i) => {
                 const featureName = this.scaler.features[i] || `feature_${i}`;
                 return (val - means[featureName]) / stds[featureName];
             });
 
+            // 5. جلب بيانات التدريب
             const data = await DataService.getTrainingData();
             if (!data || data.length === 0) {
                 throw new Error('No training data available for prediction.');
             }
 
             const featureNames = ['age', 'gender', 'pain_severity', 'pain_time', 'tooth_location',
-                'is_pregnant', 'previous_treatment', 'takes_medication', 'medication_type', 'rating'];
+                'is_pregnant', 'previous_treatment', 'medicines', 'chronic_diseases', 'notes', 'case_type'];
 
-            const X = data.map(row => featureNames.map(f => parseFloat(row[f])));
+            // ✅ تحويل بيانات التدريب إلى مصفوفة رقمية
+            const X = data.map(row => {
+                return featureNames.map(f => {
+                    const val = row[f];
+                    if (f === 'medicines' || f === 'chronic_diseases' || f === 'notes') {
+                        return val ? val.length : 0;
+                    }
+                    if (f === 'case_type') {
+                        return val ? val.toString().split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) : 0;
+                    }
+                    return parseFloat(val) || 0;
+                });
+            });
+            
             const y = data.map(row => parseInt(row.status));
 
-            const knn = new Neighbors.KNearstNeighbors(9, 'distance', '2-norm');
+            if (X.length === 0 || y.length === 0) {
+                throw new Error('No valid training data available.');
+            }
+
+            // ✅ استخدم أفضل قيمة K من النموذج المدرب
+            let bestK = 3;
+            try {
+                const modelData = JSON.parse(fs.readFileSync(this.modelPath, 'utf8'));
+                bestK = modelData.bestK || 3;
+            } catch (e) {
+                console.warn('Could not read best K from model, using default 3');
+            }
+
+            // 6. تدريب نموذج مؤقت للتنبؤ
+            const knn = new Neighbors.KNearstNeighbors(bestK, 'distance', '2-norm');
             knn.fit(X, y);
 
+            // 7. التنبؤ
             const prediction = knn.predict([normalizedFeatures])[0];
 
-            // حساب الثقة
+            // 8. حساب الثقة المحسنة
             const distances = [];
-            const k = 9;
+            const k = Math.min(bestK, X.length);
 
             for (let i = 0; i < X.length; i++) {
                 let dist = 0;
@@ -239,13 +312,9 @@ class MLService {
 
             distances.sort((a, b) => a.distance - b.distance);
             const nearestK = distances.slice(0, k);
-            let avgDistance = 0;
-            for (const d of nearestK) {
-                avgDistance += d.distance;
-            }
-            avgDistance = avgDistance / nearestK.length;
-
-            const confidence = Math.max(0, Math.min(100, (1 / (1 + avgDistance)) * 100));
+            
+            // ✅ حساب الثقة بطريقة محسنة
+            const confidence = this.calculateConfidence(prediction, nearestK, y, X, normalizedFeatures);
 
             return {
                 prediction: prediction === 1 ? '✅ مقبولة' : '❌ مرفوضة',
@@ -255,6 +324,7 @@ class MLService {
 
         } catch (error) {
             console.error('❌ Prediction error:', error.message);
+            console.error('Stack:', error.stack);
             throw error;
         }
     }

@@ -20,6 +20,7 @@
         "previous_treatment",
         "medicines",
         "chronic_diseases",
-        "notes"
+        "notes",
+        "case_type"
     ]
 }

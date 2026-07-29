@@ -1,5 +1,5 @@
 // ml/scripts/exportData.js
-require('dotenv').config();  
+require('dotenv').config();
 const DataService = require('../services/dataService');
 
 async function main() {

@@ -13,10 +13,6 @@ class DataService {
         this.trainedCountPath = path.join(__dirname, '../data/metadata/trained_count.json');
     }
 
-    // ============================================================
-    // 📊 إدارة عدد الحالات المدربة
-    // ============================================================
-
     setLastTrainedCount(count) {
         try {
             const dir = path.dirname(this.trainedCountPath);
@@ -63,63 +59,59 @@ class DataService {
         }
     }
 
+    async checkBatchSize() {
+        try {
+            const currentCount = await this.getTotalRecordsCount();
+            const previousCount = this.getLastTrainedCount() || currentCount;
+            const newRecords = currentCount - previousCount;
 
-async checkBatchSize() {
-    try {
-        const currentCount = await this.getTotalRecordsCount();
-        const previousCount = this.getLastTrainedCount();  // ✅ لا تستخدم || currentCount
-        
-        // ✅ إذا كان الملف غير موجود أو previousCount = 0، فهذا أول تدريب
-        if (previousCount === 0) {
-            console.log('🔄 First training detected (no trained count).');
-            return true;
+            console.log(`📊 Previous: ${previousCount}, Current: ${currentCount}, New: ${newRecords}`);
+
+            if (previousCount === 0) {
+                console.log('🔄 First training detected. Starting initial training...');
+                return true;
+            }
+
+            return newRecords >= 10;
+
+        } catch (error) {
+            console.error('Error checking batch size:', error.message);
+            return false;
         }
-        
-        const newRecords = currentCount - previousCount;
-        console.log(`📊 Previous: ${previousCount}, Current: ${currentCount}, New: ${newRecords}`);
-        
-        return newRecords >= 10;
-
-    } catch (error) {
-        console.error('Error checking batch size:', error.message);
-        return false;
     }
-}
 
-   
-
-    // ============================================================
-    // 📊 تنسيق البيانات للتدريب
-    // ============================================================
-
+    // ✅ الدالة المعدلة - تستخرج البيانات من Requestion و more_details مع case_type
     formatData(items, status) {
         return items.map(item => {
+            // ✅ استخراج البيانات من Requestion إذا كانت موجودة
+            const req = item.Requestion || item;
+            
+            // ✅ استخراج more_details إذا كانت موجودة
+            const moreDetails = req.more_details || {};
+            
             return {
-                age: item.age || 25,
-                gender: item.gender || 'male',
-                pain_severity: item.pain_severity || 5,
-                pain_time: item.pain_time || 'all',
-                tooth_location: parseInt(item.tooth_location) || 20,
-                is_pregnant: item.is_pregnant || false,
-                previous_treatment: item.previous_treatment,
-                medicines:item.medicines,
-                chronic_diseases:item.medicines,
-                notes:item.notes,
+                age: req.age || 25,
+                gender: req.gender || 'male',
+                pain_severity: req.pain_severity || 5,
+                pain_time: req.pain_time || 'all',
+                tooth_location: parseInt(req.tooth_location) || 20,
+                is_pregnant: req.is_pregnant || false,
+                previous_treatment: moreDetails.previous_treatment || false,
+                medicines: moreDetails.medicines || '',
+                chronic_diseases: moreDetails.chronic_diseases || '',
+                notes: moreDetails.notes || '',
+                case_type: req.case_type || item.case_type || '',
                 status: status
             };
         });
     }
 
-    // ============================================================
-    // 💾 حفظ البيانات كـ CSV
-    // ============================================================
-
     async saveToCSV(data, filePath) {
         const headers = [
             'age', 'gender', 'pain_severity', 'pain_time', 'tooth_location',
-            'is_pregnant', 'previous_treatment',  "medicines",
-        "chronic_diseases",
-        "notes",'status'
+            'is_pregnant', 'previous_treatment', 'medicines', 'chronic_diseases', 'notes',
+            'case_type',
+            'status'
         ];
 
         const dir = path.dirname(filePath);
@@ -137,10 +129,6 @@ async checkBatchSize() {
         return true;
     }
 
-    // ============================================================
-    // 📥 قراءة البيانات من CSV
-    // ============================================================
-
     async loadFromCSV(filePath) {
         return new Promise((resolve, reject) => {
             const results = [];
@@ -151,10 +139,6 @@ async checkBatchSize() {
                 .on('error', (error) => reject(error));
         });
     }
-
-    // ============================================================
-    // 📊 تصدير البيانات من MongoDB
-    // ============================================================
 
     async exportFromMongoDB() {
         try {
@@ -171,7 +155,6 @@ async checkBatchSize() {
             }
 
             const db = mongoose.connection.db;
-
             const finished = await db.collection('finished_requests').find({}).toArray();
             const rejected = await db.collection('rejected_requests').find({}).toArray();
 
@@ -220,10 +203,6 @@ async checkBatchSize() {
         }
     }
 
-    // ============================================================
-    // 🔄 معالجة البيانات (Preprocessing)
-    // ============================================================
-
     async preprocessData() {
         try {
             console.log('⏳ Preprocessing data...');
@@ -236,10 +215,10 @@ async checkBatchSize() {
             const data = await this.loadFromCSV(this.rawDataPath);
             console.log(`📊 Loaded ${data.length} records`);
 
+            // ✅ ترميز المتغيرات الفئوية
             const processed = data.map(row => {
                 const genderMap = { male: 0, female: 1 };
                 const painTimeMap = { morning: 0, evening: 1, night: 2, all: 3 };
-                const medTypeMap = { '': 0, painkiller: 1, antibiotic: 2, multiple: 3 };
 
                 return {
                     age: parseFloat(row.age) || 25,
@@ -249,25 +228,32 @@ async checkBatchSize() {
                     tooth_location: parseFloat(row.tooth_location) || 20,
                     is_pregnant: row.is_pregnant === 'true' ? 1 : 0,
                     previous_treatment: row.previous_treatment === 'true' ? 1 : 0,
-                    takes_medication: row.takes_medication === 'true' ? 1 : 0,
-                    medication_type: medTypeMap[row.medication_type] !== undefined ? medTypeMap[row.medication_type] : 0,
-                    rating: parseFloat(row.rating) || 3,
+                    medicines: row.medicines ? (row.medicines.includes(',') ? 2 : 1) : 0,
+                    chronic_diseases: row.chronic_diseases ? (row.chronic_diseases.includes(',') ? 2 : 1) : 0,
+                    notes: row.notes ? Math.min(row.notes.length / 10, 5) : 0,
+                    case_type: row.case_type ? row.case_type.toString().split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) : 0,
                     status: parseInt(row.status)
                 };
             });
 
             const features = ['age', 'gender', 'pain_severity', 'pain_time', 'tooth_location',
-                'is_pregnant', 'previous_treatment', 'takes_medication', 'medication_type', 'rating'];
+                'is_pregnant', 'previous_treatment', 'medicines', 'chronic_diseases', 'notes', 'case_type'];
 
+            console.log('📊 Feature statistics:');
             const means = {};
             const stds = {};
 
             features.forEach(f => {
                 const values = processed.map(row => row[f]);
+                const unique = [...new Set(values)];
                 const mean = values.reduce((a, b) => a + b, 0) / values.length;
                 const variance = values.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / values.length;
+                const std = Math.sqrt(variance);
+                
                 means[f] = mean;
-                stds[f] = Math.sqrt(variance) || 1;
+                stds[f] = std === 0 ? 1 : std;
+                
+                console.log(`   ${f}: mean=${mean.toFixed(2)}, std=${stds[f].toFixed(2)}, unique=${unique.length}`);
             });
 
             const normalized = processed.map(row => {
@@ -298,10 +284,6 @@ async checkBatchSize() {
             return { success: false, error: error.message };
         }
     }
-
-    // ============================================================
-    // 📊 الحصول على بيانات التدريب
-    // ============================================================
 
     async getTrainingData() {
         try {

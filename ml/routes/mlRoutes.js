@@ -16,15 +16,29 @@ router.use(autoTrainMiddleware);
 
 router.post('/predict', verifyToken, async (req, res) => {
     try {
-        const { age, gender, pain_severity, pain_time, tooth_location, is_pregnant, previous_treatment, takes_medication, medication_type, rating } = req.body;
+        const { 
+            age, 
+            gender, 
+            pain_severity, 
+            pain_time, 
+            tooth_location, 
+            is_pregnant, 
+            previous_treatment, 
+            medicines, 
+            chronic_diseases, 
+            notes, 
+            case_type 
+        } = req.body;
 
-        if (!age || !gender || !pain_severity || !pain_time || !tooth_location) {
-            return res.status(400).json({
-                status: 'error',
-                message: 'الرجاء إدخال جميع البيانات المطلوبة'
-            });
-        }
+        // // ✅ التحقق من الحقول المطلوبة
+        // if (!age || !gender || !pain_severity|| !pain_time || !tooth_location) {
+        //     return res.status(400).json({
+        //         status: 'error',
+        //         message: 'الرجاء إدخال جميع البيانات المطلوبة: age, gender, pain_severity, pain_time, tooth_location'
+        //     });
+        // }
 
+        // ✅ التنبؤ باستخدام الميزات الجديدة
         const result = await MLService.predict({
             age,
             gender,
@@ -33,9 +47,10 @@ router.post('/predict', verifyToken, async (req, res) => {
             tooth_location,
             is_pregnant: is_pregnant || false,
             previous_treatment: previous_treatment || false,
-            takes_medication: takes_medication || false,
-            medication_type: medication_type || null,
-            rating: rating || 3
+            medicines: medicines || '',
+            chronic_diseases: chronic_diseases || '',
+            notes: notes || '',
+            case_type: case_type || ''
         });
 
         res.status(200).json({
@@ -67,7 +82,7 @@ router.get('/info', verifyToken, async (req, res) => {
         let info = {
             isTrained: fs.existsSync(modelPath),
             features: ['age', 'gender', 'pain_severity', 'pain_time', 'tooth_location',
-                'is_pregnant', 'previous_treatment', 'takes_medication', 'medication_type', 'rating']
+                'is_pregnant', 'previous_treatment', 'medicines', 'chronic_diseases', 'notes', 'case_type']
         };
 
         if (fs.existsSync(modelPath)) {
