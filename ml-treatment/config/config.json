@@ -13,12 +13,13 @@
         "tooth_location",
         "is_pregnant",
         "previous_treatment",
-        "takes_medication",
-        "medication_type"
+        "medicines",
+        "chronic_diseases",
+        "notes"
     ],
     "image": {
-        "width": 64,
-        "height": 64,
+        "width": 32,
+        "height": 32,
         "channels": 3
     }
 }

@@ -16,7 +16,7 @@ class TreatmentDataService {
     }
 
     // ============================================================
-    // 📊 تصدير البيانات من MongoDB (نص + صور)
+    // 📊 تصدير البيانات من MongoDB (بدون more_details)
     // ============================================================
 
     async exportFromMongoDB() {
@@ -40,7 +40,7 @@ class TreatmentDataService {
                 return { success: false, message: 'No data found' };
             }
 
-            // ✅ البيانات النصية
+            // ✅ البيانات النصية (بدون more_details)
             const textData = this.prepareTextData(finished);
             
             // ✅ مسارات الصور
@@ -58,7 +58,6 @@ class TreatmentDataService {
                 fs.mkdirSync(this.imagesDir, { recursive: true });
             }
 
-            // نسخ الصور إلى مجلد المعالجة
             const imagePaths = [];
             for (const item of imageData) {
                 if (item.imageUrl) {
@@ -103,47 +102,28 @@ class TreatmentDataService {
     }
 
     // ============================================================
-    // 📝 تجهيز البيانات النصية (بدون rating)
+    // 📝 تجهيز البيانات النصية (بدون more_details)
     // ============================================================
 
     prepareTextData(items) {
         return items.map(item => {
-            const details = this.extractMoreDetails(item);
+            // ✅ استخراج البيانات من Requestion
+            const req = item.Requestion || item;
+            
             return {
-                age: item.age || 25,
-                gender: item.gender || 'male',
-                pain_severity: item.pain_severity || 5,
-                pain_time: item.pain_time || 'all',
-                tooth_location: parseInt(item.tooth_location) || 20,
-                is_pregnant: item.is_pregnant || false,
-                previous_treatment: details.previous_treatment || false,
-                takes_medication: details.takes_medication || false,
-                medication_type: details.medication_type || null,
-                case_type: item.case_type
+                age: req.age || 25,
+                gender: req.gender || 'male',
+                pain_severity: req.pain_severity || 5,
+                pain_time: req.pain_time || 'all',
+                tooth_location: parseInt(req.tooth_location) || 20,
+                is_pregnant: req.is_pregnant || false,
+                previous_treatment: req.previous_treatment || false,
+                medicines: req.medicines || '',
+                chronic_diseases: req.chronic_diseases || '',
+                notes: req.notes || '',
+                case_type: req.case_type || item.case_type || ''
             };
         });
-    }
-
-    // ============================================================
-    // 📊 استخراج more_details
-    // ============================================================
-
-    extractMoreDetails(item) {
-        let previous_treatment = false;
-        let takes_medication = false;
-        let medication_type = null;
-
-        if (item.more_details) {
-            const details = typeof item.more_details === 'string'
-                ? JSON.parse(item.more_details)
-                : item.more_details;
-
-            previous_treatment = details.previous_treatment || false;
-            takes_medication = details.takes_medication || false;
-            medication_type = details.medication_type || null;
-        }
-
-        return { previous_treatment, takes_medication, medication_type };
     }
 
     // ============================================================
@@ -153,7 +133,7 @@ class TreatmentDataService {
     async saveToCSV(data, filePath) {
         const headers = [
             'age', 'gender', 'pain_severity', 'pain_time', 'tooth_location',
-            'is_pregnant', 'previous_treatment', 'takes_medication', 'medication_type',
+            'is_pregnant', 'previous_treatment', 'medicines', 'chronic_diseases', 'notes',
             'case_type'
         ];
 

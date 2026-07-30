@@ -16,10 +16,6 @@ class BrainTreatmentService {
         this.imageMode = false;
     }
 
-    // ============================================================
-    // 📊 تحميل التكوين
-    // ============================================================
-
     loadConfig() {
         try {
             if (fs.existsSync(this.configPath)) {
@@ -31,7 +27,7 @@ class BrainTreatmentService {
         return {
             training: { iterations: 5000, errorThresh: 0.005, learningRate: 0.3 },
             features: ['age', 'gender', 'pain_severity', 'pain_time', 'tooth_location',
-                'is_pregnant', 'previous_treatment', 'takes_medication', 'medication_type']
+                'is_pregnant', 'previous_treatment', 'medicines', 'chronic_diseases', 'notes']
         };
     }
 
@@ -93,6 +89,7 @@ class BrainTreatmentService {
 
             console.log(`📊 Loaded ${textData.length} records`);
 
+            // ✅ تجميع الفئات
             const uniqueClasses = [...new Set(textData.map(row => row.case_type))];
             this.classMap = {};
             uniqueClasses.forEach((cls, index) => {
@@ -101,6 +98,13 @@ class BrainTreatmentService {
             this.numClasses = uniqueClasses.length;
 
             console.log(`📊 Treatment types: ${this.numClasses}`);
+
+            // ✅ الميزات الجديدة (بدون more_details)
+            const features = this.loadConfig().features || [
+                'age', 'gender', 'pain_severity', 'pain_time', 'tooth_location',
+                'is_pregnant', 'previous_treatment', 'medicines', 'chronic_diseases', 'notes'
+            ];
+            this.features = features;
 
             let trainingData = [];
 
@@ -124,12 +128,7 @@ class BrainTreatmentService {
                 console.log(`📊 Using text + image features (${trainingData[0]?.input.length || 0} inputs)`);
 
             } else {
-                const features = this.loadConfig().features || [
-                    'age', 'gender', 'pain_severity', 'pain_time', 'tooth_location',
-                    'is_pregnant', 'previous_treatment', 'takes_medication', 'medication_type'
-                ];
-                this.features = features;
-
+                // ✅ استخدام النص فقط
                 trainingData = textData.map(row => {
                     const input = features.map(f => parseFloat(row[f]) || 0);
                     const normalizedInput = this.normalizeInput(input);
@@ -142,6 +141,7 @@ class BrainTreatmentService {
                 console.log(`📊 Using text only (${features.length} inputs)`);
             }
 
+            // ✅ إضافة بيانات وهمية إذا كان هناك نوع واحد فقط
             if (this.numClasses < 2) {
                 console.log('⚠️ Only one treatment type found. Adding synthetic data...');
                 const dummyClass = 'dummy_treatment_123';
@@ -149,7 +149,7 @@ class BrainTreatmentService {
                 this.numClasses = 2;
 
                 const dummyData = textData.slice(0, 5).map(row => {
-                    const input = this.features.map(f => parseFloat(row[f]) || 0);
+                    const input = features.map(f => parseFloat(row[f]) || 0);
                     const normalizedInput = this.normalizeInput(input);
                     const output = new Array(this.numClasses).fill(0);
                     output[1] = 1;
@@ -161,7 +161,7 @@ class BrainTreatmentService {
 
             console.log(`📊 Training samples: ${trainingData.length}`);
 
-            const inputSize = trainingData[0]?.input.length || 9;
+            const inputSize = trainingData[0]?.input.length || features.length;
             this.buildModel(inputSize, this.numClasses);
 
             console.log('⏳ Training neural network...');
@@ -178,6 +178,11 @@ class BrainTreatmentService {
             console.log(`   Final error: ${JSON.stringify(result)}`);
 
             this.isTrained = true;
+
+            // ✅ تحديث العدد المدرب
+            const totalRecords = await DataService.getTotalRecordsCount();
+            DataService.setLastTrainedCount(totalRecords);
+
             this.saveModel();
 
             return {
@@ -186,7 +191,8 @@ class BrainTreatmentService {
                 iterations: config.training.iterations || 5000,
                 classes: this.numClasses,
                 inputSize: inputSize,
-                imageMode: useImages
+                imageMode: useImages,
+                totalRecords: totalRecords
             };
 
         } catch (error) {
@@ -255,7 +261,7 @@ class BrainTreatmentService {
     }
 
     // ============================================================
-    // 🔮 التنبؤ مع دعم الصور
+    // 🔮 التنبؤ
     // ============================================================
 
     predict(features, imageFeatures = null) {

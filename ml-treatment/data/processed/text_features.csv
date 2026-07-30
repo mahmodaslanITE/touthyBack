@@ -1,27 +1,17 @@
-age,gender,pain_severity,pain_time,tooth_location,is_pregnant,previous_treatment,takes_medication,medication_type,case_type
-25,male,5,all,20,false,false,false,,6a245cdce5e4159c8d00cb45
-22,male,9,night,18,false,false,true,painkiller,6a245cdce5e4159c8d00cb45
-25,female,7,evening,20,false,false,false,,6a245cdce5e4159c8d00cb45
-35,male,6,morning,15,false,true,true,antibiotic,6a245cdce5e4159c8d00cb45
-28,female,8,night,22,true,false,false,,6a245cdce5e4159c8d00cb45
-27,male,8,all,25,false,false,true,painkiller,6a245cdce5e4159c8d00cb45
-33,female,7,evening,30,false,true,true,antibiotic,6a245cdce5e4159c8d00cb45
-40,male,9,night,20,false,false,true,painkiller,6a245cdce5e4159c8d00cb45
-24,female,6,morning,12,false,false,false,,6a245cdce5e4159c8d00cb45
-45,male,7,all,28,false,true,true,multiple,6a245cdce5e4159c8d00cb45
-30,female,8,night,26,false,false,true,painkiller,6a245cdce5e4159c8d00cb45
-26,female,7,evening,21,false,false,false,,6a245cdce5e4159c8d00cb45
-57,male,2,evening,20,false,true,true,multiple,6a245cdce5e4159c8d00cb45
-57,male,2,evening,20,false,true,true,multiple,6a245cdce5e4159c8d00cb45
-57,male,2,evening,20,false,true,true,multiple,6a245cdce5e4159c8d00cb45
-57,male,2,evening,20,false,true,true,multiple,6a245cdce5e4159c8d00cb45
-57,male,2,evening,20,false,true,true,multiple,6a245cdce5e4159c8d00cb45
-57,male,2,evening,20,false,true,true,multiple,6a245cdce5e4159c8d00cb45
-57,male,2,evening,20,false,true,true,multiple,6a245cdce5e4159c8d00cb45
-57,male,2,evening,20,false,true,true,multiple,6a245cdce5e4159c8d00cb45
-57,male,2,evening,20,false,true,true,multiple,6a245cdce5e4159c8d00cb45
-57,male,2,evening,20,false,true,true,multiple,6a245cdce5e4159c8d00cb45
-57,male,2,evening,20,false,true,true,multiple,6a245cdce5e4159c8d00cb45
-57,male,2,evening,20,false,true,true,multiple,6a245cdce5e4159c8d00cb45
-57,male,2,evening,20,false,true,true,multiple,6a245cdce5e4159c8d00cb45
-57,male,2,evening,20,false,true,true,multiple,6a245cdce5e4159c8d00cb45
+age,gender,pain_severity,pain_time,tooth_location,is_pregnant,previous_treatment,medicines,chronic_diseases,notes,case_type
+22,male,9,night,18,false,false,painkiller,none,ألم شديد في ضرس العقل يزداد ليلاً,6a245cdce5e4159c8d00cb45
+25,female,7,evening,20,false,false,,none,تسوس عميق في الضرس الخلفي,6a245cdce5e4159c8d00cb45
+28,female,8,night,22,true,false,,none,ألم أثناء الحمل في الشهر السادس,6a245cdce5e4159c8d00cb45
+30,male,6,morning,15,false,true,antibiotic,none,تم معالجته سابقاً، عاد الألم مجدداً,6a245cdce5e4159c8d00cb45
+32,male,8,night,19,false,false,painkiller,none,ألم شديد عند الاستلقاء,6a245cdce5e4159c8d00cb45
+24,male,9,all,17,false,false,antibiotic,none,ألم مستمر مع تورم,6a245cdce5e4159c8d00cb45
+27,male,5,all,30,false,false,,none,ألم خفيف في الضرس الخلفي,6a245cdce5e4159c8d00cb45
+29,female,6,evening,25,false,false,,none,ألم في الضرس الأمامي العلوي,6a245cdce5e4159c8d00cb45
+31,female,7,night,22,false,false,painkiller,none,ألم شديد يوقظ المريضة من النوم,6a245cdce5e4159c8d00cb45
+33,female,7,morning,20,true,false,,none,ألم أثناء الحمل في الشهر الرابع,6a245cdce5e4159c8d00cb45
+35,male,6,morning,18,false,true,antibiotic,none,التهاب مزمن في اللثة,6a245cdce5e4159c8d00cb45
+38,male,8,all,18,false,false,painkiller,none,ألم مستمر في الضرس الخلفي,6a245cdce5e4159c8d00cb45
+40,male,8,all,30,false,false,,none,ألم في الضرس الخلفي السفلي,6a245cdce5e4159c8d00cb45
+42,female,6,morning,20,true,false,,none,ألم أثناء الحمل في الشهر الثامن,6a245cdce5e4159c8d00cb45
+45,male,9,night,15,false,false,painkiller,none,ألم شديد جداً في الضرس الأمامي,6a245cdce5e4159c8d00cb45
+45,male,9,night,15,false,false,painkiller,none,ألم شديد جداً في الضرس الأمامي,6a245cdce5e4159c8d00cb45
