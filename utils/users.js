@@ -1,5 +1,6 @@
 // functions/users.js
 
+const Admin_profile = require("../models/Admin_profile");
 const { Overseer_profile } = require("../models/Overseer_profile");
 const Patient_profile = require("../models/Patient_profile");
 const Student_profile = require("../models/Student_profile");
@@ -25,6 +26,9 @@ async function getUserProfile(userId, role) {
             case 'overseer':{
                 profile= await Overseer_profile.findOne({ user: userId });
             break}
+            case 'admin':{
+                profile=await Admin_profile.findOne({user:userId})
+            }
             default:
                 
         }
