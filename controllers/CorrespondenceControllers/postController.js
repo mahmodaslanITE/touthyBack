@@ -587,3 +587,28 @@ res.status(201).json({
     
 })
 })
+
+
+/**
+ * @description show user owner post 
+ * @route POST /api/posts/pending/accept/:id
+ * @access Private (any authenticated user)
+ */
+module.exports.showUserPost=asyncHandler(async(req,res)=>{
+    const userID=req.user.id;
+    let result=null;
+    let message=''
+  
+        result=await Post.find({publisher:userID})
+        message='هذه هي البوستات  الخاصة بك '
+    
+    const formattedPosts = await Promise.all(
+        result.map(post => formatPost(post, req.user.id))
+    );
+    res.status(200).json({
+        status:'success',
+        count:result.length,
+        message:message,
+        data:formattedPosts
+    })
+})
