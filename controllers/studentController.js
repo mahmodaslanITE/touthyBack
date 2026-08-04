@@ -125,6 +125,7 @@ if(userRole=='student' || isAdmin){
         .populate('case_type', '_id case_type');
         message='أنت مريض ...يمكنك رؤية طلباتك فقط '
     }
+    console.log(requests)
     const formattedRequests = requests.map((item)=>{
        return  formatRequestResponse(req,item)
     })
